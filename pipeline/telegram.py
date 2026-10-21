@@ -76,10 +76,22 @@ def melde_neue_cluster(cluster: pd.DataFrame, isin_zu_ticker: dict) -> int:
 
 if __name__ == "__main__":
     if len(sys.argv) == 3 and sys.argv[1] == "--chat-id":
-        updates = requests.get(f"https://api.telegram.org/bot{sys.argv[2]}/getUpdates", timeout=30).json()
-        chats = {u["message"]["chat"]["id"]: u["message"]["chat"].get("first_name", "")
-                 for u in updates.get("result", []) if "message" in u}
-        print(chats or "Keine Nachrichten gefunden. Schreib dem Bot zuerst irgendetwas.")
+        token = sys.argv[2]
+        bot = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=30).json()
+        if not bot.get("ok"):
+            sys.exit(f"Telegram lehnt das Token ab: {bot.get('description')}. Token neu kopieren.")
+        print(f"Token gehört zum Bot @{bot['result']['username']}")
+        updates = requests.get(f"https://api.telegram.org/bot{token}/getUpdates", timeout=30).json()
+        if not updates.get("ok"):
+            sys.exit(f"Telegram-Fehler: {updates.get('description')}")
+        chats = {}
+        for u in updates["result"]:
+            nachricht = u.get("message") or u.get("edited_message") or u.get("my_chat_member") or {}
+            if "chat" in nachricht:
+                chats[nachricht["chat"]["id"]] = nachricht["chat"].get("first_name") or nachricht["chat"].get("title", "")
+        print(f"Chat-ID(s): {chats}" if chats else
+              f"Keine Nachrichten gefunden. Öffne in Telegram genau @{bot['result']['username']}, "
+              "schreib ihm etwas und starte das hier erneut.")
     elif sys.argv[1:] == ["--test"]:
         _senden("✅ Insider-Monitor: Testnachricht")
         print("gesendet")
