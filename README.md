@@ -21,6 +21,12 @@ python3 -m pipeline.firmen # DAX/MDAX-Liste neu aufbauen (nach Indexänderungen)
 | `pipeline/event_study.py` | Ereignisse bilden, Marktmodell, AR, AAR, CAAR, t-Test |
 | `pipeline/cluster.py` | Cluster-Käufe (≥ 3 Personen in 14 Tagen, ≥ 50.000 €) |
 | `pipeline/export.py` | JSON für die Website nach `docs/data/` |
+| `docs/index.html`, `start.js` | Startseite: Kennzahlen, CAAR-Kurve, Cluster-Käufe, Live-Ticker, Firmenliste |
+| `docs/firma.html`, `firma.js` | Firmenseite (`firma.html?t=SAP.DE`): Kurs mit Insider-Geschäften, CAR je Ereignis, Meldungen |
+| `docs/gemeinsam.js`, `style.css` | Formatierung, Liniendiagramm, Farben (hell und dunkel) |
+| `docs/methode.html`, `impressum.html` | Methode; Impressum mit Platzhaltern zum Ausfüllen |
+
+Lokal ansehen: `cd docs && python3 -m http.server`, dann http://localhost:8000
 
 ## Methode, Unterschiede zur Bachelorarbeit
 

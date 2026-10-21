@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Methode · Insider-Monitor</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%232a78d6'/><path d='M3 11l3-3 2 2 5-5' stroke='white' stroke-width='2' fill='none'/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr.</div>
+  <header class="kopf">
+    <div class="marke"><a href="./">← Insider-Monitor</a></div>
+    <h1>Methode</h1>
+    <p class="unterzeile">Wie die Kursreaktionen berechnet werden. Grundlage ist meine Bachelorarbeit an der Universität
+      Bayreuth zu Directors' Dealings im DAX und MDAX (2018–2024).</p>
+  </header>
+  <main class="text-seite">
+    <section class="karte">
+      <h2>Daten</h2>
+      <p>Führungskräfte börsennotierter Unternehmen und ihnen eng verbundene Personen müssen eigene Geschäfte mit Aktien
+        ihres Unternehmens nach Art. 19 der Marktmissbrauchsverordnung (MAR) innerhalb von drei Geschäftstagen melden.
+        Die BaFin veröffentlicht diese Meldungen in ihrer Datenbank, allerdings nur für die letzten zwölf Monate. Diese Seite
+        fragt die Datenbank alle 30 Minuten ab und speichert jede Meldung dauerhaft, die Historie wächst also mit der Zeit.</p>
+      <p>Kurse stammen von Yahoo Finance und sind um Dividenden und Splits bereinigt.</p>
+
+      <h2>Event Study</h2>
+      <ul>
+        <li><b>Ereignis:</b> alle Aktienkäufe bzw. alle Aktienverkäufe von Vorstand oder Aufsichtsrat einer Firma, die am
+          selben Tag veröffentlicht wurden. Teilausführungen und mehrere Personen am selben Tag zählen als ein Ereignis.</li>
+        <li><b>Ereignistag t = 0:</b> der erste Handelstag am oder nach dem Mitteilungsdatum.</li>
+        <li><b>Normale Rendite:</b> Marktmodell R<sub>i</sub> = α + β · R<sub>Index</sub>, mit dem DAX bzw. MDAX als Index,
+          geschätzt per OLS über 120 Handelstage (Tag −130 bis −11). Mindestens 100 Handelstage sind nötig.</li>
+        <li><b>Abnormale Rendite:</b> AR = tatsächliche minus normale Rendite, mit logarithmierten Tagesrenditen.</li>
+        <li><b>Aggregation:</b> AAR = Durchschnitt der AR aller Ereignisse an Tag t, CAAR = Summe der AAR seit Tag −5.</li>
+        <li><b>Test:</b> zweiseitiger t-Test, ob die AAR eines Tages von null abweicht. Ein gefüllter Punkt in der Grafik heißt
+          p &lt; 5 %.</li>
+      </ul>
+
+      <h2>Cluster-Käufe</h2>
+      <p>Ein Cluster liegt vor, wenn mindestens drei verschiedene Führungskräfte (Vorstand, Aufsichtsrat oder sonstige
+        Führungsperson) innerhalb von 14 Tagen Aktien ihres Unternehmens kaufen, gemessen am Datum des Geschäfts, und
+        zusammen mindestens 50.000 € investieren. Die Mindestsumme filtert Mitarbeiter-Aktienprogramme heraus. Eng verbundene
+        Personen zählen nicht mit, weil sie oft die Holding eines Vorstands sind.</p>
+
+      <h2>Unterschiede zur Bachelorarbeit</h2>
+      <ul>
+        <li>Fenster in Handelstagen statt Kalendertagen.</li>
+        <li>Mitteilungsdatum als Ereignistag. In der Arbeit stammte das Datum aus einer anderen Quelle (finanzen.net) und war
+          nicht eindeutig als Veröffentlichungstag erkennbar.</li>
+        <li>Mehrere Meldungen derselben Firma am selben Tag zählen einmal statt mehrfach.</li>
+        <li>Bereinigte statt nominaler Kurse; Dividendentermine verzerren die Renditen nicht mehr.</li>
+        <li>Nur das Marktmodell. Das Fama-French-Dreifaktorenmodell der Arbeit braucht Faktordaten, die nur monatlich
+          mit Verzögerung erscheinen; in der Arbeit kamen beide Modelle zum selben Ergebnis.</li>
+        <li>Zeitraum ab Oktober 2025 statt 2018–2024, weil die BaFin nur zwölf Monate rückwirkend bereitstellt.</li>
+      </ul>
+
+      <h2>Grenzen</h2>
+      <p>Die Indexzusammensetzung ist die aktuelle, nicht die zum Zeitpunkt der Meldung. Bei wenigen Ereignissen,
+        etwa Verkäufen, sind die Durchschnitte unsicher. Überschneiden sich die Ereignisfenster mehrerer Meldungen derselben
+        Firma, sind die Beobachtungen nicht unabhängig, und die t-Werte fallen eher zu hoch aus.</p>
+    </section>
+  </main>
+  <footer>
+    <p><b>Keine Anlageberatung.</b> <a href="impressum.html">Impressum und Datenschutz</a></p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Insider-Monitor</title>
+  <meta name="description" content="Directors' Dealings im DAX und MDAX: neue BaFin-Meldungen, Cluster-Käufe und abnormale Renditen, alle 30 Minuten aktualisiert.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%232a78d6'/><path d='M3 11l3-3 2 2 5-5' stroke='white' stroke-width='2' fill='none'/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quelle: BaFin-Datenbank der Eigengeschäfte von Führungskräften.</div>
+
+  <header class="kopf">
+    <div class="marke">Insider-Monitor</div>
+    <h1>Was kaufen und verkaufen Vorstände und Aufsichtsräte?</h1>
+    <p class="unterzeile">Meldungen nach Art. 19 MAR aus der BaFin-Datenbank, alle 30 Minuten aktualisiert. Für DAX und MDAX
+      werden die Kursreaktionen mit der Event Study aus meiner Bachelorarbeit berechnet.</p>
+    <div class="stand" id="stand">Lade Daten …</div>
+  </header>
+
+  <main>
+    <div class="kacheln" id="kacheln"></div>
+
+    <section class="karte">
+      <h2>Kursreaktion um Insider-Geschäfte</h2>
+      <p class="erklaerung">Kumulierte durchschnittliche abnormale Rendite (CAAR) von 5 Handelstagen vor bis 5 nach der
+        Veröffentlichung, getrennt nach Käufen und Verkäufen von Vorstand und Aufsichtsrat im DAX und MDAX.
+        Abnormal heißt: bereinigt um die Bewegung des Index (Marktmodell). <a href="methode.html">Zur Methode</a></p>
+      <div class="legende" id="caar-legende"></div>
+      <div id="caar"></div>
+      <details>
+        <summary>Als Tabelle anzeigen</summary>
+        <div id="caar-tabelle"></div>
+      </details>
+    </section>
+
+    <section class="karte">
+      <h2>Cluster-Käufe</h2>
+      <p class="erklaerung" id="cluster-erklaerung">Mindestens drei Führungskräfte einer Firma kaufen innerhalb von 14 Tagen
+        Aktien. Gilt für alle Emittenten, nicht nur DAX und MDAX.</p>
+      <div class="cluster-liste" id="cluster"></div>
+      <button class="knopf mehr" id="cluster-mehr" hidden>Alle anzeigen</button>
+    </section>
+
+    <section class="karte">
+      <h2>Neueste Meldungen</h2>
+      <p class="erklaerung">Teilausführungen derselben Person am selben Tag sind zusammengefasst. Zeit = Freischaltung bei der BaFin.</p>
+      <div class="filter">
+        <div class="knopfgruppe" id="art-filter">
+          <button aria-pressed="true" data-art="">Alle</button>
+          <button aria-pressed="false" data-art="Kauf">Käufe</button>
+          <button aria-pressed="false" data-art="Verkauf">Verkäufe</button>
+        </div>
+        <label class="schalter"><input type="checkbox" id="nur-index"> nur DAX und MDAX</label>
+        <label class="schalter"><input type="checkbox" id="nur-aktien" checked> nur Aktien</label>
+      </div>
+      <div id="ticker"></div>
+      <button class="knopf mehr" id="ticker-mehr">Mehr anzeigen</button>
+    </section>
+
+    <section class="karte">
+      <h2>Firmen im DAX und MDAX</h2>
+      <p class="erklaerung">Kursverlauf mit allen Insider-Geschäften und den Kursreaktionen je Meldung.</p>
+      <input type="search" id="firmen-suche" placeholder="Firma suchen" aria-label="Firma suchen">
+      <div class="firmen-liste" id="firmen"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p><b>Keine Anlageberatung.</b> Diese Seite zeigt öffentlich gemeldete Daten und statistische Auswertungen. Sie ist keine
+      Empfehlung, Wertpapiere zu kaufen oder zu verkaufen. Vergangene Kursreaktionen sagen nichts über künftige aus.</p>
+    <p><a href="methode.html">Methode</a> · <a href="impressum.html">Impressum und Datenschutz</a> ·
+      Daten: <a href="https://portal.mvp.bafin.de/database/DealingsInfo/">BaFin</a>, Kurse: Yahoo Finance</p>
+  </footer>
+
+  <script src="gemeinsam.js"></script>
+  <script src="start.js"></script>
+</body>
+</html>

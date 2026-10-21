@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Firma · Insider-Monitor</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%232a78d6'/><path d='M3 11l3-3 2 2 5-5' stroke='white' stroke-width='2' fill='none'/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quelle: BaFin-Datenbank der Eigengeschäfte von Führungskräften.</div>
+
+  <header class="kopf">
+    <div class="marke"><a href="./">← Insider-Monitor</a></div>
+    <h1 id="name">Lade …</h1>
+    <p class="unterzeile" id="kennung"></p>
+  </header>
+
+  <main>
+    <div class="kacheln" id="kacheln"></div>
+
+    <section class="karte">
+      <h2>Kurs und Insider-Geschäfte</h2>
+      <p class="erklaerung">Schlusskurse bereinigt um Dividenden und Splits. Punkte markieren Aktienkäufe und -verkäufe
+        von Führungskräften am Tag des Geschäfts. Fahre über das Diagramm für Details.</p>
+      <div class="filter">
+        <div class="knopfgruppe" id="zeitraum">
+          <button aria-pressed="false" data-monate="6">6 Monate</button>
+          <button aria-pressed="false" data-monate="12">1 Jahr</button>
+          <button aria-pressed="true" data-monate="24">2 Jahre</button>
+        </div>
+      </div>
+      <div class="legende">
+        <span><span class="strich" style="background:var(--kurs)"></span>Schlusskurs</span>
+        <span><span class="punkt" style="background:var(--kauf)"></span>Insider-Kauf</span>
+        <span><span class="punkt" style="background:var(--verkauf)"></span>Insider-Verkauf</span>
+      </div>
+      <div id="kurs"></div>
+    </section>
+
+    <section class="karte">
+      <h2>Kursreaktion je Ereignis</h2>
+      <p class="erklaerung">Abnormale Rendite (CAR) gegenüber dem Marktmodell mit <span id="benchmark">dem Index</span>,
+        von 5 Handelstagen vor bis 5 nach der Veröffentlichung. Nur Vorstand und Aufsichtsrat, Käufe und Verkäufe am selben
+        Tag sind je ein Ereignis. Einzelne Ereignisse schwanken stark, aussagekräftig ist erst der Durchschnitt
+        auf der <a href="./">Startseite</a>.</p>
+      <div id="ereignisse"></div>
+    </section>
+
+    <section class="karte">
+      <h2>Alle Meldungen</h2>
+      <div id="meldungen"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p><b>Keine Anlageberatung.</b> Diese Seite zeigt öffentlich gemeldete Daten und statistische Auswertungen. Sie ist keine
+      Empfehlung, Wertpapiere zu kaufen oder zu verkaufen.</p>
+    <p><a href="methode.html">Methode</a> · <a href="impressum.html">Impressum und Datenschutz</a></p>
+  </footer>
+
+  <script src="gemeinsam.js"></script>
+  <script src="firma.js"></script>
+</body>
+</html>
