@@ -1,0 +1,61 @@
+# Holt alle 30 Minuten neue Directors' Dealings von der BaFin und rechnet bei Bedarf neu.
+# Werktags um 17:15 UTC (19:15 Sommerzeit, 18:15 Winterzeit) wird immer neu gerechnet,
+# damit die Ereignisfenster um den neuen Kurstag wachsen.
+# Die Website liegt in docs/ und geht über GitHub Pages mit jedem Commit live.
+name: Daten aktualisieren
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+    - cron: "15 17 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      immer:
+        description: "Auch ohne neue Meldungen neu rechnen"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+# Nie zwei Läufe gleichzeitig, sonst kollidieren die Commits
+concurrency:
+  group: daten
+  cancel-in-progress: false
+
+jobs:
+  aktualisieren:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Pipeline ausführen
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ "${{ github.event.schedule }}" = "15 17 * * 1-5" ] || [ "${{ inputs.immer }}" = "true" ]; then
+            python lauf.py --immer
+          else
+            python lauf.py
+          fi
+
+      - name: Änderungen speichern
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add daten docs/data
+          if git diff --cached --quiet; then
+            echo "Keine Änderungen"
+          else
+            git commit -m "Daten $(TZ=Europe/Berlin date '+%d.%m.%Y %H:%M')"
+            git push
+          fi
