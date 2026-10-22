@@ -200,3 +200,18 @@ function tabelle(kopf, zeilen) {
     el("thead", {}, el("tr", {}, kopf.map(([text, klasse]) => el("th", { class: klasse }, text)))),
     el("tbody", {}, zeilen)));
 }
+
+function rankingTabelle(liste, mitFirma = true) {
+  return tabelle([["#", "zahl"], ["Person"], mitFirma ? ["Firma"] : null, ["Käufe", "zahl"],
+    ["Typisch (Median)", "zahl"], ["Durchschnitt", "zahl"], ["Besser als Index", "zahl"], ["Zeitraum"]].filter(Boolean),
+  liste.map((r) => el("tr", {},
+    el("td", { class: "zahl" }, r.rang),
+    el("td", {}, r.person, el("div", { class: "klein" }, fmt.position(r.position))),
+    mitFirma ? el("td", {}, firmaLink(r.name, r.ticker)) : null,
+    el("td", { class: "zahl" }, r.kaeufe),
+    el("td", { class: `zahl ${r.median > 0 ? "positiv" : "negativ"}` }, fmt.prozent(r.median)),
+    el("td", { class: "zahl" }, fmt.prozent(r.ueberrendite)),
+    el("td", { class: "zahl" }, `${fmt.zahl(r.trefferquote * 100)} %`),
+    el("td", { class: "datum" }, r.erster_kauf.slice(0, 4) === r.letzter_kauf.slice(0, 4)
+      ? r.erster_kauf.slice(0, 4) : `${r.erster_kauf.slice(0, 4)}–${r.letzter_kauf.slice(0, 4)}`))));
+}

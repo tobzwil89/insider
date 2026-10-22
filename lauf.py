@@ -11,6 +11,8 @@ import sys
 import pandas as pd
 
 from pipeline import DATEN, bafin, event_study as es, export
+from pipeline.meldungen import lade_alle
+from pipeline import ranking as rk
 from pipeline.cluster import finde_cluster
 from pipeline.kurse import lade_kurse
 from pipeline.telegram import melde_neue_cluster
@@ -26,13 +28,13 @@ def main() -> int:
     if neu.empty and not args.immer and (export.AUSGABE / "stand.json").exists():
         return 0
 
-    meldungen = bafin.lade_meldungen()
+    meldungen = lade_alle()
     firmen = pd.read_csv(DATEN / "firmen.csv", dtype=str, keep_default_na=False)
     ereignisse = es.ereignisse(meldungen, firmen)
 
     mit_ticker = firmen[firmen["ticker"] != ""]
     start = min(meldungen["mitteilungsdatum"].min() - pd.Timedelta(days=220),
-                pd.Timestamp.now() - pd.DateOffset(years=export.KURS_JAHRE, days=10))
+                pd.Timestamp("2017-01-01"))
     kurse = lade_kurse(list(mit_ticker["ticker"]) + list(mit_ticker["benchmark"]), start)
     print(f"Kurse: {kurse.shape[1]} Reihen bis {kurse.index.max():%d.%m.%Y}")
 
@@ -41,7 +43,11 @@ def main() -> int:
     print(f"Event Study: {ar['id'].nunique()} von {len(ereignisse)} Ereignissen ausgewertet, "
           f"{len(cluster)} Cluster-Käufe")
 
-    export.exportiere(meldungen, firmen, kurse, ereignisse, ar, cluster)
+    kaeufe = rk.kaeufe_mit_rendite(meldungen, firmen, kurse)
+    rangliste = rk.ranking(kaeufe)
+    print(f"Ranking: {len(rangliste)} Insider mit mindestens {rk.MIN_KAEUFE} Käufen")
+
+    export.exportiere(meldungen, firmen, kurse, ereignisse, ar, cluster, rangliste)
     print("JSON geschrieben nach docs/data/")
     melde_neue_cluster(cluster, dict(zip(mit_ticker["isin"], mit_ticker["ticker"])))
     return 0

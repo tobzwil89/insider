@@ -2,6 +2,7 @@
 
     python3 historie.py                     2018-01-01 bis 2025-10-21, höchstens 320 Minuten
     python3 historie.py --max-minuten 30    in Etappen; ein neuer Aufruf macht dort weiter
+    python3 historie.py --reparieren        Käufe/Verkäufe ohne Volumen neu lesen (Leser-Fehler bis 22.10.2026)
 
 Läuft als GitHub Action „Historie laden“. Ergebnis: daten/eqs_historie.csv (eine Zeile je
 Geschäft) und daten/eqs_fortschritt.csv (welche Firmen fertig sind). Beides wird nach jeder
@@ -20,13 +21,34 @@ ERGEBNIS = DATEN / "eqs_historie.csv"
 FORTSCHRITT = DATEN / "eqs_fortschritt.csv"
 
 
+def reparieren(ende: float) -> int:
+    """Meldungen mit Kauf/Verkauf, aber ohne Volumen, neu lesen und ersetzen."""
+    h = pd.read_csv(ERGEBNIS, dtype=str, keep_default_na=False)
+    kaputt = h.loc[h["art"].isin(["Kauf", "Verkauf"]) & h["volumen"].eq(""), "url"].unique()
+    neu, ersetzt = [], set()
+    for url in kaputt:
+        if time.monotonic() > ende:
+            break
+        try:
+            neu += eqs.meldung_lesen(url)
+            ersetzt.add(url)
+        except Exception as fehler:
+            print(f"  fehlgeschlagen: {url} ({fehler})")
+    pd.concat([h[~h["url"].isin(ersetzt)], pd.DataFrame(neu)]).to_csv(ERGEBNIS, index=False)
+    print(f"{len(ersetzt)} von {len(kaputt)} Meldungen repariert")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--von", default="2018-01-01")
     parser.add_argument("--bis", default="2025-10-21")
     parser.add_argument("--max-minuten", type=float, default=320)
+    parser.add_argument("--reparieren", action="store_true")
     args = parser.parse_args()
     ende = time.monotonic() + args.max_minuten * 60
+    if args.reparieren:
+        return reparieren(ende)
     von, bis = pd.Timestamp(args.von), pd.Timestamp(args.bis)
 
     firmen = pd.read_csv(DATEN / "firmen.csv", dtype=str, keep_default_na=False)

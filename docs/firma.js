@@ -41,7 +41,7 @@ function zeigeKurs(f, monate) {
   }
 
   const xTicks = [];
-  const abstand = Math.max(1, Math.round(monate / 6));
+  const abstand = Math.max(1, Math.round(Math.min(monate, daten.length / 21) / 6));
   daten.forEach((d, i) => {
     const neu = i > 0 && d.slice(5, 7) !== daten[i - 1].slice(5, 7);
     if (neu && (+d.slice(5, 7) - 1) % abstand === 0) xTicks.push(i);
@@ -101,13 +101,17 @@ function zeigeMeldungen(f) {
   const ticker = new URLSearchParams(location.search).get("t") || "";
   try {
     if (!/^[A-Z0-9.\-]{1,15}$/.test(ticker)) throw new Error("unbekannte Firma");
-    const f = await ladeJson(`data/firmen/${ticker}.json`);
+    const [f, ranking] = await Promise.all([ladeJson(`data/firmen/${ticker}.json`), ladeJson("data/ranking.json")]);
     document.title = `${f.name} · Insider-Monitor`;
     document.getElementById("name").textContent = f.name;
     document.getElementById("kennung").textContent = `${f.ticker} · ${f.index} · ISIN ${f.isins.join(", ")}`;
     document.getElementById("benchmark").textContent = INDEXNAME[f.benchmark] || f.benchmark;
+    document.querySelectorAll(".benchmark-name").forEach((e) => { e.textContent = INDEXNAME[f.benchmark] || f.benchmark; });
+    const eigene = ranking.map((r, i) => ({ ...r, rang: i + 1 })).filter((r) => r.ticker === ticker);
+    document.getElementById("ranking").append(eigene.length ? rankingTabelle(eigene, false)
+      : el("p", { class: "leer" }, "Keine Führungskraft dieser Firma hat mindestens 3 Käufe mit abgeschlossenen 3 Monaten."));
     zeigeKacheln(f);
-    zeigeKurs(f, 24);
+    zeigeKurs(f, 60);
     document.querySelectorAll("#zeitraum button").forEach((knopf) => knopf.addEventListener("click", () => {
       document.querySelectorAll("#zeitraum button").forEach((k) => k.setAttribute("aria-pressed", k === knopf));
       zeigeKurs(f, +knopf.dataset.monate);
@@ -115,6 +119,7 @@ function zeigeMeldungen(f) {
     zeigeEreignisse(f);
     zeigeMeldungen(f);
   } catch (fehler) {
+    console.error(fehler);
     document.getElementById("name").textContent = "Firma nicht gefunden";
     document.getElementById("kennung").replaceChildren("Zurück zur ", el("a", { href: "./" }, "Übersicht"), ".");
   }

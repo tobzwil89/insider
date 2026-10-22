@@ -45,9 +45,15 @@ Reihenfolge laut Tobias: 1. Historie 2018–2025 nachholen, 2. Ranking der Insid
 
 **Nächste Schritte:**
 1. Tobias pusht und startet „Historie laden“; Ergebnis prüfen (Anzahl je Firma in `eqs_fortschritt.csv`, Stichproben).
-2. Zusammenführen: `bafin.lade_meldungen()` um `eqs_historie.csv` ergänzen (Spalte `quelle`), nur EQS-Zeilen vor Beginn der BaFin-Daten (22.10.2025) verwenden. Gekennzeichnete Korrekturmeldungen ersetzen ältere Meldungen mit gleicher ISIN/Person/Geschäftsdatum. Event Study über 2018–heute, Kurse ab 2017 laden, Methode-Seite anpassen (Quellen, 88 %-Lücke).
+2. ~~Zusammenführen~~ erledigt lokal (22.10.2026, noch nicht gepusht – erst nach Lauf 2 pushen, sonst rechnet die Live-Seite mit unvollständiger Historie): `pipeline/meldungen.py` `lade_alle()` = BaFin + EQS vor erster BaFin-Meldung, Korrekturen ersetzen Vorgänger; `lauf.py` nutzt es, Kurse ab 2017; Firmen-Kursdiagramm mit 5 Jahre/Alles; Texte auf Start-, Methode-, Impressum-Seite (Quellen, 88 %, Indexzusammensetzung). Test mit Lauf-1-Daten: 1.126 Ereignisse; Käufe AAR t0 +0,21 %*, t+1 +0,22 %* (BA: +0,33 % t+1), Verkäufe t+1 −0,52 %*.
 
-**Ranking (danach; Idee, noch nicht mit Tobias abgestimmt):** je Person abnormale Rendite 20/60 Handelstage nach dem Geschäftsdatum, Verkäufe mit umgekehrtem Vorzeichen, mindestens 3 Geschäfte, Trefferquote dazu; Holdings über „in enger Beziehung zu“ der Führungskraft zuordnen; nüchterne Darstellung ohne wertende Sprache.
+**Ranking (gebaut 22.10.2026, lokal, noch nicht gepusht):** Tobias' Entscheidungen: 3 Monate (60 Handelstage), nur Käufe, mind. 3 Käufe. Maß: Überrendite = Aktienrendite − Indexrendite (DAX/MDAX) ab Schlusskurs des Geschäftstags (Marktmodell über 60 Tage zu unzuverlässig). Sortiert nach Median (Ausreißer, z. B. Bertermann/Auto1: Ø +30 %, Median −0,8 %). Holdings über `bezug_person` der Führungskraft zugeordnet; Titel für Namensabgleich entfernt (nur mit Punkt). `pipeline/ranking.py`, `docs/data/ranking.json`, Tabelle auf Start- und Firmenseite, Abschnitt auf Methode-Seite. Handrechnung Elmos/Meyer stimmt (+34,6 %).
+
+**Leser-Fehler gefunden (22.10.2026):** Meldungen bis 2020 schreiben Betrag und Währung in getrennte Zeilen → Volumen/Preis leer (fast alle von 2018/2019). Behoben mit `eqs._aggregiert`. Bereits geladene Zeilen reparieren: `historie.py --reparieren` bzw. Action-Häkchen „reparieren“.
+
+**Reihenfolge nach Lauf 2:** 1. Tobias pusht den lokalen Stand, 2. „Historie laden“ mit Häkchen „reparieren“, 3. „Daten aktualisieren“ manuell starten, 4. Ergebnis prüfen (Jahre 2018/2019 vs. BA-Daten, Ranking, Event Study).
+
+Skript-/Stil-Dateien haben `?v=2` (Cache von GitHub Pages bis 10 Min.); bei JS/CSS-Änderungen hochzählen.
 
 ## Offen
 

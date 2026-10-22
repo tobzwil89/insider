@@ -119,6 +119,19 @@ def _datum(text: str) -> str | None:
     return f"{m[1]}-{m[2]}-{m[3]}" if m[1] else f"{m[6]}-{m[5]}-{m[4]}"
 
 
+def _aggregiert(block: list) -> tuple:
+    """Preis und Volumen aus 'd) Aggregierte Informationen'. Neuere Meldungen schreiben
+    '17,2105 EUR' in eine Zeile, ältere (bis 2020) Betrag und Währung in getrennte Zeilen."""
+    if "d) Aggregierte Informationen" not in block:
+        return "", ""
+    i = block.index("d) Aggregierte Informationen") + 1
+    ende = next((j for j in range(i, len(block)) if block[j].startswith("e) ")), len(block))
+    text = " ".join(z for z in block[i:ende] if z not in ("Preis", "Aggregiertes Volumen"))
+    werte = re.findall(r"(\d[\d.,]*)\s*([A-Z]{3})?", text)
+    werte = [f"{zahl} {waehrung}".strip() for zahl, waehrung in werte[:2]]
+    return tuple((werte + ["", ""])[:2])
+
+
 def _nach(zeilen: list, marke: str, start: int = 0) -> str:
     """Erste Zeile nach der Zeile `marke` (ab Position `start`)."""
     for i in range(start, len(zeilen) - 1):
@@ -183,9 +196,7 @@ def meldung_lesen(url: str, html: str | None = None) -> list:
     for n, s in enumerate(starts):
         block = zeilen[s: starts[n + 1] if n + 1 < len(starts) else len(zeilen)]
         art_text = _nach(block, "b) Art des Geschäfts")
-        i_agg = block.index("d) Aggregierte Informationen") if "d) Aggregierte Informationen" in block else -1
-        werte = block[i_agg + 3: i_agg + 5] if i_agg >= 0 else ["", ""]
-        preis_text, volumen_text = (werte + ["", ""])[:2]
+        preis_text, volumen_text = _aggregiert(block)
         geschaefte.append(dict(basis,
             instrument=_nach(block, "Art:"), isin=_nach(block, "ISIN:"),
             art=art_text if art_text in ("Kauf", "Verkauf") else "Sonstiges", art_text=art_text,

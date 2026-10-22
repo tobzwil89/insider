@@ -8,6 +8,10 @@ on:
       max_minuten:
         description: "Höchstens so viele Minuten laden"
         default: "320"
+      reparieren:
+        description: "Nur Meldungen ohne Volumen neu lesen"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -31,7 +35,7 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: EQS-Archiv laden
-        run: python historie.py --max-minuten "${{ inputs.max_minuten }}"
+        run: python historie.py --max-minuten "${{ inputs.max_minuten }}" ${{ inputs.reparieren && '--reparieren' || '' }}
 
       # Auch nach einem Fehler speichern, was bis dahin geladen wurde
       - name: Ergebnis speichern

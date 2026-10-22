@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Methode · Insider-Monitor</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%232a78d6'/><path d='M3 11l3-3 2 2 5-5' stroke='white' stroke-width='2' fill='none'/></svg>">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
   <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr.</div>
@@ -21,7 +21,13 @@
       <p>Führungskräfte börsennotierter Unternehmen und ihnen eng verbundene Personen müssen eigene Geschäfte mit Aktien
         ihres Unternehmens nach Art. 19 der Marktmissbrauchsverordnung (MAR) innerhalb von drei Geschäftstagen melden.
         Die BaFin veröffentlicht diese Meldungen in ihrer Datenbank, allerdings nur für die letzten zwölf Monate. Diese Seite
-        fragt die Datenbank alle 30 Minuten ab und speichert jede Meldung dauerhaft, die Historie wächst also mit der Zeit.</p>
+        fragt die Datenbank alle 30 Minuten ab und speichert jede Meldung dauerhaft.</p>
+      <p>Für die Zeit davor (2018 bis Oktober 2025) stammen die Meldungen aus dem Archiv von EQS News, über das die meisten
+        deutschen Emittenten ihre Pflichtmitteilungen verbreiten. Ein Abgleich mit den BaFin-Daten der letzten zwölf Monate
+        ergab: Rund 88 % der Meldungen von DAX- und MDAX-Firmen sind bei EQS vorhanden, und Person, Datum, Art und Volumen
+        stimmen dort zu über 99 % überein. Nicht über EQS melden unter anderem Siemens Energy (seit 2025), Bayer,
+        Fresenius und BMW; deren ältere Meldungen fehlen. Ebenso fehlen Meldungen, die nur auf Englisch oder in einem
+        ausländischen Formular erschienen sind.</p>
       <p>Kurse stammen von Yahoo Finance und sind um Dividenden und Splits bereinigt.</p>
 
       <h2>Event Study</h2>
@@ -43,6 +49,17 @@
         zusammen mindestens 50.000 € investieren. Die Mindestsumme filtert Mitarbeiter-Aktienprogramme heraus. Eng verbundene
         Personen zählen nicht mit, weil sie oft die Holding eines Vorstands sind.</p>
 
+      <h2 id="ranking">Timing der Insider</h2>
+      <p>Für jeden Aktienkauf einer Führungskraft wird verglichen, wie sich die Aktie in den 60 Handelstagen (rund 3 Monaten)
+        nach dem Kauf entwickelt hat, gemessen ab dem Schlusskurs des Geschäftstags, und wie sich im selben Zeitraum der DAX
+        bzw. MDAX entwickelt hat. Die Differenz ist die Überrendite. Mehrere Käufe derselben Person am selben Tag zählen als
+        einer. Käufe von eng verbundenen Personen, etwa einer privaten Holding, werden der Führungskraft zugerechnet, wenn die
+        Meldung sie nennt. Ins Ranking kommen Personen mit mindestens drei solchen Käufen; sortiert wird nach dem Median, also
+        dem typischen Kauf, damit ein einzelner Ausreißer das Ergebnis nicht bestimmt. Verkäufe zählen nicht, weil sie oft
+        private Gründe haben.</p>
+      <p>Das Ranking beschreibt die Vergangenheit. Bei drei bis zehn Käufen pro Person spielt Zufall eine große Rolle;
+        ein guter Platz ist kein Beleg für besonderes Wissen und keine Empfehlung, Käufen dieser Person zu folgen.</p>
+
       <h2>Unterschiede zur Bachelorarbeit</h2>
       <ul>
         <li>Fenster in Handelstagen statt Kalendertagen.</li>
@@ -52,11 +69,12 @@
         <li>Bereinigte statt nominaler Kurse; Dividendentermine verzerren die Renditen nicht mehr.</li>
         <li>Nur das Marktmodell. Das Fama-French-Dreifaktorenmodell der Arbeit braucht Faktordaten, die nur monatlich
           mit Verzögerung erscheinen; in der Arbeit kamen beide Modelle zum selben Ergebnis.</li>
-        <li>Zeitraum ab Oktober 2025 statt 2018–2024, weil die BaFin nur zwölf Monate rückwirkend bereitstellt.</li>
+        <li>Daten aus BaFin und EQS-Archiv statt aus finanzen.net, mit eindeutigem Veröffentlichungsdatum.</li>
       </ul>
 
       <h2>Grenzen</h2>
-      <p>Die Indexzusammensetzung ist die aktuelle, nicht die zum Zeitpunkt der Meldung. Bei wenigen Ereignissen,
+      <p>Die Indexzusammensetzung ist die aktuelle, nicht die zum Zeitpunkt der Meldung: Firmen, die seit 2018 aus DAX
+        oder MDAX ausgeschieden sind, fehlen in der Auswertung, Aufsteiger zählen auch für die Zeit davor. Bei wenigen Ereignissen,
         etwa Verkäufen, sind die Durchschnitte unsicher. Überschneiden sich die Ereignisfenster mehrerer Meldungen derselben
         Firma, sind die Beobachtungen nicht unabhängig, und die t-Werte fallen eher zu hoch aus.</p>
     </section>

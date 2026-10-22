@@ -6,6 +6,7 @@
     caar.json             AAR/CAAR-Kurven für Käufe und Verkäufe
     ereignisse.json       alle ausgewerteten Ereignisse mit CAR
     firmen.json           Übersicht der Firmen mit eigener Seite
+    ranking.json          Insider mit dem besten Timing (Überrendite 3 Monate nach Käufen)
     firmen/<TICKER>.json  je Firma: Kurse, Meldungen, Ereignisse mit abnormalen Renditen
 """
 
@@ -15,10 +16,10 @@ import math
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, event_study as es, cluster as cl
+from pipeline import AUSGABE, event_study as es, cluster as cl, ranking as rk
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
-KURS_JAHRE = 2       # so weit reicht der Kursverlauf auf den Firmenseiten
+KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
 
 
 def _sauber(x):
@@ -66,7 +67,8 @@ def meldungen_zusammenfassen(m: pd.DataFrame) -> pd.DataFrame:
 
 
 def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFrame,
-               ereignisse: pd.DataFrame, ar: pd.DataFrame, cluster: pd.DataFrame) -> None:
+               ereignisse: pd.DataFrame, ar: pd.DataFrame, cluster: pd.DataFrame,
+               rangliste: pd.DataFrame) -> None:
     mit_seite = firmen[firmen["ticker"] != ""]
     isin_zu_ticker = dict(zip(mit_seite["isin"], mit_seite["ticker"]))
     zusammen = meldungen_zusammenfassen(meldungen)
@@ -85,12 +87,14 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
         "methode": {"modell": "Marktmodell (DAX bzw. MDAX)", "ereignisfenster": es.EREIGNISFENSTER,
                     "schaetzfenster": es.SCHAETZFENSTER, "min_schaetztage": es.MIN_SCHAETZTAGE,
                     "positionen": sorted(es.POSITIONEN), "cluster_tage": cl.FENSTER_TAGE,
-                    "cluster_personen": cl.MIN_PERSONEN, "cluster_volumen": cl.MIN_VOLUMEN},
+                    "cluster_personen": cl.MIN_PERSONEN, "cluster_volumen": cl.MIN_VOLUMEN,
+                    "ranking_tage": rk.TAGE, "ranking_min_kaeufe": rk.MIN_KAEUFE},
     })
     _schreibe("neueste.json", _zeilen(zusammen.head(NEUESTE)))
     _schreibe("cluster.json", _zeilen(cluster.assign(ticker=cluster["isin"].map(isin_zu_ticker))))
     _schreibe("caar.json", {art: _zeilen(teil.drop(columns="art"))
                             for art, teil in caar.groupby("art")} if not caar.empty else {})
+    _schreibe("ranking.json", _zeilen(rangliste))
     _schreibe("ereignisse.json", _zeilen(ausgewertet.sort_values("mitteilungsdatum", ascending=False)))
 
     kurs_start = kurse.index.max() - pd.DateOffset(years=KURS_JAHRE)

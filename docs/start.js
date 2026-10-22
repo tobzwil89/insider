@@ -114,6 +114,20 @@ function zeigeTicker(meldungen) {
   aktualisieren();
 }
 
+function zeigeRanking(ranking) {
+  const ziel = document.getElementById("ranking");
+  const mehr = document.getElementById("ranking-mehr");
+  const liste = ranking.map((r, i) => ({ ...r, rang: i + 1 }));
+  if (!liste.length) { ziel.append(el("p", { class: "leer" }, "Noch zu wenige Käufe für ein Ranking.")); return; }
+  let anzahl = 20;
+  const zeichnen = () => {
+    ziel.replaceChildren(rankingTabelle(liste.slice(0, anzahl)));
+    mehr.hidden = liste.length <= anzahl;
+  };
+  mehr.addEventListener("click", () => { anzahl += 50; zeichnen(); });
+  zeichnen();
+}
+
 function zeigeFirmen(firmen) {
   const ziel = document.getElementById("firmen");
   const suche = document.getElementById("firmen-suche");
@@ -130,15 +144,17 @@ function zeigeFirmen(firmen) {
 
 (async () => {
   try {
-    const [stand_, caar, cluster, meldungen, firmen] = await Promise.all(
-      ["stand", "caar", "cluster", "neueste", "firmen"].map((n) => ladeJson(`data/${n}.json`)));
+    const [stand_, caar, cluster, meldungen, firmen, ranking] = await Promise.all(
+      ["stand", "caar", "cluster", "neueste", "firmen", "ranking"].map((n) => ladeJson(`data/${n}.json`)));
     document.getElementById("stand").textContent = stand(stand_);
     zeigeKacheln(stand_, caar, cluster);
     zeigeCaar(caar);
     zeigeCluster(cluster);
+    zeigeRanking(ranking);
     zeigeTicker(meldungen);
     zeigeFirmen(firmen);
   } catch (fehler) {
+    console.error(fehler);
     document.getElementById("stand").textContent = `Daten konnten nicht geladen werden (${fehler.message}).`;
   }
 })();

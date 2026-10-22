@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Insider-Monitor</title>
-  <meta name="description" content="Directors' Dealings im DAX und MDAX: neue BaFin-Meldungen, Cluster-Käufe und abnormale Renditen, alle 30 Minuten aktualisiert.">
+  <meta name="description" content="Directors' Dealings im DAX und MDAX: BaFin-Meldungen seit 2018, Cluster-Käufe und abnormale Renditen, alle 30 Minuten aktualisiert.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%232a78d6'/><path d='M3 11l3-3 2 2 5-5' stroke='white' stroke-width='2' fill='none'/></svg>">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
-  <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quelle: BaFin-Datenbank der Eigengeschäfte von Führungskräften.</div>
+  <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quellen: BaFin-Datenbank der Eigengeschäfte von Führungskräften, EQS-Archiv.</div>
 
   <header class="kopf">
     <div class="marke">Insider-Monitor</div>
     <h1>Was kaufen und verkaufen Vorstände und Aufsichtsräte?</h1>
-    <p class="unterzeile">Meldungen nach Art. 19 MAR aus der BaFin-Datenbank, alle 30 Minuten aktualisiert. Für DAX und MDAX
-      werden die Kursreaktionen mit der Event Study aus meiner Bachelorarbeit berechnet.</p>
+    <p class="unterzeile">Meldungen nach Art. 19 MAR seit 2018, laufend alle 30 Minuten aus der BaFin-Datenbank aktualisiert.
+      Für DAX und MDAX werden die Kursreaktionen mit der Event Study aus meiner Bachelorarbeit berechnet.</p>
     <div class="stand" id="stand">Lade Daten …</div>
   </header>
 
@@ -44,8 +44,18 @@
     </section>
 
     <section class="karte">
+      <h2>Timing der Insider</h2>
+      <p class="erklaerung">Wie liefen die Aktien in den 3 Monaten (60 Handelstagen) nach den Käufen einer Führungskraft,
+        verglichen mit DAX bzw. MDAX? Sortiert nach der typischen Überrendite (Median) aller Käufe einer Person, damit ein
+        einzelner Glückstreffer das Ergebnis nicht bestimmt. Nur Personen mit mindestens 3 Aktienkäufen. Vergangenes Timing
+        sagt nichts über künftige Käufe aus. <a href="methode.html#ranking">Zur Methode</a></p>
+      <div id="ranking"></div>
+      <button class="knopf mehr" id="ranking-mehr" hidden>Mehr anzeigen</button>
+    </section>
+
+    <section class="karte">
       <h2>Neueste Meldungen</h2>
-      <p class="erklaerung">Teilausführungen derselben Person am selben Tag sind zusammengefasst. Zeit = Freischaltung bei der BaFin.</p>
+      <p class="erklaerung">Teilausführungen derselben Person am selben Tag sind zusammengefasst. Zeit = Veröffentlichung (EQS) bzw. Freischaltung bei der BaFin.</p>
       <div class="filter">
         <div class="knopfgruppe" id="art-filter">
           <button aria-pressed="true" data-art="">Alle</button>
@@ -71,10 +81,10 @@
     <p><b>Keine Anlageberatung.</b> Diese Seite zeigt öffentlich gemeldete Daten und statistische Auswertungen. Sie ist keine
       Empfehlung, Wertpapiere zu kaufen oder zu verkaufen. Vergangene Kursreaktionen sagen nichts über künftige aus.</p>
     <p><a href="methode.html">Methode</a> · <a href="impressum.html">Impressum und Datenschutz</a> ·
-      Daten: <a href="https://portal.mvp.bafin.de/database/DealingsInfo/">BaFin</a>, Kurse: Yahoo Finance</p>
+      Daten: <a href="https://portal.mvp.bafin.de/database/DealingsInfo/">BaFin</a>, <a href="https://www.eqs-news.com/de/">EQS News</a>, Kurse: Yahoo Finance</p>
   </footer>
 
-  <script src="gemeinsam.js"></script>
-  <script src="start.js"></script>
+  <script src="gemeinsam.js?v=2"></script>
+  <script src="start.js?v=2"></script>
 </body>
 </html>
