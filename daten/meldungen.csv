@@ -1,4 +1,7 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+EnviTec Biogas AG,40006808,DE000A0MVLS8,2. vLB GmbH & Co. KG,in enger Beziehung,Aktie,Kauf,"17,37 EUR","1.354,62 EUR",2026-10-21,2026-10-21,Tradegate,2026-10-22 09:41:38,17.37,EUR,1354.62,2026-10-22 14:37:02
+EnviTec Biogas AG,40006808,DE000A0MVLS8,2. vLB GmbH & Co. KG,in enger Beziehung,Aktie,Kauf,"17,11 EUR","174.549,99 EUR",2026-10-21,2026-10-20,Tradegate,2026-10-22 09:41:38,17.11,EUR,174549.99,2026-10-22 14:37:02
+EnviTec Biogas AG,40006808,DE000A0MVLS8,2. vLB GmbH & Co. KG,in enger Beziehung,Aktie,Kauf,"17,21 EUR","3.442,10 EUR",2026-10-21,2026-10-19,Tradegate,2026-10-22 09:41:38,17.21,EUR,3442.1,2026-10-22 14:37:02
 Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"65,00 EUR","16.250,00 EUR",2026-10-20,2026-10-19,XETRA,2026-10-20 14:50:33,65.0,EUR,16250.0,2026-10-22 00:50:12
 Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"64,50 EUR","16.125,00 EUR",2026-10-20,2026-10-19,Tradegate,2026-10-20 14:50:33,64.5,EUR,16125.0,2026-10-22 00:50:12
 Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"65,00 EUR","130.000,00 EUR",2026-10-20,2026-10-19,XETRA,2026-10-20 14:45:48,65.0,EUR,130000.0,2026-10-22 00:50:12
