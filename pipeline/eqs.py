@@ -71,8 +71,10 @@ def _seite(uuid: str, seite: int) -> str:
     raise Gedrosselt(f"EQS liefert für {uuid} keine Nachrichtenliste")
 
 
-def dd_links(uuid: str, ab: pd.Timestamp, bis: pd.Timestamp | None = None) -> list:
-    """(URL, Titel) aller Directors'-Dealings-Meldungen einer Firma von `ab` bis `bis` (neueste zuerst)."""
+def dd_links(uuid: str, ab: pd.Timestamp, bis: pd.Timestamp | None = None,
+             kategorie: str = "directors-dealings") -> list:
+    """(URL, Titel) aller Meldungen einer Kategorie (Teil der Adresse, z. B. 'stimmrechtsanteile')
+    einer Firma von `ab` bis `bis` (neueste zuerst). Standard: Directors' Dealings."""
     links, seite, datum = [], 1, None
     while True:
         html = _seite(uuid, seite)
@@ -82,7 +84,7 @@ def dd_links(uuid: str, ab: pd.Timestamp, bis: pd.Timestamp | None = None) -> li
             if knoten.name == "p":
                 t, m, j = knoten.get_text(strip=True).split()
                 datum = pd.Timestamp(int(j), MONATE[m], int(t))
-            elif datum >= ab and (bis is None or datum <= bis) and "/news/directors-dealings/" in knoten["href"]:
+            elif datum >= ab and (bis is None or datum <= bis) and f"/news/{kategorie}/" in knoten["href"]:
                 titel = knoten.select_one(".news__heading")
                 links.append((knoten["href"], titel.get_text(strip=True) if titel else ""))
         if datum is not None and datum < ab:

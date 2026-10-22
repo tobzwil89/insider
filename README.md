@@ -12,6 +12,7 @@ python3 lauf.py --immer               # immer neu rechnen (täglich nach Börsen
 python3 -m pipeline.firmen            # DAX/MDAX-Liste neu aufbauen (nach Indexänderungen)
 python3 historie.py                   # EQS-Archiv 2018 bis 21.10.2025 laden (setzt bei Abbruch fort)
 python3 historie.py --reparieren      # EQS-Meldungen ohne Volumen oder Währung neu lesen
+python3 stimmrechte_laden.py          # Stimmrechtsmitteilungen seit 2018 laden (setzt bei Abbruch fort)
 ```
 
 Lokal ansehen: `cd docs && python3 -m http.server`, dann http://localhost:8000
@@ -22,10 +23,12 @@ Lokal ansehen: `cd docs && python3 -m http.server`, dann http://localhost:8000
 |---|---|
 | `daten/meldungen.csv` | alle je gesehenen BaFin-Meldungen; wird nur ergänzt, weil die BaFin nur 12 Monate zeigt |
 | `daten/eqs_historie.csv`, `eqs_fortschritt.csv` | Meldungen aus dem EQS-Archiv (2018 bis Oktober 2025) und welche Firmen fertig sind |
+| `daten/stimmrechte.csv`, `stimmrechte_fortschritt.csv` | Stimmrechtsmitteilungen (§§ 33 ff. WpHG) seit 2018, eine Zeile je Mitteilung, und welche Firmen fertig sind |
 | `daten/firmen.csv` | DAX/MDAX: ISIN → Name, Index, Yahoo-Ticker (nach Neuaufbau von Hand prüfen) |
 | `daten/gemeldete_cluster.txt` | schon per Telegram gemeldete Cluster |
 | `pipeline/bafin.py` | CSV-Export der BaFin holen, neue Zeilen erkennen |
 | `pipeline/eqs.py` | EQS-Archiv: Firma suchen, Nachrichtenliste blättern (mit Drossel-Erkennung), MAR-Formular lesen |
+| `pipeline/stimmrechte.py` | Stimmrechtsformular lesen (Deutsch/Englisch): wer, Datum, Anteile Aktien/Instrumente neu und vorher |
 | `pipeline/meldungen.py` | BaFin und EQS zu einer Tabelle zusammenführen |
 | `pipeline/kurse.py` | bereinigte Schlusskurse von Yahoo |
 | `pipeline/event_study.py` | Ereignisse bilden, Marktmodell, AR, AAR, CAAR, t-Test |
@@ -54,6 +57,7 @@ Lokal ansehen: `cd docs && python3 -m http.server`, dann http://localhost:8000
 
 - `aktualisieren.yml`: alle 30 Minuten `lauf.py`, werktags 17:15 UTC `lauf.py --immer`. Committet `daten/` und `docs/`; GitHub Pages veröffentlicht `docs/` mit jedem Commit.
 - `historie.yml` („Historie laden“, per Knopfdruck): lädt das EQS-Archiv, höchstens 320 Minuten, speichert nach jeder Firma. Häkchen „reparieren“ liest fehlerhafte Meldungen neu.
+- `stimmrechte.yml` („Stimmrechte laden“, per Knopfdruck): lädt Stimmrechtsmitteilungen seit 2018, höchstens 320 Minuten je Lauf, speichert nach jeder Firma. Mehrmals starten, bis im Protokoll „Alle Firmen fertig“ steht. Abbrechen jederzeit möglich, das Geladene bleibt erhalten.
 
 Telegram bei neuen Cluster-Käufen, wenn die Secrets `TELEGRAM_TOKEN` und `TELEGRAM_CHAT_ID` gesetzt sind:
 
