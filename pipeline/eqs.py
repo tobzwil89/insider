@@ -5,7 +5,9 @@ Emittenten und hält sie seit Jahren vor. Jede Meldung folgt dem einheitlichen M
 daraus werden dieselben Spalten gelesen wie aus der BaFin-CSV, plus Uhrzeit der
 Veröffentlichung und bei eng verbundenen Personen die zugehörige Führungskraft.
 
-Höflich abrufen: eine Anfrage pro Sekunde.
+Höflich abrufen: Pause zwischen Anfragen. EQS drosselt still, indem es leere Antworten mit
+Status 200 schickt. Deshalb wird eine leere Antwort, die eigentlich Inhalt haben müsste,
+nach Wartezeiten wiederholt (WARTEN) statt als Ende gewertet.
 """
 
 import re
@@ -18,7 +20,12 @@ from bs4 import BeautifulSoup
 AJAX = "https://www.eqs-news.com/wp/wp-admin/admin-ajax.php?lang=de"
 SUCHE = "https://www.eqs-news.com/de/search-results/"
 HEADER = {"User-Agent": "Mozilla/5.0 (insider.tobiaszwilling.me; tobzwilling@gmx.de)"}
-PAUSE = 1.0
+PAUSE = 2.0
+WARTEN = [30, 60, 120, 240]  # Sekunden zwischen Wiederholungen nach einer leeren Antwort
+
+
+class Gedrosselt(Exception):
+    """EQS liefert trotz Wiederholungen keinen Inhalt."""
 MONATE = {m: i for i, m in enumerate(["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August",
                                        "September", "Oktober", "November", "Dezember"], 1)}
 
@@ -36,17 +43,39 @@ def _holen(url, **params) -> str:
 
 
 def firma_uuid(isin: str) -> str | None:
-    treffer = re.findall(r"company/[a-z0-9\-]+/news/([0-9a-f\-]{36})",
-                         _holen(SUCHE, searchtype="company", searchword=isin))
-    return treffer[0] if treffer else None
+    """EQS-ID einer Firma. Ohne Treffer wird gewartet und wiederholt, weil auch die Suche gedrosselt wird."""
+    for warten in WARTEN[:3]:
+        treffer = re.findall(r"company/[a-z0-9\-]+/news/([0-9a-f\-]{36})",
+                             _holen(SUCHE, searchtype="company", searchword=isin))
+        if treffer:
+            return treffer[0]
+        time.sleep(warten)
+    return None
+
+
+def _listenseite(uuid: str, seite: int) -> str:
+    return _holen(AJAX, action="fetch_eqs_financial_news_data", pageLimit=30, pageNo=seite,
+                  loadFrom="mysql", companyId=uuid, companyName=uuid, parseBy="newsgrouping")
+
+
+def _seite(uuid: str, seite: int) -> str:
+    """Listenseite; leer nur, wenn die Liste wirklich zu Ende ist.
+    Seite 1 hat immer Inhalt: Ist auch sie leer, drosselt EQS gerade, also warten."""
+    for warten in WARTEN:
+        html = _listenseite(uuid, seite)
+        if html.strip():
+            return html
+        if seite > 1 and _listenseite(uuid, 1).strip():
+            return _listenseite(uuid, seite)  # EQS antwortet wieder: zweite Chance, sonst echtes Ende
+        time.sleep(warten)
+    raise Gedrosselt(f"EQS liefert für {uuid} keine Nachrichtenliste")
 
 
 def dd_links(uuid: str, ab: pd.Timestamp, bis: pd.Timestamp | None = None) -> list:
     """(URL, Titel) aller Directors'-Dealings-Meldungen einer Firma von `ab` bis `bis` (neueste zuerst)."""
     links, seite, datum = [], 1, None
     while True:
-        html = _holen(AJAX, action="fetch_eqs_financial_news_data", pageLimit=30, pageNo=seite,
-                      loadFrom="mysql", companyId=uuid, companyName=uuid, parseBy="newsgrouping")
+        html = _seite(uuid, seite)
         if not html.strip():
             return links
         for knoten in BeautifulSoup(html, "lxml").select("[data-financial-news-date-grouped], a[data-financial-news-item]"):
@@ -64,9 +93,10 @@ def dd_links(uuid: str, ab: pd.Timestamp, bis: pd.Timestamp | None = None) -> li
 def nur_zuteilung(titel: str) -> bool:
     """True, wenn der Titel eindeutig kein Kauf oder Verkauf ist (z. B. '…, Zuteilung').
     Ältere Titel wie 'DGAP-DD: SAP SE deutsch' nennen die Art nicht; die werden geladen."""
-    if "," not in titel or titel.startswith(("DGAP-DD", "EQS-DD")):
+    rest = titel.split(": ", 1)[-1]  # Titel: "Firma: Person, Art des Geschäfts"
+    if "," not in rest or titel.startswith(("DGAP-DD", "EQS-DD")):
         return False
-    art = titel.rsplit(",", 1)[1].strip()
+    art = rest.split(",", 1)[1]
     return "Kauf" not in art and "Verkauf" not in art
 
 
@@ -123,7 +153,10 @@ def meldung_lesen(url: str, html: str | None = None) -> list:
     text = soup.get_text("\n", strip=True)
     anfang, ende = text.find("1. Angaben zu den Personen"), text.find("Ende der Mitteilung")
     if anfang < 0:
-        return []
+        # Echte Meldung in anderem Formular (z. B. englisch/luxemburgisch): nicht unterstützt
+        if "Für den Inhalt der Mitteilung" in text or "The issuer is solely responsible" in text:
+            return []
+        raise Gedrosselt(f"Meldung ohne Inhalt: {url}")
     kopf = text[max(0, anfang - 400): anfang]
     zeilen = text[anfang: ende if ende > 0 else None].split("\n")
     zeit = re.search(r"(\d{2})\.(\d{2})\.(\d{4}) / (\d{2}:\d{2})", kopf)

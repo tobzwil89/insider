@@ -40,15 +40,20 @@ def main() -> int:
         if time.monotonic() > ende:
             print("Zeitbudget erreicht, beim nächsten Aufruf geht es weiter")
             return 0
-        uuid = next((u for u in map(eqs.firma_uuid, gattungen["isin"]) if u), None)
-        links = eqs.dd_links(uuid, von, bis) if uuid else []
+        try:
+            uuid = next((u for u in map(eqs.firma_uuid, gattungen["isin"]) if u), None)
+            links = eqs.dd_links(uuid, von, bis) if uuid else []
+        except eqs.Gedrosselt as fehler:
+            print(f"{name}: {fehler}, beim nächsten Aufruf erneut")
+            continue
         offen = [(u, t) for u, t in links if u not in gelesen and not eqs.nur_zuteilung(t)]
-        zeilen = []
+        zeilen, fehlgeschlagen = [], 0
         for url, _ in offen:
             try:
                 zeilen += eqs.meldung_lesen(url)
-            except Exception as fehler:  # einzelne kaputte Meldung überspringen, nicht die ganze Firma
-                print(f"  übersprungen: {url} ({fehler})")
+            except Exception as fehler:  # Firma bleibt offen, der nächste Aufruf holt nur die fehlenden
+                fehlgeschlagen += 1
+                print(f"  fehlgeschlagen: {url} ({fehler})")
             if time.monotonic() > ende:
                 break
         if zeilen:
@@ -58,6 +63,9 @@ def main() -> int:
         if time.monotonic() > ende:
             print(f"Zeitbudget erreicht mitten in {name}, beim nächsten Aufruf geht es weiter")
             return 0
+        if fehlgeschlagen:
+            print(f"{name}: {fehlgeschlagen} Meldungen fehlgeschlagen, Firma bleibt offen")
+            continue
         eintrag = pd.DataFrame([{"name": name, "uuid": uuid or "", "meldungen": len(links),
                                  "geladen": len(offen), "geschaefte": len(zeilen)}])
         eintrag.to_csv(FORTSCHRITT, mode="a", header=not FORTSCHRITT.exists(), index=False)

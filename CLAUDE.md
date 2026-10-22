@@ -41,6 +41,8 @@ Reihenfolge laut Tobias: 1. Historie 2018–2025 nachholen, 2. Ranking der Insid
 - `historie.py` + Action `.github/workflows/historie.yml` („Historie laden“, per Knopfdruck, max. 320 Min., speichert nach jeder Firma in `daten/eqs_historie.csv` und `daten/eqs_fortschritt.csv`, setzt bei Neustart fort). Lokal mit 3 Min. getestet. Titel mit eindeutig anderer Art als Kauf/Verkauf werden übersprungen (`eqs.nur_zuteilung`).
 - Beide Workflows machen vor dem Push `git pull --rebase`, weil sie parallel committen können.
 
+**Lauf 1 der Action (22.10.2026):** unvollständig, weil EQS GitHub still gedrosselt hat (leere Antworten mit Status 200) und der Code das als Listenende wertete. Folge: Listen brachen ab (SAP erst ab 2022, Zalando ab 2025), Firmen ohne Treffer. Behoben in `pipeline/eqs.py` (`_seite`: leere Seite → Seite 1 gegenprüfen, sonst warten 30/60/120/240 s; `Gedrosselt`; Meldung ohne Inhalt = Fehler, Firma bleibt offen) und Pause 2 s. `eqs_fortschritt.csv` von Lauf 1 liegt in `.recherche/`, die geladenen Geschäfte bleiben und werden nicht erneut abgerufen. Nicht unterstützt: luxemburgisches HOS-2-Formular (Aroundtown), nur englische Meldungen.
+
 **Nächste Schritte:**
 1. Tobias pusht und startet „Historie laden“; Ergebnis prüfen (Anzahl je Firma in `eqs_fortschritt.csv`, Stichproben).
 2. Zusammenführen: `bafin.lade_meldungen()` um `eqs_historie.csv` ergänzen (Spalte `quelle`), nur EQS-Zeilen vor Beginn der BaFin-Daten (22.10.2025) verwenden. Gekennzeichnete Korrekturmeldungen ersetzen ältere Meldungen mit gleicher ISIN/Person/Geschäftsdatum. Event Study über 2018–heute, Kurse ab 2017 laden, Methode-Seite anpassen (Quellen, 88 %-Lücke).
