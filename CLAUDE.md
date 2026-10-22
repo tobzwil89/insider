@@ -23,26 +23,34 @@ Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: eine Art GuruFocus f�
 Ergebnis: Käufe AAR t0 +0,24 %*, t+1 +0,23 %*, vorher signifikant negativ; Verkäufe t+1 −0,41 %*.
 Jahreszahlen EQS passen zu den BA-Daten (2018: 211 vs. 239, 2019: 219 vs. 194, 2021: 497 vs. 452).
 
-**Lokal fertig, noch nicht gepusht** (Umsetzung von GURUFOCUS.md, Punkt 1–4):
-- Firmenseiten als fertiges HTML: `pipeline/seiten.py` schreibt `docs/firma/<TICKER>/index.html` (Kacheln,
-  Ereignisse, Timing, Meldungen im HTML; Texte mit `html.escape`; Markierungen als eingebettetes JSON, `</` maskiert).
-  `docs/firma.js` zeichnet nur noch das Diagramm, Kurse aus `docs/data/kurse/<TICKER>.json`.
-- Alte Adresse `firma.html?t=…` leitet auf `firma/<TICKER>/` um (Telegram-Links von früher). Telegram verlinkt neu.
-- Entfernt: `docs/data/ereignisse.json` (ungenutzt) und `docs/data/firmen/*.json` (groß, jetzt im HTML + kurse/).
-  `docs/data` 7,5 → 4,8 MB.
-- `docs/sitemap.xml` (vom Export erzeugt) und `docs/robots.txt`.
-- Versionsnummern: Export setzt `?v=<Prüfsumme>` in alle Seiten (`seiten.versionen_eintragen`), kein Hochzählen mehr.
-- Startseite: Speculation Rules (Chrome baut Firmenseiten beim Darüberfahren vor).
-- Workflow `aktualisieren.yml` committet jetzt `git add daten docs` (wegen `docs/firma`, Sitemap, Löschungen).
-- Fix: Währung „GBp“ (Pence, TUI/Unifirm) wurde nicht erkannt → Volumen als Euro gezählt (bis 1,1 Mrd.).
-  `eqs._aggregiert` erkennt jetzt `[A-Z][A-Za-z]{2}`; `--reparieren` liest auch Zeilen ohne Währung neu;
-  16 Meldungen lokal repariert (`daten/eqs_historie.csv`, Sicherung in `.recherche/eqs_historie_vor_gbp.csv`).
-- Getestet: Pipeline läuft (13 s), SAP-Seite zeigt Zahlen ohne JavaScript (curl), Diagramm per Screenshot,
-  Weiterleitung `firma.html?t=DEZ.DE` → Deutz, Startseiten-Links auf `firma/<TICKER>/`.
+**Seit 22.10.2026 abends ebenfalls live** (Umsetzung GURUFOCUS.md Punkt 1–4): Firmenseiten als fertiges HTML unter
+`/firma/<TICKER>/` (`pipeline/seiten.py`, Texte mit `html.escape`, Markierungen als eingebettetes JSON), Kurse in
+`docs/data/kurse/<TICKER>.json`, Weiterleitung `firma.html?t=…`, `sitemap.xml`, `robots.txt`, automatische
+Versionsnummern `?v=<Prüfsumme>`, Speculation Rules auf der Startseite. `ereignisse.json` und `data/firmen/` entfernt
+(7,5 → 4,8 MB). GBp-Fix (TUI/Unifirm, 16 Meldungen repariert). Live geprüft: 6 Firmenseiten antworten (200),
+Deutz/SAP per Screenshot korrekt, Diagramm auch bei 500 px Breite (63 Markierungen bei Rheinmetall).
 
-**Was Tobias jetzt tun muss:** `git pull`, `git add -A`, `git commit`, `git push`, danach Action
-„Daten aktualisieren“ manuell starten (erzeugt alle Firmenseiten neu und löscht die alten JSON-Dateien).
-Bis dahin zeigen neue Links auf die Firmenseiten aus dem Commit (Stand des lokalen Testlaufs).
+**Befund Taktung (22.10.2026):** Mit `*/30` hat GitHub in 17 Stunden nur 3 geplante Läufe gestartet (alle erfolgreich).
+Geändert auf `13,43 * * * *` (krumme Minuten, lokal, **noch nicht gepusht**). Nach 1–2 Tagen prüfen:
+`curl -s "https://api.github.com/repos/tobzwil89/insider/actions/workflows/aktualisieren.yml/runs?per_page=100"`.
+Reicht das nicht, externen Auslöser nehmen (z. B. cron-job.org ruft `workflow_dispatch` über die GitHub-API auf;
+braucht ein Token mit Actions-Recht).
+
+**Abgleich mit dem ursprünglichen Plan** (Auftrag vom 21.10.2026): Action prüft BaFin regelmäßig ✅ (Taktung s. o.),
+Kurse + AR nach BA-Methode + JSON ✅, GitHub Pages unter insider.tobiaszwilling.me ✅, Live-Ticker ✅, Cluster-Käufe ✅,
+Kurs mit Insider-Markierungen ✅, CAR-Kurve Käufe vs. Verkäufe laufend ✅, Ranking bestes Timing ✅, Telegram bei
+Clustern ✅, „keine Anlageberatung“ + Impressum ✅. Zusätzlich: Historie 2018–2025 aus EQS, Methode-Seite, Firmenseiten als HTML.
+
+**Was manuell bleibt** (alles andere läuft automatisch):
+1. Vierteljährlich nach Indexänderungen (März, Juni, Sept., Dez.): `python3 -m pipeline.firmen`, Ergebnis prüfen, pushen;
+   danach „Historie laden“ starten (lädt nur neue Firmen, weil die Fortschrittsliste sie nicht kennt).
+2. Bei E-Mail von GitHub über einen fehlgeschlagenen Lauf: nachsehen (meist BaFin/Yahoo/EQS kurz nicht erreichbar,
+   der nächste Lauf holt alles nach; dauerhaft nur bei Formatänderungen der Quellen).
+3. Gelegentlich prüfen, ob die geplanten Läufe noch aktiv sind (60-Tage-Regel; der tägliche Lauf committet immer,
+   das sollte als Aktivität reichen).
+
+**Review:** `/code-review ultra` ist kostenpflichtig (nicht kostenlos). Empfehlung: `/code-review high` lokal in einem
+neuen Chat (frischer Blick, kein Zusatzpreis über die normale Nutzung hinaus), vor dem GuruFocus-Ausbau.
 
 ## Entscheidungen (mit Grund)
 
@@ -79,7 +87,9 @@ Bis dahin zeigen neue Links auf die Firmenseiten aus dem Commit (Stand des lokal
 
 ## Offen
 
-- [ ] **Push der GuruFocus-Umsetzung** und Action „Daten aktualisieren“ starten (Tobias), danach Live-Seite prüfen.
+- [ ] **Push der neuen Taktung** (`13,43 * * * *`) und nach 1–2 Tagen Anzahl der geplanten Läufe prüfen.
+- [ ] Diagramm auf der Firmenseite einmal auf dem echten Handy ansehen.
+- [ ] Code-Review (`/code-review high`) in einem neuen Chat.
 - [ ] **Datenquelle für Fundamentaldaten klären**, bevor der GuruFocus-Ausbau beginnt: Yahoo (gratis, ~4 Jahre,
       lückenhaft), EODHD / Financial Modeling Prep (~20–30 €/Monat), Bundesanzeiger (gratis, mühsam).
 - [ ] **Repository-Größe beobachten:** Der Bot committet bei jedem Lauf mehrere MB; GitHub empfiehlt < 1 GB.
@@ -101,4 +111,6 @@ Bis dahin zeigen neue Links auf die Firmenseiten aus dem Commit (Stand des lokal
 - **22.10.2026:** EQS als Quelle für 2018–2025 gefunden und validiert; Action „Historie laden“. Lauf 1 unvollständig
   (stille Drosselung) → Erkennung eingebaut, Lauf 2 vollständig. Leser-Fehler „Betrag und Währung in getrennten Zeilen“
   (bis 2020) behoben und repariert. Zusammenführen BaFin + EQS (`pipeline/meldungen.py`). Ranking gebaut und live.
-  GuruFocus-Analyse (GURUFOCUS.md) bewertet; Punkte 1–4 umgesetzt (lokal), GBp-Fehler behoben.
+  GuruFocus-Analyse (GURUFOCUS.md) bewertet; Punkte 1–4 umgesetzt und live, GBp-Fehler behoben.
+  Abschlussprüfung: Firmenseiten live geprüft, Plan vollständig umgesetzt, Taktungsproblem gefunden (3 statt ~34 Läufe)
+  → Cron auf krumme Minuten.

@@ -6,7 +6,9 @@ name: Daten aktualisieren
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    # Krumme Minuten: Zur vollen/halben Stunde ist GitHub überlastet und lässt Läufe ausfallen
+    # (am 22.10.2026 nur 3 von ~34 Läufen mit "*/30").
+    - cron: "13,43 * * * *"
     - cron: "15 17 * * 1-5"
   workflow_dispatch:
     inputs:
