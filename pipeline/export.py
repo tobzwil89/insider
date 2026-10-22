@@ -7,16 +7,20 @@
     ereignisse.json       alle ausgewerteten Ereignisse mit CAR
     firmen.json           Übersicht der Firmen mit eigener Seite
     ranking.json          Insider mit dem besten Timing (Überrendite 3 Monate nach Käufen)
-    firmen/<TICKER>.json  je Firma: Kurse, Meldungen, Ereignisse mit abnormalen Renditen
+    kurse/<TICKER>.json   je Firma: Schlusskurse als [Datum, Kurs] für das Diagramm
+
+Außerdem (pipeline/seiten.py): docs/firma/<TICKER>/index.html als fertige Seite je Firma,
+docs/sitemap.xml und Versionsnummern (?v=) für CSS/JS.
 """
 
 import json
 import math
+import shutil
 
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, event_study as es, cluster as cl, ranking as rk
+from pipeline import AUSGABE, event_study as es, cluster as cl, ranking as rk, seiten
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
 KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
@@ -95,25 +99,31 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     _schreibe("caar.json", {art: _zeilen(teil.drop(columns="art"))
                             for art, teil in caar.groupby("art")} if not caar.empty else {})
     _schreibe("ranking.json", _zeilen(rangliste))
-    _schreibe("ereignisse.json", _zeilen(ausgewertet.sort_values("mitteilungsdatum", ascending=False)))
+    # Nicht mehr genutzte Dateien früherer Versionen entfernen
+    (AUSGABE / "ereignisse.json").unlink(missing_ok=True)
+    shutil.rmtree(AUSGABE / "firmen", ignore_errors=True)
 
+    v = seiten.versionen()
+    seiten.versionen_eintragen(v)
+    rang = rangliste.assign(rang=range(1, len(rangliste) + 1))
     kurs_start = kurse.index.max() - pd.DateOffset(years=KURS_JAHRE)
     uebersicht = []
     for ticker, f in mit_seite.groupby("ticker"):
         eigene = zusammen[zusammen["ticker"] == ticker]
-        ev = ausgewertet[ausgewertet["ticker"] == ticker]
-        ar_ev = ar[ar["id"].isin(ev["id"])]
         verlauf = kurse[ticker].dropna() if ticker in kurse else pd.Series(dtype=float)
         verlauf = verlauf[verlauf.index >= kurs_start]
-        _schreibe(f"firmen/{ticker}.json", {
-            "ticker": ticker, "name": f["name"].iloc[0], "index": f["index"].iloc[0],
-            "benchmark": f["benchmark"].iloc[0], "isins": list(f["isin"]),
-            "kurse": [[d, round(float(p), 2)] for d, p in verlauf.items()],
-            "meldungen": _zeilen(eigene),
-            "ereignisse": [dict(e, ar=_zeilen(ar_ev[ar_ev["id"] == e["id"]][["t", "datum", "ar"]]))
-                           for e in _zeilen(ev)],
-        })
-        uebersicht.append({"ticker": ticker, "name": f["name"].iloc[0], "index": f["index"].iloc[0],
+        _schreibe(f"kurse/{ticker}.json", [[d, round(float(p), 2)] for d, p in verlauf.items()])
+        stamm = {"ticker": ticker, "name": f["name"].iloc[0], "index": f["index"].iloc[0],
+                 "benchmark": f["benchmark"].iloc[0], "isins": list(f["isin"])}
+        letzter = (verlauf.index[-1], verlauf.iloc[-1]) if len(verlauf) else None
+        seiten.schreiben(seiten.DOCS / "firma" / ticker / "index.html", seiten.firmenseite(
+            stamm, eigene, ausgewertet[ausgewertet["ticker"] == ticker], rang[rang["ticker"] == ticker], letzter, v))
+        uebersicht.append({"ticker": ticker, "name": stamm["name"], "index": stamm["index"],
                            "meldungen": len(eigene),
                            "letzte_meldung": eigene["mitteilungsdatum"].max() if len(eigene) else None})
     _schreibe("firmen.json", sorted(uebersicht, key=lambda x: x["name"].lower()))
+    # Seiten von Firmen entfernen, die nicht mehr im Index sind
+    for ordner in (seiten.DOCS / "firma").iterdir():
+        if ordner.name not in set(mit_seite["ticker"]):
+            shutil.rmtree(ordner)
+    (seiten.DOCS / "sitemap.xml").write_text(seiten.sitemap(sorted(mit_seite["ticker"].unique())), encoding="utf-8")

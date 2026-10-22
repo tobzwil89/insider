@@ -2,7 +2,7 @@
 
     python3 historie.py                     2018-01-01 bis 2025-10-21, höchstens 320 Minuten
     python3 historie.py --max-minuten 30    in Etappen; ein neuer Aufruf macht dort weiter
-    python3 historie.py --reparieren        Käufe/Verkäufe ohne Volumen neu lesen (Leser-Fehler bis 22.10.2026)
+    python3 historie.py --reparieren        Käufe/Verkäufe ohne Volumen oder Währung neu lesen (Leser-Fehler bis 22.10.2026)
 
 Läuft als GitHub Action „Historie laden“. Ergebnis: daten/eqs_historie.csv (eine Zeile je
 Geschäft) und daten/eqs_fortschritt.csv (welche Firmen fertig sind). Beides wird nach jeder
@@ -22,9 +22,9 @@ FORTSCHRITT = DATEN / "eqs_fortschritt.csv"
 
 
 def reparieren(ende: float) -> int:
-    """Meldungen mit Kauf/Verkauf, aber ohne Volumen, neu lesen und ersetzen."""
+    """Meldungen mit Kauf/Verkauf, aber ohne Volumen oder Währung, neu lesen und ersetzen."""
     h = pd.read_csv(ERGEBNIS, dtype=str, keep_default_na=False)
-    kaputt = h.loc[h["art"].isin(["Kauf", "Verkauf"]) & h["volumen"].eq(""), "url"].unique()
+    kaputt = h.loc[h["art"].isin(["Kauf", "Verkauf"]) & (h["volumen"].eq("") | h["waehrung"].eq("")), "url"].unique()
     neu, ersetzt = [], set()
     for url in kaputt:
         if time.monotonic() > ende:

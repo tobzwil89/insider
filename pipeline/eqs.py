@@ -127,7 +127,7 @@ def _aggregiert(block: list) -> tuple:
     i = block.index("d) Aggregierte Informationen") + 1
     ende = next((j for j in range(i, len(block)) if block[j].startswith("e) ")), len(block))
     text = " ".join(z for z in block[i:ende] if z not in ("Preis", "Aggregiertes Volumen"))
-    werte = re.findall(r"(\d[\d.,]*)\s*([A-Z]{3})?", text)
+    werte = re.findall(r"(\d[\d.,]*)\s*([A-Z][A-Za-z]{2})?", text)  # auch "GBp" (Pence)
     werte = [f"{zahl} {waehrung}".strip() for zahl, waehrung in werte[:2]]
     return tuple((werte + ["", ""])[:2])
 

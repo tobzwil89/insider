@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aurubis: Insider-Käufe und -Verkäufe · Insider-Monitor</title>
+  <meta name="description" content="Directors&#x27; Dealings bei Aurubis (NDA.DE): 5 Käufe und 0 Verkäufe von Vorstand und Aufsichtsrat seit 2018, Kursreaktionen und Timing.">
+  <link rel="canonical" href="https://insider.tobiaszwilling.me/firma/NDA.DE/">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%232a78d6'/><path d='M3 11l3-3 2 2 5-5' stroke='white' stroke-width='2' fill='none'/></svg>">
+  <link rel="stylesheet" href="../../style.css?v=aad8d2c8">
+</head>
+<body>
+  <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quellen: BaFin-Datenbank der Eigengeschäfte von Führungskräften, EQS-Archiv.</div>
+
+  <header class="kopf">
+    <div class="marke"><a href="../../">← Insider-Monitor</a></div>
+    <h1>Aurubis</h1>
+    <p class="unterzeile">NDA.DE · MDAX · ISIN DE0006766504</p>
+  </header>
+
+  <main>
+    <div class="kacheln"><div class="kachel"><div class="label">Schlusskurs</div><div class="wert">131,50 €</div><div class="zusatz">am 22.10.2026</div></div><div class="kachel"><div class="label">Insider-Käufe</div><div class="wert">5</div><div class="zusatz">zusammen 837 Tsd. €</div></div><div class="kachel"><div class="label">Insider-Verkäufe</div><div class="wert">0</div><div class="zusatz">zusammen 0 €</div></div><div class="kachel"><div class="label">Ø Reaktion nach Käufen</div><div class="wert">−0,2 %</div><div class="zusatz">CAR Tag 0 bis +5, 5 Ereignisse</div></div></div>
+
+    <section class="karte">
+      <h2>Kurs und Insider-Geschäfte</h2>
+      <p class="erklaerung">Schlusskurse bereinigt um Dividenden und Splits. Punkte markieren Aktienkäufe und -verkäufe
+        von Führungskräften am Tag des Geschäfts. Fahre über das Diagramm für Details.</p>
+      <div class="filter">
+        <div class="knopfgruppe" id="zeitraum">
+          <button aria-pressed="false" data-monate="6">6 Monate</button>
+          <button aria-pressed="false" data-monate="12">1 Jahr</button>
+          <button aria-pressed="false" data-monate="24">2 Jahre</button>
+          <button aria-pressed="true" data-monate="60">5 Jahre</button>
+          <button aria-pressed="false" data-monate="999">Alles</button>
+        </div>
+      </div>
+      <div class="legende">
+        <span><span class="strich" style="background:var(--kurs)"></span>Schlusskurs</span>
+        <span><span class="punkt" style="background:var(--kauf)"></span>Insider-Kauf</span>
+        <span><span class="punkt" style="background:var(--verkauf)"></span>Insider-Verkauf</span>
+      </div>
+      <div id="kurs"></div>
+    </section>
+
+    <section class="karte">
+      <h2>Kursreaktion je Ereignis</h2>
+      <p class="erklaerung">Abnormale Rendite (CAR) gegenüber dem Marktmodell mit dem MDAX,
+        von 5 Handelstagen vor bis 5 nach der Veröffentlichung. Nur Vorstand und Aufsichtsrat, Käufe und Verkäufe am selben
+        Tag sind je ein Ereignis. Einzelne Ereignisse schwanken stark, aussagekräftig ist erst der Durchschnitt
+        auf der <a href="../../">Startseite</a>.</p>
+      <div class="tabelle-rahmen"><table><thead><tr><th class="">Veröffentlicht</th><th class="">Art</th><th class="">Personen</th><th class="zahl">Volumen</th><th class="zahl">CAR −5 bis +5</th><th class="zahl">CAR 0 bis +5</th></tr></thead><tbody><tr><td class="datum">24.05.2019</td><td class=""><span class="art"><span class="punkt" style="background:var(--kauf)"></span>Kauf</span></td><td class="">Vahrenholt, Prof. Dr. Fritz</td><td class="zahl">102 Tsd. €</td><td class="zahl positiv">+5,9 %</td><td class="zahl positiv">+2,9 %</td></tr><tr><td class="datum">27.05.2019</td><td class=""><span class="art"><span class="punkt" style="background:var(--kauf)"></span>Kauf</span></td><td class="">Harings, Roland</td><td class="zahl">394 Tsd. €</td><td class="zahl positiv">+5,9 %</td><td class="zahl positiv">+0,1 %</td></tr><tr><td class="datum">14.05.2021</td><td class=""><span class="art"><span class="punkt" style="background:var(--kauf)"></span>Kauf</span></td><td class="">Harings, Roland</td><td class="zahl">156 Tsd. €</td><td class="zahl negativ">−5,8 %</td><td class="zahl negativ">−3,8 %</td></tr><tr><td class="datum">28.05.2021</td><td class=""><span class="art"><span class="punkt" style="background:var(--kauf)"></span>Kauf</span></td><td class="">Arnold, Dr. Heiko</td><td class="zahl">76 Tsd. €</td><td class="zahl negativ">−1,3 %</td><td class="zahl positiv">+1,9 %</td></tr><tr><td class="datum">01.09.2021</td><td class=""><span class="art"><span class="punkt" style="background:var(--kauf)"></span>Kauf</span></td><td class="">Lossin, Dr. Elke</td><td class="zahl">109 Tsd. €</td><td class="zahl negativ">−2,8 %</td><td class="zahl negativ">−2,0 %</td></tr></tbody></table></div>
+    </section>
+
+    <section class="karte">
+      <h2>Timing der Insider</h2>
+      <p class="erklaerung">Überrendite gegenüber dem MDAX in den 3 Monaten nach den Aktienkäufen, für Personen
+        mit mindestens 3 Käufen. Der Rang bezieht sich auf alle Insider im DAX und MDAX
+        (<a href="../../">Startseite</a>, <a href="../../methode.html#ranking">Methode</a>).</p>
+      <p class="leer">Keine Führungskraft dieser Firma hat mindestens 3 Käufe mit abgeschlossenen 3 Monaten.</p>
+    </section>
+
+    <section class="karte">
+      <h2>Alle Meldungen</h2>
+      <div class="tabelle-rahmen"><table><thead><tr><th class="">Veröffentlicht</th><th class="">Geschäft</th><th class="">Person</th><th class="">Art</th><th class="">Instrument</th><th class="zahl">Volumen</th><th class="zahl">Kurs</th></tr></thead><tbody><tr><td class="datum">01.09.2021</td><td class="datum">30.08.2021</td><td class="">Lossin, Dr. Elke<div class="klein">Aufsichtsrat</div></td><td class=""><span class="art"><span class="punkt" style="background:var(--kauf)"></span>Kauf</span></td><td class="">Aktie</td><td class="zahl">109 Tsd. €</td><td class="zahl">72,51</td></tr><tr><td class="datum">28.05.2021</td><td class="datum">28.05.2021</td><td class="">Arnold, Dr. Heiko<div class="klein">Vorstand</div></td><td class=""><span class="art"><span class="punkt" style="background:var(--kauf)"></span>Kauf</span></td><td class="">Aktie</td><td class="zahl">76 Tsd. €</td><td class="zahl">76,24</td></tr><tr><td class="datum">14.05.2021</td><td class="datum">11.05.2021</td><td class="">Harings, Roland<div class="klein">Vorstand</div></td><td class=""><span class="art"><span class="punkt" style="background:var(--kauf)"></span>Kauf</span></td><td class="">Aktie</td><td class="zahl">156 Tsd. €</td><td class="zahl">77,90</td></tr><tr><td class="datum">27.05.2019</td><td class="datum">24.05.2019</td><td class="">Harings, Roland<div class="klein">Vorstand</div></td><td class=""><span class="art"><span class="punkt" style="background:var(--kauf)"></span>Kauf</span></td><td class="">Aktie</td><td class="zahl">394 Tsd. €</td><td class="zahl">39,41</td></tr><tr><td class="datum">24.05.2019</td><td class="datum">23.05.2019</td><td class="">Vahrenholt, Prof. Dr. Fritz<div class="klein">Aufsichtsrat</div></td><td class=""><span class="art"><span class="punkt" style="background:var(--kauf)"></span>Kauf</span></td><td class="">Aktie</td><td class="zahl">102 Tsd. €</td><td class="zahl">40,70</td></tr></tbody></table></div>
+    </section>
+  </main>
+
+  <footer>
+    <p><b>Keine Anlageberatung.</b> Diese Seite zeigt öffentlich gemeldete Daten und statistische Auswertungen. Sie ist keine
+      Empfehlung, Wertpapiere zu kaufen oder zu verkaufen.</p>
+    <p><a href="../../methode.html">Methode</a> · <a href="../../impressum.html">Impressum und Datenschutz</a></p>
+  </footer>
+
+  <script type="application/json" id="daten">{"ticker": "NDA.DE", "name": "Aurubis", "marker": [{"geschaeftsdatum": "2021-08-30", "art": "Kauf", "person": "Lossin, Dr. Elke", "volumen": 108762.0, "waehrung": "EUR"}, {"geschaeftsdatum": "2021-05-28", "art": "Kauf", "person": "Arnold, Dr. Heiko", "volumen": 76244.0, "waehrung": "EUR"}, {"geschaeftsdatum": "2021-05-11", "art": "Kauf", "person": "Harings, Roland", "volumen": 155800.0, "waehrung": "EUR"}, {"geschaeftsdatum": "2019-05-24", "art": "Kauf", "person": "Harings, Roland", "volumen": 394150.0, "waehrung": "EUR"}, {"geschaeftsdatum": "2019-05-23", "art": "Kauf", "person": "Vahrenholt, Prof. Dr. Fritz", "volumen": 101750.0, "waehrung": "EUR"}]}</script>
+  <script src="../../gemeinsam.js?v=d7826b92"></script>
+  <script src="../../firma.js?v=ea85a0d9"></script>
+</body>
+</html>

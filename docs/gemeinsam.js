@@ -55,7 +55,7 @@ function artMarke(art) {
 }
 
 function firmaLink(name, ticker) {
-  return ticker ? el("a", { href: `firma.html?t=${encodeURIComponent(ticker)}` }, name) : el("span", {}, name);
+  return ticker ? el("a", { href: `firma/${encodeURIComponent(ticker)}/` }, name) : el("span", {}, name);
 }
 
 function stand(s) {

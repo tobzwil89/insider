@@ -1,22 +1,7 @@
-// Firmenseite: Kursverlauf mit Insider-Geschäften, CAR je Ereignis, alle Meldungen.
+// Firmenseite (docs/firma/<TICKER>/index.html, von pipeline/seiten.py erzeugt): Zahlen und Tabellen
+// stehen schon im HTML. Hier wird nur das Kursdiagramm mit den Insider-Geschäften gezeichnet.
 
-const INDEXNAME = { "^GDAXI": "dem DAX", "^MDAXI": "dem MDAX" };
 const monat = (text) => new Date(text).toLocaleDateString("de-DE", { month: "short", year: "2-digit", timeZone: "UTC" });
-
-function zeigeKacheln(f) {
-  const [letztesDatum, letzterKurs] = f.kurse[f.kurse.length - 1] || [];
-  const aktien = f.meldungen.filter((m) => m.instrument === "Aktie");
-  const summe = (art) => aktien.filter((m) => m.art === art);
-  const volumen = (liste) => liste.reduce((s, m) => s + (m.volumen || 0), 0);
-  const kaeufe = f.ereignisse.filter((e) => e.art === "Kauf");
-  const schnitt = kaeufe.length ? kaeufe.reduce((s, e) => s + e.car_ab_0, 0) / kaeufe.length : null;
-  document.getElementById("kacheln").replaceChildren(
-    kachel("Schlusskurs", letzterKurs == null ? "–" : `${fmt.zahl(letzterKurs, 2)} €`, `am ${fmt.datum(letztesDatum)}`),
-    kachel("Insider-Käufe", fmt.zahl(summe("Kauf").length), `zusammen ${fmt.euro(volumen(summe("Kauf")))}`),
-    kachel("Insider-Verkäufe", fmt.zahl(summe("Verkauf").length), `zusammen ${fmt.euro(volumen(summe("Verkauf")))}`),
-    kachel("Ø Reaktion nach Käufen", fmt.prozent(schnitt), `CAR Tag 0 bis +5, ${kaeufe.length} Ereignisse`),
-  );
-}
 
 function zeigeKurs(f, monate) {
   const behaelter = document.getElementById("kurs");
@@ -28,8 +13,7 @@ function zeigeKurs(f, monate) {
 
   // Insider-Geschäfte dem ersten Handelstag am oder nach dem Geschäftsdatum zuordnen
   const jeTag = new Map();
-  for (const m of f.meldungen) {
-    if (m.instrument !== "Aktie" || !(m.art in FARBE) || !m.geschaeftsdatum) continue;
+  for (const m of f.marker) {
     const i = daten.findIndex((d) => d >= m.geschaeftsdatum);
     if (i < 0 || m.geschaeftsdatum < daten[0]) continue;
     if (!jeTag.has(i)) jeTag.set(i, []);
@@ -62,65 +46,17 @@ function zeigeKurs(f, monate) {
   });
 }
 
-function carZelle(x) {
-  return el("td", { class: `zahl ${x > 0 ? "positiv" : x < 0 ? "negativ" : ""}` }, fmt.prozent(x));
-}
-
-function zeigeEreignisse(f) {
-  const ziel = document.getElementById("ereignisse");
-  if (!f.ereignisse.length) {
-    ziel.append(el("p", { class: "leer" }, "Noch keine auswertbaren Ereignisse. Es braucht mindestens 100 Handelstage Kurshistorie vor der Meldung."));
-    return;
-  }
-  ziel.append(tabelle([["Veröffentlicht"], ["Art"], ["Personen"], ["Volumen", "zahl"], ["CAR −5 bis +5", "zahl"], ["CAR 0 bis +5", "zahl"]],
-    f.ereignisse.map((e) => el("tr", {},
-      el("td", { class: "datum" }, fmt.datum(e.mitteilungsdatum)),
-      el("td", {}, artMarke(e.art)),
-      el("td", {}, e.personen.join("; ")),
-      el("td", { class: "zahl" }, fmt.euro(e.volumen)),
-      carZelle(e.car),
-      el("td", { class: `zahl ${e.car_ab_0 > 0 ? "positiv" : e.car_ab_0 < 0 ? "negativ" : ""}` }, fmt.prozent(e.car_ab_0),
-        e.tage_nach < 5 ? el("div", { class: "klein" }, `erst bis Tag +${e.tage_nach}`) : null)))));
-}
-
-function zeigeMeldungen(f) {
-  const ziel = document.getElementById("meldungen");
-  if (!f.meldungen.length) { ziel.append(el("p", { class: "leer" }, "Seit Beginn der Aufzeichnung keine Meldungen.")); return; }
-  ziel.append(tabelle([["Veröffentlicht"], ["Geschäft"], ["Person"], ["Art"], ["Instrument"], ["Volumen", "zahl"], ["Kurs", "zahl"]],
-    f.meldungen.map((m) => el("tr", {},
-      el("td", { class: "datum" }, fmt.datum(m.mitteilungsdatum)),
-      el("td", { class: "datum" }, fmt.datum(m.geschaeftsdatum)),
-      el("td", {}, m.person, el("div", { class: "klein" }, fmt.position(m.position))),
-      el("td", {}, artMarke(m.art)),
-      el("td", {}, m.instrument),
-      el("td", { class: "zahl" }, fmt.euro(m.volumen, m.waehrung)),
-      el("td", { class: "zahl" }, m.preis == null ? "–" : fmt.zahl(m.preis, 2))))));
-}
-
 (async () => {
-  const ticker = new URLSearchParams(location.search).get("t") || "";
+  const f = JSON.parse(document.getElementById("daten").textContent);
   try {
-    if (!/^[A-Z0-9.\-]{1,15}$/.test(ticker)) throw new Error("unbekannte Firma");
-    const [f, ranking] = await Promise.all([ladeJson(`data/firmen/${ticker}.json`), ladeJson("data/ranking.json")]);
-    document.title = `${f.name} · Insider-Monitor`;
-    document.getElementById("name").textContent = f.name;
-    document.getElementById("kennung").textContent = `${f.ticker} · ${f.index} · ISIN ${f.isins.join(", ")}`;
-    document.getElementById("benchmark").textContent = INDEXNAME[f.benchmark] || f.benchmark;
-    document.querySelectorAll(".benchmark-name").forEach((e) => { e.textContent = INDEXNAME[f.benchmark] || f.benchmark; });
-    const eigene = ranking.map((r, i) => ({ ...r, rang: i + 1 })).filter((r) => r.ticker === ticker);
-    document.getElementById("ranking").append(eigene.length ? rankingTabelle(eigene, false)
-      : el("p", { class: "leer" }, "Keine Führungskraft dieser Firma hat mindestens 3 Käufe mit abgeschlossenen 3 Monaten."));
-    zeigeKacheln(f);
-    zeigeKurs(f, 60);
-    document.querySelectorAll("#zeitraum button").forEach((knopf) => knopf.addEventListener("click", () => {
-      document.querySelectorAll("#zeitraum button").forEach((k) => k.setAttribute("aria-pressed", k === knopf));
-      zeigeKurs(f, +knopf.dataset.monate);
-    }));
-    zeigeEreignisse(f);
-    zeigeMeldungen(f);
+    f.kurse = await ladeJson(`../../data/kurse/${encodeURIComponent(f.ticker)}.json`);
   } catch (fehler) {
     console.error(fehler);
-    document.getElementById("name").textContent = "Firma nicht gefunden";
-    document.getElementById("kennung").replaceChildren("Zurück zur ", el("a", { href: "./" }, "Übersicht"), ".");
+    f.kurse = [];
   }
+  zeigeKurs(f, 60);
+  document.querySelectorAll("#zeitraum button").forEach((knopf) => knopf.addEventListener("click", () => {
+    document.querySelectorAll("#zeitraum button").forEach((k) => k.setAttribute("aria-pressed", k === knopf));
+    zeigeKurs(f, +knopf.dataset.monate);
+  }));
 })();

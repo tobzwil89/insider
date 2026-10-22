@@ -42,7 +42,7 @@ def nachricht(c: pd.Series, ticker: str | None) -> str:
         f"{len(c['personen'])} Führungskräfte kauften vom {c['von']:%d.%m.} bis {c['bis']:%d.%m.%Y} "
         f"für zusammen {_betrag(c['volumen'])}.",
         "Personen: " + html.escape("; ".join(c["personen"])),
-        f'<a href="{WEBSITE}/firma.html?t={ticker}">Zur Firmenseite</a>' if ticker else WEBSITE,
+        f'<a href="{WEBSITE}/firma/{ticker}/">Zur Firmenseite</a>' if ticker else WEBSITE,
         "<i>Keine Anlageberatung.</i>",
     ]
     return "\n".join(zeilen)
