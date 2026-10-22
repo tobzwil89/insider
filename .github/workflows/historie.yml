@@ -1,0 +1,49 @@
+# Einmalig per Knopfdruck: Directors' Dealings 2018 bis Oktober 2025 aus dem EQS-Archiv nachladen.
+# Speichert nach jeder Firma; ein erneuter Start macht dort weiter, wo der letzte aufgehört hat.
+name: Historie laden
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_minuten:
+        description: "Höchstens so viele Minuten laden"
+        default: "320"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historie
+  cancel-in-progress: false
+
+jobs:
+  laden:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: EQS-Archiv laden
+        run: python historie.py --max-minuten "${{ inputs.max_minuten }}"
+
+      # Auch nach einem Fehler speichern, was bis dahin geladen wurde
+      - name: Ergebnis speichern
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add daten/eqs_historie.csv daten/eqs_fortschritt.csv 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Nichts Neues"
+          else
+            git commit -m "Historie $(TZ=Europe/Berlin date '+%d.%m.%Y %H:%M')"
+            git pull --rebase
+            git push
+          fi

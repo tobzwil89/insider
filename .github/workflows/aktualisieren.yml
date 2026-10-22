@@ -57,5 +57,6 @@ jobs:
             echo "Keine Änderungen"
           else
             git commit -m "Daten $(TZ=Europe/Berlin date '+%d.%m.%Y %H:%M')"
+            git pull --rebase
             git push
           fi

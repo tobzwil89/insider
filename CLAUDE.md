@@ -36,10 +36,14 @@ Reihenfolge laut Tobias: 1. Historie 2018–2025 nachholen, 2. Ranking der Insid
 - **Abdeckung geprüft (23.10.2026):** EQS hat ~88 % der BaFin-Meldungen der letzten 12 Monate (Zählung je Firma in `.recherche/fertig.log`). Fehlt ganz: Siemens Energy, Bayer, Fresenius, BMW. Teilweise: Lufthansa, LEG, Wacker, Renk. EQS zählt je Firma, nicht je Aktiengattung (Sartorius, Fuchs). **Tobias hat entschieden: mit 88 % weitermachen, Lücke auf der Methode-Seite offen benennen.**
 - EQS hat oft mehr Meldungen als die BaFin-Zählung (z. B. Zalando 74 vs. 22); keine Sprach-Duplikate, sondern viele Einzelmeldungen.
 
-**Nächste Schritte (morgen):**
-1. Geschäftsgenauer Abgleich EQS vs. BaFin für Zalando, Deutz, SAP (Code stand im Chat; letzte 12 Monate parsen, nach Person/Geschäftsdatum/Art/Volumen matchen) → Leser validieren.
-2. GitHub Action „Historie laden“ (workflow_dispatch, max. 6 h): je Firma DD-Links ab 2018-01-01 bis 2025-10-21, Meldungen lesen, nach jeder Firma Zwischenstand committen, bei Neustart fortsetzen. Titel enthält die Art („…, Kauf“) → Nicht-Kauf/Verkauf überspringen, spart ~1/3. 1 Anfrage/s. **Tobias will das nicht lokal laufen lassen (Rechner nicht stundenlang an).**
-3. Zusammenführen mit `daten/meldungen.csv` (Spalte `quelle`), Doppelte im Überschneidungszeitraum vermeiden, Event Study über 2018–heute, Methode-Seite anpassen (Quellen, 88 %-Lücke).
+**Stand 22.10.2026 vormittags:**
+- Abgleich Geschäft für Geschäft (Zalando, Deutz, SAP, letzte 12 Monate): 148 von 149 BaFin-Geschäften exakt bei EQS gefunden; Mitteilungsdatum und Position 100 % gleich. Ausreißer: EQS behält widerrufene Meldungen (Zalando 05.08.2026, 4,9 Mio. €, später „hat nicht stattgefunden“), die BaFin löscht sie.
+- `historie.py` + Action `.github/workflows/historie.yml` („Historie laden“, per Knopfdruck, max. 320 Min., speichert nach jeder Firma in `daten/eqs_historie.csv` und `daten/eqs_fortschritt.csv`, setzt bei Neustart fort). Lokal mit 3 Min. getestet. Titel mit eindeutig anderer Art als Kauf/Verkauf werden übersprungen (`eqs.nur_zuteilung`).
+- Beide Workflows machen vor dem Push `git pull --rebase`, weil sie parallel committen können.
+
+**Nächste Schritte:**
+1. Tobias pusht und startet „Historie laden“; Ergebnis prüfen (Anzahl je Firma in `eqs_fortschritt.csv`, Stichproben).
+2. Zusammenführen: `bafin.lade_meldungen()` um `eqs_historie.csv` ergänzen (Spalte `quelle`), nur EQS-Zeilen vor Beginn der BaFin-Daten (22.10.2025) verwenden. Gekennzeichnete Korrekturmeldungen ersetzen ältere Meldungen mit gleicher ISIN/Person/Geschäftsdatum. Event Study über 2018–heute, Kurse ab 2017 laden, Methode-Seite anpassen (Quellen, 88 %-Lücke).
 
 **Ranking (danach; Idee, noch nicht mit Tobias abgestimmt):** je Person abnormale Rendite 20/60 Handelstage nach dem Geschäftsdatum, Verkäufe mit umgekehrtem Vorzeichen, mindestens 3 Geschäfte, Trefferquote dazu; Holdings über „in enger Beziehung zu“ der Führungskraft zuordnen; nüchterne Darstellung ohne wertende Sprache.
 

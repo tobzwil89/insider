@@ -41,8 +41,8 @@ def firma_uuid(isin: str) -> str | None:
     return treffer[0] if treffer else None
 
 
-def dd_links(uuid: str, ab: pd.Timestamp) -> list:
-    """URLs aller Directors'-Dealings-Meldungen einer Firma seit `ab` (neueste zuerst)."""
+def dd_links(uuid: str, ab: pd.Timestamp, bis: pd.Timestamp | None = None) -> list:
+    """(URL, Titel) aller Directors'-Dealings-Meldungen einer Firma von `ab` bis `bis` (neueste zuerst)."""
     links, seite, datum = [], 1, None
     while True:
         html = _holen(AJAX, action="fetch_eqs_financial_news_data", pageLimit=30, pageNo=seite,
@@ -53,11 +53,21 @@ def dd_links(uuid: str, ab: pd.Timestamp) -> list:
             if knoten.name == "p":
                 t, m, j = knoten.get_text(strip=True).split()
                 datum = pd.Timestamp(int(j), MONATE[m], int(t))
-            elif datum >= ab and "/news/directors-dealings/" in knoten["href"]:
-                links.append(knoten["href"])
+            elif datum >= ab and (bis is None or datum <= bis) and "/news/directors-dealings/" in knoten["href"]:
+                titel = knoten.select_one(".news__heading")
+                links.append((knoten["href"], titel.get_text(strip=True) if titel else ""))
         if datum is not None and datum < ab:
             return links
         seite += 1
+
+
+def nur_zuteilung(titel: str) -> bool:
+    """True, wenn der Titel eindeutig kein Kauf oder Verkauf ist (z. B. '…, Zuteilung').
+    Ältere Titel wie 'DGAP-DD: SAP SE deutsch' nennen die Art nicht; die werden geladen."""
+    if "," not in titel or titel.startswith(("DGAP-DD", "EQS-DD")):
+        return False
+    art = titel.rsplit(",", 1)[1].strip()
+    return "Kauf" not in art and "Verkauf" not in art
 
 
 def _zahl(text: str) -> float | None:
