@@ -1,4 +1,6 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+FUCHS SE,40001544,DE000A3E5D64,"Rheinboldt, Dr. Ralph",Vorstand,Aktie,Verkauf,"45,24 EUR","264.553,92 EUR",2026-10-22,2026-10-20,XETRA - REGULIERTER MARKT,2026-10-23 08:20:10,45.24,EUR,264553.92,2026-10-23 09:33:47
+HelloFresh SE,40024258,DE000A161408,Active Ownership Opportunities SCS,in enger Beziehung,Aktie,Kauf,"2,38 EUR","225.758,00 EUR",2026-10-09,2026-10-05,XETRA,2026-10-23 08:09:25,2.38,EUR,225758.0,2026-10-23 09:33:47
 EnviTec Biogas AG,40006808,DE000A0MVLS8,2. vLB GmbH & Co. KG,in enger Beziehung,Aktie,Kauf,"17,37 EUR","1.354,62 EUR",2026-10-21,2026-10-21,Tradegate,2026-10-22 09:41:38,17.37,EUR,1354.62,2026-10-22 14:37:02
 EnviTec Biogas AG,40006808,DE000A0MVLS8,2. vLB GmbH & Co. KG,in enger Beziehung,Aktie,Kauf,"17,11 EUR","174.549,99 EUR",2026-10-21,2026-10-20,Tradegate,2026-10-22 09:41:38,17.11,EUR,174549.99,2026-10-22 14:37:02
 EnviTec Biogas AG,40006808,DE000A0MVLS8,2. vLB GmbH & Co. KG,in enger Beziehung,Aktie,Kauf,"17,21 EUR","3.442,10 EUR",2026-10-21,2026-10-19,Tradegate,2026-10-22 09:41:38,17.21,EUR,3442.1,2026-10-22 14:37:02
