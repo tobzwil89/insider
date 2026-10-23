@@ -1,4 +1,19 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+DEUTZ Aktiengesellschaft,40001150,DE0006305006,"Voggenreiter, Dr. Dietmar",Aufsichtsrat,Aktie,Kauf,"10,08 EUR","50.400,00 EUR",2026-10-23,2026-10-22,XETRA,2026-10-23 10:57:28,10.08,EUR,50400.0,2026-10-23 14:53:00
+DEUTZ Aktiengesellschaft,40001150,DE0006305006,"Voggenreiter, Dr. Simone",in enger Beziehung,Aktie,Kauf,"9,88 EUR","49.400,00 EUR",2026-10-23,2026-10-22,XETRA,2026-10-23 10:57:28,9.88,EUR,49400.0,2026-10-23 14:53:00
+DEUTZ Aktiengesellschaft,40001150,DE0006305006,"Voggenreiter, Dr. Simone",in enger Beziehung,Aktie,Kauf,"9,94 EUR","49.675,00 EUR",2026-10-23,2026-10-22,XETRA,2026-10-23 10:57:28,9.94,EUR,49675.0,2026-10-23 14:53:00
+Brockhaus Technologies AG,40026230,DE000A2GSU42,Brockhaus Private Equity GmbH,in enger Beziehung,Aktie,Sonstiges,"25,00 EUR","206.050,00 EUR",2026-10-22,2026-10-19,,2026-10-23 10:52:06,25.0,EUR,206050.0,2026-10-23 14:53:00
+Brockhaus Technologies AG,40026230,DE000A2GSU42,Manhattan Heritage GmbH,in enger Beziehung,Aktie,Sonstiges,"25,00 EUR","74.975,00 EUR",2026-10-22,2026-10-19,,2026-10-23 10:52:06,25.0,EUR,74975.0,2026-10-23 14:53:00
+Brockhaus Technologies AG,40026230,DE000A2GSU42,Falkenstein Heritage GmbH,in enger Beziehung,Aktie,Sonstiges,"25,00 EUR","1.648.475,00 EUR",2026-10-22,2026-10-19,,2026-10-23 10:46:56,25.0,EUR,1648475.0,2026-10-23 14:53:00
+Brockhaus Technologies AG,40026230,DE000A2GSU42,"Hütten, Prof. Dr. Christoph",Aufsichtsrat,Aktie,Sonstiges,"25,00 EUR","325,00 EUR",2026-10-22,2026-10-19,,2026-10-23 09:59:57,25.0,EUR,325.0,2026-10-23 14:53:00
+Brockhaus Technologies AG,40026230,DE000A2GSU42,"Bestmann, Martin",Aufsichtsrat,Aktie,Sonstiges,"25,00 EUR","7.800,00 EUR",2026-10-22,2026-10-19,,2026-10-23 09:59:57,25.0,EUR,7800.0,2026-10-23 14:53:00
+Brockhaus Technologies AG,40026230,DE000A2GSU42,"Wilhelm, Dr. Marcel",Vorstand,Aktie,Sonstiges,"25,00 EUR","90.800,00 EUR",2026-10-22,2026-10-19,,2026-10-23 09:59:57,25.0,EUR,90800.0,2026-10-23 14:53:00
+OHB SE,40002548,DE0005936124,"Schmidt, Daniela",Vorstand,Aktie,Sonstiges,"0,00 EUR","0,00 EUR",2026-10-23,2026-10-20,,2026-10-23 09:55:10,0.0,EUR,0.0,2026-10-23 14:53:00
+OHB SE,40002548,DE0005936124,"Moeller, Dr. Markus",Vorstand,Aktie,Sonstiges,"0,00 EUR","0,00 EUR",2026-10-23,2026-10-20,,2026-10-23 09:55:10,0.0,EUR,0.0,2026-10-23 14:53:00
+OHB SE,40002548,DE0005936124,"Tecklenburg, Dr. Tim",Vorstand,Aktie,Sonstiges,"0,00 EUR","0,00 EUR",2026-10-23,2026-10-20,,2026-10-23 09:55:10,0.0,EUR,0.0,2026-10-23 14:53:00
+Brockhaus Technologies AG,40026230,DE000A2GSU42,"Belker, Dr. Othmar",Aufsichtsrat,Aktie,Sonstiges,"25,00 EUR","16.225,00 EUR",2026-10-22,2026-10-19,,2026-10-23 09:55:10,25.0,EUR,16225.0,2026-10-23 14:53:00
+Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"64,99 EUR","7.344,00 EUR",2026-10-22,2026-10-20,XETRA,2026-10-23 09:49:57,64.99,EUR,7344.0,2026-10-23 14:53:00
+Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"64,90 EUR","8.437,00 EUR",2026-10-22,2026-10-20,Tradegate,2026-10-23 09:49:57,64.9,EUR,8437.0,2026-10-23 14:53:00
 FUCHS SE,40001544,DE000A3E5D64,"Rheinboldt, Dr. Ralph",Vorstand,Aktie,Verkauf,"45,24 EUR","264.553,92 EUR",2026-10-22,2026-10-20,XETRA - REGULIERTER MARKT,2026-10-23 08:20:10,45.24,EUR,264553.92,2026-10-23 09:33:47
 HelloFresh SE,40024258,DE000A161408,Active Ownership Opportunities SCS,in enger Beziehung,Aktie,Kauf,"2,38 EUR","225.758,00 EUR",2026-10-09,2026-10-05,XETRA,2026-10-23 08:09:25,2.38,EUR,225758.0,2026-10-23 09:33:47
 EnviTec Biogas AG,40006808,DE000A0MVLS8,2. vLB GmbH & Co. KG,in enger Beziehung,Aktie,Kauf,"17,37 EUR","1.354,62 EUR",2026-10-21,2026-10-21,Tradegate,2026-10-22 09:41:38,17.37,EUR,1354.62,2026-10-22 14:37:02
