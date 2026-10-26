@@ -1,4 +1,11 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+Beno Holding AG,40022640,,"Renner, Florian",Vorstand,Anderes auf Aktie/schuldtitel bez. FI,Sonstiges,,,2026-10-26,2026-10-26,,2026-10-26 15:02:02,,,,2026-10-26 16:12:29
+Beno Holding AG,40022640,,PAX Investments GmbH Entwicklung & Beteiligung,in enger Beziehung,Anderes auf Aktie/schuldtitel bez. FI,Sonstiges,,,2026-10-26,2026-10-26,,2026-10-26 15:02:02,,,,2026-10-26 16:12:29
+Beno Holding AG,40022640,,H2 Immobilienobjekte GmbH,in enger Beziehung,Anderes auf Aktie/schuldtitel bez. FI,Sonstiges,,,2026-10-26,2026-10-26,,2026-10-26 15:02:02,,,,2026-10-26 16:12:29
+Beno Holding AG,40022640,,3BX GmbH,in enger Beziehung,Anderes auf Aktie/schuldtitel bez. FI,Sonstiges,,,2026-10-26,2026-10-26,,2026-10-26 15:02:02,,,,2026-10-26 16:12:29
+Beno Holding AG,40022640,,"Schulze, Klaus",Sonstige Führungsperson,Anderes auf Aktie/schuldtitel bez. FI,Sonstiges,,,2026-10-26,2026-10-26,,2026-10-26 15:02:02,,,,2026-10-26 16:12:29
+Rigsave S.p.A.,40035602,IT0005526295,Pareto Capital Partners SA - SPF,in enger Beziehung,Aktie,Kauf,"3,00 EUR","18.000,00 EUR",2026-10-23,2026-10-22,xetra,2026-10-26 13:28:15,3.0,EUR,18000.0,2026-10-26 16:12:29
+DEUTZ Aktiengesellschaft,40001150,DE0006305006,"Ernst, Helmut",Aufsichtsrat,Aktie,Kauf,"9,96 EUR","99.600,00 EUR",2026-10-26,2026-10-22,XETRA,2026-10-26 13:28:15,9.96,EUR,99600.0,2026-10-26 16:12:29
 DEUTZ Aktiengesellschaft,40001150,DE0006305006,"Voggenreiter, Dr. Dietmar",Aufsichtsrat,Aktie,Kauf,"10,08 EUR","50.400,00 EUR",2026-10-23,2026-10-22,XETRA,2026-10-23 10:57:28,10.08,EUR,50400.0,2026-10-23 14:53:00
 DEUTZ Aktiengesellschaft,40001150,DE0006305006,"Voggenreiter, Dr. Simone",in enger Beziehung,Aktie,Kauf,"9,88 EUR","49.400,00 EUR",2026-10-23,2026-10-22,XETRA,2026-10-23 10:57:28,9.88,EUR,49400.0,2026-10-23 14:53:00
 DEUTZ Aktiengesellschaft,40001150,DE0006305006,"Voggenreiter, Dr. Simone",in enger Beziehung,Aktie,Kauf,"9,94 EUR","49.675,00 EUR",2026-10-23,2026-10-22,XETRA,2026-10-23 10:57:28,9.94,EUR,49675.0,2026-10-23 14:53:00
