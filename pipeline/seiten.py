@@ -278,9 +278,114 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
 """
 
 
-def sitemap(ticker: list) -> str:
+# --- Guru-Depots (13F) ----------------------------------------------------------------------------
+
+STATUS_FARBE = {"neu": "var(--kauf)", "aufgestockt": "var(--kauf)", "reduziert": "var(--verkauf)",
+                "verkauft": "var(--verkauf)"}
+
+
+def kurzname(name: str) -> str:
+    """'Warren Buffett (Berkshire Hathaway)' → 'warren-buffett' für die Adresse."""
+    return re.sub(r"[^a-z]+", "-", name.split("(")[0].lower()).strip("-")
+
+
+def usd(x) -> str:
+    if _leer(x):
+        return "–"
+    if abs(x) >= 1e9:
+        return f"{zahl(x / 1e9, 1)} Mrd. $"
+    return f"{zahl(x / 1e6, 1)} Mio. $"
+
+
+def _guru_rahmen(titel: str, beschreibung: str, adresse: str, wurzel: str, kopf: str, inhalt: str, v: dict) -> str:
+    """Gemeinsames Seitengerüst; wurzel = relativer Weg zur Startseite ('../' oder '../../')."""
+    return f"""<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{e(titel)} · Insider-Monitor</title>
+  <meta name="description" content="{e(beschreibung)}">
+  <link rel="canonical" href="{WEBSITE}/{adresse}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%232a78d6'/><path d='M3 11l3-3 2 2 5-5' stroke='white' stroke-width='2' fill='none'/></svg>">
+  <link rel="stylesheet" href="{wurzel}style.css?v={v['style.css']}">
+</head>
+<body>
+  <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quelle: Formular 13F der US-Börsenaufsicht SEC.</div>
+  <header class="kopf">{kopf}</header>
+  <main>{inhalt}</main>
+  <footer>
+    <p><b>Keine Anlageberatung.</b> Diese Seite zeigt öffentlich gemeldete Daten. Sie ist keine
+      Empfehlung, Wertpapiere zu kaufen oder zu verkaufen.</p>
+    <p><a href="{wurzel}methode.html">Methode</a> · <a href="{wurzel}impressum.html">Impressum und Datenschutz</a></p>
+  </footer>
+</body>
+</html>
+"""
+
+
+ERKLAERUNG_13F = ("Wer in den USA mehr als 100 Mio. USD in US-Wertpapieren verwaltet, muss jedes Quartal seine "
+                  "Positionen melden (Formular 13F). Die Meldung kommt bis zu 45 Tage nach Quartalsende, die "
+                  "Positionen können sich seitdem also geändert haben. Enthalten sind nur an US-Börsen gehandelte "
+                  "Papiere (deutsche Aktien nur als ADR, z. B. SAP oder Deutsche Bank), keine Leerverkäufe, kein Bargeld.")
+
+
+def guruseite(d: dict, v: dict) -> str:
+    p = d["positionen"]
+    gehalten = p[p["status"] != "verkauft"]
+    vq = f"Veränderung zum {datum(d['vorquartal'])} nach Stückzahl." if d["vorquartal"] else ""
+    tabelle = _tabelle(
+        [("Wertpapier", ""), ("Wert", "zahl"), ("Anteil", "zahl"), ("Stück", "zahl"), ("Veränderung", "")],
+        [[(f'{e(r.emittent)}<div class="klein">{e(r.klasse)}{" · " + e(r.put_call) if r.put_call else ""}</div>', ""),
+          (usd(r.wert_usd), "zahl"), ("–" if _leer(r.anteil) else f"{zahl(r.anteil * 100, 1)} %", "zahl"),
+          (zahl(r.stueck), "zahl"),
+          (f'<span class="art"><span class="punkt" style="background:{STATUS_FARBE.get(r.status, "var(--sonstiges)")}">'
+           f'</span>{e(r.status)}</span>'
+           + (f' <span class="klein">{prozent(r.veraenderung, 0)}</span>'
+              if r.status in ("aufgestockt", "reduziert") else ""), "")]
+         for r in p.itertuples()])
+    kopf = (f'<div class="marke"><a href="../">← Alle Investoren</a></div><h1>{e(d["name"])}</h1>'
+            f'<p class="unterzeile">13F-Meldung zum {datum(d["quartal"])}, eingereicht am {datum(d["eingereicht"])}'
+            f' · <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&amp;CIK={d["cik"]}&amp;type=13F"'
+            f' rel="nofollow">Originalmeldungen bei der SEC</a></p>')
+    kacheln = "".join([
+        _kachel("Depotwert", usd(d["wert"]), "nur Aktien, ohne Optionen"),
+        _kachel("Positionen", zahl(len(gehalten)), f"Stand {datum(d['quartal'])}"),
+        _kachel("Neu gekauft", zahl((p["status"] == "neu").sum()), "im letzten Quartal"),
+        _kachel("Ganz verkauft", zahl((p["status"] == "verkauft").sum()), "im letzten Quartal"),
+    ])
+    inhalt = (f'<div class="kacheln">{kacheln}</div><section class="karte"><h2>Positionen</h2>'
+              f'<p class="erklaerung">{ERKLAERUNG_13F} {vq} Bei Optionen (Put/Call) ist der Wert der des Basiswerts; '
+              f'sie zählen nicht zum Anteil.</p>{tabelle}</section>')
+    return _guru_rahmen(f"{d['name']}: Depot laut 13F", f"Aktiendepot von {d['name']} laut SEC-Meldung zum "
+                        f"{datum(d['quartal'])}: Positionen, Käufe und Verkäufe.",
+                        f"gurus/{kurzname(d['name'])}/", "../../", kopf, inhalt, v)
+
+
+def gurus_uebersicht(depots: list, v: dict) -> str:
+    zeilen = []
+    for d in sorted(depots, key=lambda d: -d["wert"]):
+        p = d["positionen"]
+        top = p[p["put_call"] == ""].iloc[0]
+        zeilen.append([(f'<a href="{kurzname(d["name"])}/">{e(d["name"])}</a>', ""), (usd(d["wert"]), "zahl"),
+                       (zahl((d["positionen"]["status"] != "verkauft").sum()), "zahl"),
+                       (f'{e(top.emittent)} <span class="klein">{zahl(top.anteil * 100, 0)} %</span>', ""),
+                       (datum(d["quartal"]), "datum")])
+    kopf = ('<div class="marke"><a href="../">← Insider-Monitor</a></div><h1>Depots bekannter Investoren</h1>'
+            '<p class="unterzeile">Was Buffett und andere bekannte Investoren laut ihren Pflichtmeldungen bei der '
+            'US-Börsenaufsicht halten.</p>')
+    inhalt = (f'<section class="karte"><h2>Investoren</h2><p class="erklaerung">{ERKLAERUNG_13F} '
+              'Steht beim Stand ein älteres Quartal, kam seitdem keine neue Meldung (z. B. Fonds geschlossen).</p>'
+              + _tabelle([("Investor", ""), ("Depotwert", "zahl"), ("Positionen", "zahl"),
+                          ("Größte Position", ""), ("Stand", "")], zeilen) + "</section>")
+    return _guru_rahmen("Depots bekannter Investoren (13F)", "Aktiendepots von Warren Buffett, Bill Ackman und "
+                        "anderen bekannten Investoren laut SEC-Formular 13F.", "gurus/", "../", kopf, inhalt, v)
+
+
+def sitemap(ticker: list, weitere: list = ()) -> str:
     heute = pd.Timestamp.now().strftime("%Y-%m-%d")
-    adressen = [f"{WEBSITE}/", f"{WEBSITE}/methode.html"] + [f"{WEBSITE}/firma/{t}/" for t in ticker]
+    adressen = ([f"{WEBSITE}/", f"{WEBSITE}/methode.html"] + [f"{WEBSITE}/firma/{t}/" for t in ticker]
+                + [f"{WEBSITE}/{a}" for a in weitere])
     eintraege = "".join(f"<url><loc>{html.escape(a)}</loc><lastmod>{heute}</lastmod></url>" for a in adressen)
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{eintraege}</urlset>\n')

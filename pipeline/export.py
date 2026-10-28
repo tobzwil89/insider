@@ -21,7 +21,7 @@ import shutil
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, ranking as rk, seiten, stimmrechte
+from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, gurus, ranking as rk, seiten, stimmrechte
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
 KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
@@ -129,4 +129,11 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     for ordner in (seiten.DOCS / "firma").iterdir():
         if ordner.name not in set(mit_seite["ticker"]):
             shutil.rmtree(ordner)
-    (seiten.DOCS / "sitemap.xml").write_text(seiten.sitemap(sorted(mit_seite["ticker"].unique())), encoding="utf-8")
+    depots = gurus.alle_depots()
+    for d in depots:
+        seiten.schreiben(seiten.DOCS / "gurus" / seiten.kurzname(d["name"]) / "index.html", seiten.guruseite(d, v))
+    if depots:
+        seiten.schreiben(seiten.DOCS / "gurus" / "index.html", seiten.gurus_uebersicht(depots, v))
+    guru_adressen = ["gurus/"] + [f"gurus/{seiten.kurzname(d['name'])}/" for d in depots] if depots else []
+    (seiten.DOCS / "sitemap.xml").write_text(seiten.sitemap(sorted(mit_seite["ticker"].unique()), guru_adressen),
+                                             encoding="utf-8")

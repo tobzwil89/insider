@@ -10,7 +10,7 @@ import sys
 
 import pandas as pd
 
-from pipeline import DATEN, bafin, event_study as es, export
+from pipeline import DATEN, bafin, event_study as es, export, gurus
 from pipeline.meldungen import lade_alle
 from pipeline import ranking as rk
 from pipeline.cluster import finde_cluster
@@ -27,6 +27,12 @@ def main() -> int:
     print(f"BaFin: {len(neu)} neue Meldungen")
     if neu.empty and not args.immer and (export.AUSGABE / "stand.json").exists():
         return 0
+
+    if args.immer:  # 13F kommt nur vierteljährlich, einmal täglich nachsehen reicht
+        try:
+            gurus.laden()
+        except Exception as fehler:  # SEC nicht erreichbar: alte Depots bleiben, nächster Lauf holt nach
+            print(f"Gurus: SEC-Abruf fehlgeschlagen ({fehler})")
 
     meldungen = lade_alle()
     firmen = pd.read_csv(DATEN / "firmen.csv", dtype=str, keep_default_na=False)

@@ -133,6 +133,36 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
 - Porsche SE / Porsche AG (28.10.2026): 100 % je Familienmitglied ist korrekt (Stammaktien vollständig zugerechnet,
   gehandelt werden nur Vorzüge). Hinweis auf der Seite über `seiten.NUR_VORZUG`; „Name (1.)“ = „Name“ im Schlüssel.
 
+## Laufendes Vorhaben: Guru-Depots (13F der SEC)
+
+Auftrag Tobias 28.10.2026: Depots bekannter Investoren (Buffett usw.) wie bei GuruFocus. OpenBB (github.com/openbq-org/OpenBB,
+früher OpenBB-finance, Apache 2.0) geprüft und verworfen: keine deutschen Insider-/Fundamentaldaten, `openbb-sec` zieht
+95 Pakete nach (Webserver, MCP, ruff), 13F selbst lesen sind ~80 Zeilen mit vorhandenen Paketen. Tobias: bei komplizierten
+Datenquellen fertige Lösungen nutzen, hier selbst bauen.
+
+- [x] **Block 1 – Leser (28.10.2026, nicht gepusht):** `pipeline/gurus.py` (`python3 -m pipeline.gurus`) holt je Guru die
+      letzten 8 Meldungen 13F-HR von data.sec.gov und speichert jede Zeile nach `daten/gurus.csv` (lädt nur fehlende).
+      7 Gurus in `GURUS` (CIK geprüft; Berkshire = 1067983). Werte vor 03.01.2023 in Tausend USD → ×1000.
+      Test: 56 Meldungen, 1.942 Zeilen, 55 s, keine leeren Felder, 268 KB. Berkshire 266–299 Mrd. USD je Quartal, Apple vorn.
+      Nicht gelesen: Nachträge 13F-HR/A (Berkshire reicht vertrauliche Positionen so nach), 13F-NT (Pershing Q2/2026:
+      Positionen meldet eine andere Gesellschaft). Scion meldet seit Q3/2025 nicht mehr (Burry hat geschlossen).
+      **Deutsche Firmen:** nur Deutsche Bank bei Tepper (2025–2026). 13F enthält nur US-gehandelte Papiere.
+      **Formfehler bei der SEC:** Baupost meldet auch nach 2023 in Tausend → `positionen` erkennt das am Median-Preis
+      je Aktie < 1 USD und rechnet ×1000. Nach Korrektur liegen alle Median-Preise zwischen 18 und 238 USD.
+- [x] **Block 2 – Anzeige (28.10.2026, nicht gepusht):** `gurus.depot`/`alle_depots` fassen je CUSIP + Put/Call zusammen
+      und vergleichen mit dem Vorquartal nach Stückzahl (neu / aufgestockt / reduziert / verkauft / unverändert, ±0,5 %).
+      Anteil nur über Aktien (Optionen = Wert des Basiswerts). Seiten `docs/gurus/` (Übersicht) und
+      `docs/gurus/<name>/` aus `seiten.guruseite`/`gurus_uebersicht`, Aufruf in `export.py`, Einträge in `sitemap.xml`,
+      Link auf der Startseite. Geprüft: Screenshot Buffett und Übersicht (Werte stimmen, Apple 22 %, Alphabet +45 %).
+      Bildschirmfotos unter ~500 px schneiden rechts ab, auch bei bestehenden Firmenseiten → Werkzeug, nicht Seite.
+- [x] **Block 3 – Automatisch (28.10.2026, nicht gepusht):** `lauf.py --immer` (werktags 17:15 UTC) ruft `gurus.laden()` auf,
+      Fehler bei der SEC brechen den Lauf nicht ab. Ganzer Lauf lokal getestet (15 s). **Tobias:** committen und pushen
+      (`pipeline/gurus.py`, `daten/gurus.csv`, `docs/gurus/`, `lauf.py`, `pipeline/export.py`, `pipeline/seiten.py`,
+      `docs/index.html`, `CLAUDE.md`), danach https://insider.tobiaszwilling.me/gurus/ ansehen.
+      Push während laufender Action „Stimmrechte laden“ geprüft (28.10.2026): kein Konflikt, die Action committet nur
+      `daten/stimmrechte*.csv` und macht vor dem Push `git pull --rebase`. Wird der eigene Push abgelehnt: `git pull`, `git push`.
+- [ ] Später: Nachträge 13F-HR/A, Hinweis auf Firmenseiten bei US-Notierung (z. B. Deutsche Bank bei Tepper), mehr Investoren.
+
 ## Entscheidungen (mit Grund)
 
 - **Neu statt BA-Code übernommen:** Der alte Code (Dropbox `Uni/Universität Bayreuth/Bachelorarbeit/Code für Analyse
@@ -182,6 +212,12 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
       Unternehmensregister (gratis, nur von Hand). ESEF-Probe 22.10.2026 (`.recherche/esef_probe.md`): filings.xbrl.org
       hat keine deutschen Berichte; freier Weg erst über ESAP (EU-Portal, spätestens 10.07.2027). Tobias (22.10.2026):
       nach hinten verschoben, zuerst Stimmrechte und Rückkäufe aus EQS.
+      **Uni-Datenbanken (Nova SBE, geprüft 28.10.2026):** WRDS (Compustat, I/B/E/S, BoardEx, 13f), LSEG Workspace,
+      Bloomberg, Orbis, Pitchbook sind Lizenzen nur für Lehre/Forschung → **nicht für die öffentliche Website**
+      (Weitergabe/Anzeige verboten, Risiko für den Uni-Zugang). Nutzbar nur privat zum Prüfen (EQS-Abdeckung ~88 %,
+      fehlende Großaktionäre vor 2018) und für eine mögliche Forschungs-/Masterarbeit. Empfehlung: WRDS-Konto anlegen
+      (Uni-Mail, Subscriber „Universidade Nova de Lisboa – Nova SBE“, Typ „Students“); vor jeder indirekten Nutzung
+      Nutzungsbedingungen bei der Bibliothek erfragen.
 - [ ] **Zukünftiger Schritt: FinceptTerminal als Datenquelle testen** (Tobias 28.10.2026, nur Daten, kein Code
       übernehmen). github.com/Fincept-Corporation/FinceptTerminal, C++/Qt-Desktop-Programm, ~33.000 Sterne.
       Ziel: mehr Finanzdaten für ein vollständiges Bild (Fundamentaldaten, Kennzahlen usw.).
@@ -232,3 +268,5 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
   Gepusht (f26ea18). Test Block 6: Mitteilungen vor ~2016 sind Fließtext, Regex-Leser unbrauchbar (Details Block 6).
   Porsche-Hinweis. Block 6a (Lader vor 2018) gebaut und an Krones/Talanx getestet.
   Lizenz von FinceptTerminal geprüft; Test als Datenquelle als zukünftiger Schritt unter „Offen“ aufgenommen.
+  Datenbankliste der Nova SBE bewertet: nur für Forschung/Prüfung, nicht für die Website (Notiz unter „Offen“, Fundamentaldaten).
+- **28.10.2026 abends:** OpenBB geprüft und verworfen (Begründung unter „Guru-Depots“). Guru-Depots Block 1–3 gebaut und getestet (Baupost-Einheitenfehler abgefangen). `.env^t^t` in `.env` umbenannt (Schlüssel war nicht von `.gitignore` erfasst). Push-Befehle an Tobias übergeben (Stimmrechte-Action lief parallel, kein Konflikt).
