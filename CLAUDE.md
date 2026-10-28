@@ -88,8 +88,9 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
         nachgeladen (409 Mitteilungen) → **alle 90 Firmen fertig, Block 3 erledigt.**
       - Dabei gefunden und im Leser behoben: Natürliche Personen mit Vor- und Nachname in getrennten Zeilen wurden nur
         mit Vornamen gespeichert (57 alte Zeilen, z. B. „Gérald“ statt „Gérald Frère“). 28.10.2026 neu gelesen: 53 korrigiert,
-        4 waren richtig (RAG-Stiftung, AXA). **Offen für Block 5:** Hochtief 14.11.2023 (ACS, 75,71 %) ohne Namen,
-        englisches Formular; vor der Anzeige ansehen, sonst fehlt der Hauptaktionär.
+        4 waren richtig (RAG-Stiftung, AXA). Hochtief 14.11.2023 (ACS, 75,71 %) ohne Namen: Leerzeichen hinter
+        „Legal entity:“ → Leser entfernt jetzt Leerzeichen am Zeilenende (25 Stichproben ohne Abweichung), Zeile korrigiert.
+        Bekannt, nicht behoben: Scout24 2019, 2 Mitteilungen Sand Grove ohne Prozentwerte.
       - 214 × `anderes`: 74 eigene Aktien, 13 × § 43, Korrekturen; **Aroundtown 60** (luxemburgisches Formular, wie bei
         Directors' Dealings nicht unterstützt) und ~40 verstreute (Elmos 9, Delivery Hero 7, Beiersdorf 6 …), noch nicht angesehen.
 - [x] **Block 4 – Laufend aktuell halten (28.10.2026, noch nicht gepusht):** `stimmrechte_laden.py --tage 14` lädt für
@@ -98,7 +99,18 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
       dauert (EQS-Pause 2 s je Abruf) und das 15-Min.-Limit von „Daten aktualisieren“ sprengen würde. Knopfdruck
       lädt weiter die Historie. Lokal getestet: 12 Min., 28 neue Mitteilungen (23.–28.10.), keine Duplikate, keine
       leeren Pflichtfelder. Nach dem Push: am nächsten Morgen unter Actions prüfen, ob der Lauf um ~03:37 Uhr lief.
-- [ ] **Block 5 – Anzeige:** Bereich „Großaktionäre“ auf den Firmenseiten (je Halter letzter Stand, Aktien und Instrumente getrennt).
+- [x] **Block 5 – Anzeige (28.10.2026, noch nicht gepusht):** Abschnitt „Großaktionäre“ auf jeder Firmenseite
+      (`stimmrechte.grossaktionaere`, Aufruf in `export.py`, HTML in `seiten.py`). Je Firma und Halter die letzte
+      Mitteilung (nach Schwellendatum). Gezeigt nur **≥ 3 % Aktien oder ≥ 5 % zusammen**: Darunter kann ein Halter
+      ohne Meldung aussteigen (Schwellen Instrumente/Summe beginnen erst bei 5 %), der Stand wäre unsicher.
+      Schreibweisen zusammengefasst über `_schluessel` (Ort/Land hinter dem Namen abgeschnitten, „X / Y“ → Y),
+      Anzeigename = kürzeste Schreibweise. Keine Summenzeile (Zurechnung: Stiftung und Stifter, Konzern und Fonds).
+      Ergebnis: 422 Halter bei 79 Firmen; lokal geprüft (Hochtief, Hugo Boss, Screenshot Desktop und 420 px).
+      **Lücke (auf der Seite benannt):** nur Mitteilungen ab 2018, stabile Großaktionäre fehlen (HDI bei Talanx,
+      Schulenberg bei Eventim, Kronseder bei Krones). Volkswagen, Sartorius, Wacker: gar keine Mitteilungen bei EQS
+      (anderer Verteiler). Umfirmierungen erscheinen doppelt (Hugo Boss: PFC S.r.l. 2020 und PFC S.p.A. 2025).
+- [ ] **Block 6 – Lücke vor 2018 schließen** (Entscheidung Tobias): EQS-Archiv vor 2018 laden (alte Formulare
+      nach § 21 WpHG a. F. prüfen) und/oder Quelle für VW/Sartorius/Wacker suchen (Unternehmensregister).
 
 ## Entscheidungen (mit Grund)
 
@@ -195,4 +207,5 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
 - **24.10.2026:** Stand Stimmrechte geprüft: Lauf 1 erfolgreich, 34/90 Firmen, 6.735 Mitteilungen; noch 2 Läufe (Details Block 3).
 - **28.10.2026:** Stimmrechte-Historie geprüft: fertig bis auf 2 Auto1-Mitteilungen (Kodierungsfehler bei EQS).
   Leser repariert (Kodierung, zweizeilige Personennamen), Auto1 nachgeladen → Block 3 fertig. Block 4 gebaut und getestet. 53 alte Namen korrigiert.
+  Gepusht (f71f27b). Hochtief-Name repariert, Block 5 (Großaktionäre auf den Firmenseiten) gebaut und lokal geprüft.
   Lizenz von FinceptTerminal geprüft; Test als Datenquelle als zukünftiger Schritt unter „Offen“ aufgenommen.

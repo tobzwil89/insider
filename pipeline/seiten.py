@@ -102,8 +102,9 @@ def versionen_eintragen(v: dict) -> None:
 # --- Firmenseite --------------------------------------------------------------------------------
 
 def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, ranking: pd.DataFrame,
-                letzter_kurs: tuple, v: dict) -> str:
-    """f: ticker, name, index, benchmark, isins. ranking: Zeilen dieser Firma mit Spalte 'rang'."""
+                letzter_kurs: tuple, v: dict, aktionaere: pd.DataFrame) -> str:
+    """f: ticker, name, index, benchmark, isins. ranking: Zeilen dieser Firma mit Spalte 'rang'.
+    aktionaere: Zeilen dieser Firma aus stimmrechte.grossaktionaere."""
     index_name = INDEXNAME.get(f["benchmark"], f["benchmark"])
     aktien = meldungen[meldungen["instrument"].eq("Aktie")]
     kaeufe, verkaeufe = aktien[aktien["art"].eq("Kauf")], aktien[aktien["art"].eq("Verkauf")]
@@ -144,6 +145,17 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
               (e(f"{r.erster_kauf:%Y}" if r.erster_kauf.year == r.letzter_kauf.year
                  else f"{r.erster_kauf:%Y}–{r.letzter_kauf:%Y}"), "datum")]
              for r in ranking.itertuples()])
+
+    if aktionaere.empty:
+        ga_html = ('<p class="leer">Keine Halter über den Meldeschwellen laut den Stimmrechtsmitteilungen '
+                   'im EQS-Archiv seit 2018. Das heißt nicht, dass es keine Großaktionäre gibt.</p>')
+    else:
+        ga_html = _tabelle(
+            [("Halter", ""), ("Aktien", "zahl"), ("Instrumente", "zahl"), ("Zusammen", "zahl"), ("Stand", "")],
+            [[(e(r.halter), ""), (f"{zahl(r.aktien, 2)} %", "zahl"), (f"{zahl(r.instrumente, 2)} %", "zahl"),
+              (f"<b>{zahl(r.summe, 2)} %</b>", "zahl"),
+              (f'<a href="{e(r.url)}" rel="nofollow">{datum(r.schwellendatum)}</a>', "datum")]
+             for r in aktionaere.itertuples()])
 
     if meldungen.empty:
         m_html = '<p class="leer">Seit Beginn der Aufzeichnung keine Meldungen.</p>'
@@ -227,6 +239,17 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
         mit mindestens 3 Käufen. Der Rang bezieht sich auf alle Insider im DAX und MDAX
         (<a href="../../">Startseite</a>, <a href="../../methode.html#ranking">Methode</a>).</p>
       {rk_html}
+    </section>
+
+    <section class="karte">
+      <h2>Großaktionäre</h2>
+      <p class="erklaerung">Stimmrechtsanteile laut der letzten Stimmrechtsmitteilung je Halter (§§ 33 ff. WpHG),
+        gezählt ab 3 % in Aktien oder 5 % zusammen mit Instrumenten (z. B. Optionen, Wertpapierleihe).
+        Stand ist das Datum der Schwellenberührung, der Link führt zur Mitteilung. Dieselben Aktien können bei mehreren
+        Haltern auftauchen (z. B. Stiftung und Stifter), deshalb ergibt die Spalte keine Summe.
+        <b>Ausgewertet sind Mitteilungen seit 2018 aus dem EQS-Archiv:</b> Wer seinen Anteil seitdem nicht verändert hat
+        (oft Gründerfamilien oder Mutterkonzerne), fehlt hier. Nach Umfirmierungen kann ein Halter doppelt erscheinen.</p>
+      {ga_html}
     </section>
 
     <section class="karte">

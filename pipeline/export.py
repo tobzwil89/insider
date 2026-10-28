@@ -9,7 +9,8 @@
     ranking.json          Insider mit dem besten Timing (Überrendite 3 Monate nach Käufen)
     kurse/<TICKER>.json   je Firma: Schlusskurse als [Datum, Kurs] für das Diagramm
 
-Außerdem (pipeline/seiten.py): docs/firma/<TICKER>/index.html als fertige Seite je Firma,
+Außerdem (pipeline/seiten.py): docs/firma/<TICKER>/index.html als fertige Seite je Firma (mit Großaktionären
+aus daten/stimmrechte.csv),
 docs/sitemap.xml und Versionsnummern (?v=) für CSS/JS.
 """
 
@@ -20,7 +21,7 @@ import shutil
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, event_study as es, cluster as cl, ranking as rk, seiten
+from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, ranking as rk, seiten, stimmrechte
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
 KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
@@ -107,6 +108,7 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     seiten.versionen_eintragen(v)
     rang = rangliste.assign(rang=range(1, len(rangliste) + 1))
     kurs_start = kurse.index.max() - pd.DateOffset(years=KURS_JAHRE)
+    aktionaere = stimmrechte.grossaktionaere(pd.read_csv(DATEN / "stimmrechte.csv"))
     uebersicht = []
     for ticker, f in mit_seite.groupby("ticker"):
         eigene = zusammen[zusammen["ticker"] == ticker]
@@ -117,7 +119,8 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
                  "benchmark": f["benchmark"].iloc[0], "isins": list(f["isin"])}
         letzter = (verlauf.index[-1], verlauf.iloc[-1]) if len(verlauf) else None
         seiten.schreiben(seiten.DOCS / "firma" / ticker / "index.html", seiten.firmenseite(
-            stamm, eigene, ausgewertet[ausgewertet["ticker"] == ticker], rang[rang["ticker"] == ticker], letzter, v))
+            stamm, eigene, ausgewertet[ausgewertet["ticker"] == ticker], rang[rang["ticker"] == ticker], letzter, v,
+            aktionaere[aktionaere["firma"] == stamm["name"]]))
         uebersicht.append({"ticker": ticker, "name": stamm["name"], "index": stamm["index"],
                            "meldungen": len(eigene),
                            "letzte_meldung": eigene["mitteilungsdatum"].max() if len(eigene) else None})

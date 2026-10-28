@@ -69,7 +69,7 @@ def lesen(url: str, html: str | None = None) -> dict:
     zeile = {"url": url, "veroeffentlicht": f"{zeit[3]}-{zeit[2]}-{zeit[1]} {zeit[4]}:00" if zeit else "",
              "korrektur": "Korrektur" in text[max(0, anfang - 600): anfang]}
 
-    zeilen = [re.sub(r"\s+", " ", z) for z in text[anfang:].split("\n")]
+    zeilen = [re.sub(r"\s+", " ", z).strip() for z in text[anfang:].split("\n")]
     i3, i4, i5, i6, i7 = (_abschnitt(zeilen, f"{n}. ") for n in range(3, 8))
     i_neu = next((i for i in range(i6, i7) if zeilen[i] in NEU), -1) if 0 <= i6 < i7 else -1
     if min(i3, i4, i5, i_neu) < 0:
@@ -94,3 +94,39 @@ def lesen(url: str, html: str | None = None) -> dict:
                 gesamtstimmrechte=re.sub(r"\D", "", neu[3]),
                 aktien_vorher=_prozent(letzte[0]), instrumente_vorher=_prozent(letzte[1]),
                 summe_vorher=_prozent(letzte[2]))
+
+
+# --- Auswertung für die Firmenseiten -------------------------------------------------------------
+
+RECHTSFORM = re.compile(r"^(inc|ltd|llc|llp|lp|l\.p|plc|corp|co|s\.a|sa|ag|se|n\.v|nv|gmbh|s\.à r\.l|s\.a\.r\.l)\.?$", re.I)
+
+
+def _schluessel(name: str) -> str:
+    """Gleicher Halter, verschiedene Schreibweisen → gleicher Schlüssel.
+    'BlackRock, Inc., Wilmington, DE, USA' und 'BlackRock, Inc.' → 'blackrockinc'.
+    Ältere Formulare hängen Ort und Land an den Namen; abgeschnitten wird ab dem ersten Teil nach einem Komma,
+    der keine Rechtsform ist."""
+    name = name.split(" / ")[-1].replace("City and registered office", "")
+    teile = name.split(",")
+    behalten = [teile[0]] + [t for t in teile[1:2] if RECHTSFORM.match(t.strip())]
+    return re.sub(r"[^a-z0-9]", "", re.sub(r"\bthe\b", "", ",".join(behalten).lower()))
+
+
+def grossaktionaere(df: pd.DataFrame) -> pd.DataFrame:
+    """Letzter Stand je Firma und Halter.
+    Nur wer mindestens 3 % in Aktien oder 5 % insgesamt hält: Das sind die niedrigsten Schwellen (Aktien 3 %,
+    Instrumente und Summe 5 %). Darunter kann ein Halter ohne neue Mitteilung aussteigen, der Stand wäre unsicher.
+    Spalten: firma, halter, aktien, instrumente, summe, schwellendatum, url; sortiert nach Summe."""
+    df = df[df["formular"].eq("stimmrechte") & df["meldepflichtiger"].fillna("").ne("")].copy()
+    df["schluessel"] = df["meldepflichtiger"].map(_schluessel)
+    df["schwellendatum"] = pd.to_datetime(df["schwellendatum"], errors="coerce")
+    df["summe"] = df["summe"].fillna(df["aktien"])
+    letzte = df.sort_values(["schwellendatum", "veroeffentlicht"]).groupby(["firma", "schluessel"]).tail(1)
+    # Anzeigename: kürzeste Schreibweise des Halters (meist die ohne Ort und Land)
+    namen = df.assign(laenge=df["meldepflichtiger"].str.len()).sort_values("laenge") \
+        .groupby("schluessel")["meldepflichtiger"].first()
+    letzte["halter"] = letzte["schluessel"].map(namen)
+    return (letzte[(letzte["aktien"] >= 3) | (letzte["summe"] >= 5)]
+            .sort_values(["firma", "summe"], ascending=[True, False])
+            [["firma", "halter", "aktien", "instrumente", "summe", "schwellendatum", "url"]]
+            .reset_index(drop=True))
