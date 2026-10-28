@@ -1,13 +1,41 @@
 # Insider-Monitor – Stand der Dinge
 
 Directors' Dealings (Art. 19 MAR) von DAX- und MDAX-Firmen seit 2018, live ausgewertet mit der Event Study aus
-Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: eine Art GuruFocus für deutsche Aktien.
+Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: ein Startup, eine Finanzdaten-Plattform wie GuruFocus, global (Einstieg unten).
 
 - Website: https://insider.tobiaszwilling.me (GitHub Pages aus `/docs`, Branch `main`)
 - Repository: github.com/tobzwil89/insider (öffentlich); DNS bei Namecheap, CNAME `insider` → `tobzwil89.github.io`
 - Technische Übersicht (Dateien, Befehle): README.md; Vorbild-Analyse: GURUFOCUS.md
 - Alte Projekte (Sentiment-Tracker, StockPulse, GuruFocus-Analyse) und was davon übernehmbar ist: BESTANDSAUFNAHME.md
-- Katalog möglicher Datenquellen für USA und weitere Märkte (aus OpenBB ausgelesen, mit Adressen): DATENQUELLEN.md
+- Recherche Datenquellen für den Ausbau (OpenBB, last30days-skill, FinceptTerminal, mit Adressen): DATENQUELLEN.md
+
+## Einstieg für einen neuen Chat (Stand 28.10.2026)
+
+**Was das ist:** Tobias (Bachelorarbeit Uni Bayreuth, Event Study zu Directors' Dealings) baut aus dem Insider-Monitor
+ein **Startup**: eine Finanzdaten-Plattform nach Vorbild GuruFocus/AlleAktien, **global** (Deutschland, USA, weitere
+Märkte), mit eigener Datenbank. Der heutige Stand (statische Website auf GitHub Pages, Python-Pipeline in GitHub Actions)
+ist nur der Anfang; **Tech-Stack ist offen**, Umzug auf eine richtige Datenbank ist geplant.
+
+**Aktuelle Phase: Recherche.** Noch nichts davon gebaut. Ergebnisse in `DATENQUELLEN.md` (zuerst Lesehinweis und
+Abschnitt 7 lesen). Geprüft: OpenBB, last30days-skill, FinceptTerminal.
+
+**Lesereihenfolge:** diese Datei (Stand, Vorhaben, Offen) → `DATENQUELLEN.md` (Quellen für den Ausbau) →
+`GURUFOCUS.md` (Vorbild, Aufbau der Seiten) → `ALTERNATIVE_DATEN.md` (Rechtslage, Meldeschwellen, Ausbauideen) →
+`BESTANDSAUFNAHME.md` (alte eigene Projekte) → `README.md` (Dateien und Befehle).
+
+**So arbeitet Tobias (bitte einhalten):**
+- Deutsch, einfache Sprache, direkt; widersprechen, wenn er falschliegt; klare Empfehlung statt Optionsliste.
+- **Startup-Sicht:** Repositories und Quellen nach Nutzen fürs Produkt bewerten, nicht nach „passt in die GitHub Action“
+  oder „nur deutsche Aktien“. In der Recherche **alles aufnehmen**, auch graue Wege (Browser-Cookies, Umgehung von
+  Bot-Sperren); Rechtslage nur als Hinweis „vor dem Start klären“.
+- **Nicht ungefragt bauen:** Fragt er „Ist X nützlich?“, ist das eine Recherchefrage, kein Bauauftrag.
+- **Alles notieren**, laufend in dieser Datei (Stand, Offen, Verlauf) und in den Recherchedateien.
+- Er **pusht selbst**: am Ende jedes Schritts die Befehle zum Committen/Pushen als Codeblock geben (Dateien einzeln
+  `git add`, nie `git add .`; `.env` mit API-Schlüssel ist in `.gitignore`).
+- Bei schweren Datenquellen fertige Lösungen bevorzugen, bei einfachen schlank selbst bauen.
+
+**Offene Entscheidungen von Tobias:** Reihenfolge des Ausbaus (Sentiment/News, USA über SEC, Datenbank-Umzug);
+ob die Regel „kein Fincept-Code“ bleibt (Urheberrecht AGPL, nicht nur Nutzungsbedingungen); Taktung der Action (s. „Offen“).
 
 ## Arbeitsweise
 
@@ -137,7 +165,7 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
 ## Laufendes Vorhaben: Guru-Depots (13F der SEC)
 
 Auftrag Tobias 28.10.2026: Depots bekannter Investoren (Buffett usw.) wie bei GuruFocus. OpenBB (github.com/openbq-org/OpenBB,
-früher OpenBB-finance, Apache 2.0) geprüft und verworfen: keine deutschen Insider-/Fundamentaldaten, `openbb-sec` zieht
+früher OpenBB-finance, Apache 2.0) für diesen Zweck verworfen (später aus Startup-Sicht neu bewertet: `DATENQUELLEN.md` Abschnitt 5): keine deutschen Insider-/Fundamentaldaten, `openbb-sec` zieht
 95 Pakete nach (Webserver, MCP, ruff), 13F selbst lesen sind ~80 Zeilen mit vorhandenen Paketen. Tobias: bei komplizierten
 Datenquellen fertige Lösungen nutzen, hier selbst bauen.
 
@@ -166,6 +194,24 @@ Datenquellen fertige Lösungen nutzen, hier selbst bauen.
       in der Fußzeile der Startseite (vorher im Kopf). Beim GuruFocus-Ausbau richtig einbinden (Navigation, eigener
       Bereich neben Insidern und Großaktionären, Verknüpfung mit Firmenseiten).
 - [ ] Später: Nachträge 13F-HR/A, Hinweis auf Firmenseiten bei US-Notierung (z. B. Deutsche Bank bei Tepper), mehr Investoren.
+
+## Geplantes Vorhaben: Sentiment und News (Freigabe Tobias steht aus)
+
+Tobias 28.10.2026: „Ich brauche unbedingt eine Sentiment- und News-Sektion“, ohne KI-Agent. **Vorgabe: Startup, kein
+Hobbyprojekt. Tech-Stack offen (eigene Datenbank kommt), Markt global, nicht auf GitHub Actions oder Deutschland beschränken.**
+Gründliche Prüfung von last30days-skill: `DATENQUELLEN.md` Abschnitt 4.
+
+Vorschlag (Reihenfolge offen, Entscheidung Tobias):
+- [ ] **Ranking-Engine aus last30days übernehmen** (MIT, nur Standardbibliothek): einheitliches Datenmodell, Relevanz,
+      Engagement-Gewichtung, Rank Fusion, Duplikate, Story-Cluster → Grundgerüst für News-Feed und Sentiment.
+- [ ] **Quellen anbinden:** Pflichtmeldungen (EQS, SEC 8-K), Polymarket, Stellenanzeigen (Greenhouse/Lever/Ashby),
+      Bluesky, Hacker News, Reddit (Arctic-Shift-Archiv, interne Seitenteile), X (Cookies/GraphQL oder API), YouTube (yt-dlp),
+      StockTwits und alle weiteren Anschlüsse aus `DATENQUELLEN.md` Abschnitt 4.
+- [ ] **Stimmungswert je Firma und Tag** in der Datenbank: jede Meldung/jeden Beitrag einmal bewerten (Finanz-Wörterbuch,
+      FinBERT oder Sprachmodell im Stapel), Firmenzuordnung über ISIN/Ticker; danach Event Study auf Stimmungsänderungen.
+- [ ] **Lizenzierte Nachrichten** für die News-Sektion prüfen: GDELT (frei), Benzinga/Polygon/Tiingo (bezahlt).
+**Tobias 28.10.2026: Alles Recherchierte wird übernommen**, auch Cookies und Umgehung von Bot-Sperren (noch nicht live,
+kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLEN.md`). Noch nichts gebaut, erst Recherche.
 
 ## Entscheidungen (mit Grund)
 
@@ -223,7 +269,7 @@ Datenquellen fertige Lösungen nutzen, hier selbst bauen.
       (Uni-Mail, Subscriber „Universidade Nova de Lisboa – Nova SBE“, Typ „Students“); vor jeder indirekten Nutzung
       Nutzungsbedingungen bei der Bibliothek erfragen.
 - [ ] **Zukünftiger Schritt: FinceptTerminal als Datenquelle testen** (Tobias 28.10.2026, nur Daten, kein Code
-      übernehmen). github.com/Fincept-Corporation/FinceptTerminal, C++/Qt-Desktop-Programm, ~33.000 Sterne.
+      übernehmen). **Quellenkatalog (~240 Skripte) ausgewertet: `DATENQUELLEN.md` Abschnitt 6.** github.com/Fincept-Corporation/FinceptTerminal, C++/Qt-Desktop-Programm, ~33.000 Sterne.
       Ziel: mehr Finanzdaten für ein vollständiges Bild (Fundamentaldaten, Kennzahlen usw.).
       Lizenz (gelesen 28.10.2026, Version 2.0): Software AGPL-3.0 nur für privat/einzelne Studierende,
       sonst kostenpflichtige Lizenz; **Fincept-Daten und -APIs eigener Dienst, gratis nur „individual personal
@@ -277,4 +323,4 @@ Datenquellen fertige Lösungen nutzen, hier selbst bauen.
   Porsche-Hinweis. Block 6a (Lader vor 2018) gebaut und an Krones/Talanx getestet.
   Lizenz von FinceptTerminal geprüft; Test als Datenquelle als zukünftiger Schritt unter „Offen“ aufgenommen.
   Datenbankliste der Nova SBE bewertet: nur für Forschung/Prüfung, nicht für die Website (Notiz unter „Offen“, Fundamentaldaten).
-- **28.10.2026 abends:** OpenBB geprüft und verworfen (Begründung unter „Guru-Depots“). Guru-Depots Block 1–3 gebaut und getestet (Baupost-Einheitenfehler abgefangen). `.env^t^t` in `.env` umbenannt (Schlüssel war nicht von `.gitignore` erfasst). Push-Befehle an Tobias übergeben (Stimmrechte-Action lief parallel, kein Konflikt). Gepusht (b9c18da). Guru-Link in die Fußzeile verschoben, Umbau als offener Punkt notiert. OpenBB-Quellen in `DATENQUELLEN.md` erfasst (17 Anschlüsse im Repository mit Adressen und Schlüsselpflicht, 16 ausgelagerte PyPI-Pakete wie FMP und Yahoo; Korrektur: diese gibt es weiterhin, nur nicht mehr im Repository).
+- **28.10.2026 abends:** OpenBB geprüft und verworfen (Begründung unter „Guru-Depots“). Guru-Depots Block 1–3 gebaut und getestet (Baupost-Einheitenfehler abgefangen). `.env^t^t` in `.env` umbenannt (Schlüssel war nicht von `.gitignore` erfasst). Push-Befehle an Tobias übergeben (Stimmrechte-Action lief parallel, kein Konflikt). Gepusht (b9c18da). Guru-Link in die Fußzeile verschoben, Umbau als offener Punkt notiert. OpenBB-Quellen in `DATENQUELLEN.md` erfasst (17 Anschlüsse im Repository mit Adressen und Schlüsselpflicht, 16 ausgelagerte PyPI-Pakete wie FMP und Yahoo; Korrektur: diese gibt es weiterhin, nur nicht mehr im Repository). last30days-skill für Sentiment/News geprüft (`DATENQUELLEN.md` Abschnitt 4): nicht für die Website, StockTwits sperrt Skript-Abrufe (403), deutsche Foren fehlen; Empfehlung bleibt Sentiment aus EQS. Nachfrage Code-Übernahme beantwortet, Plan „Sentiment und News“ (3 Blöcke) notiert, Freigabe steht aus. Tobias: Startup-Sicht, Stack offen, global → last30days gründlich neu bewertet (Ranking-Engine übernehmbar, Quellen nach Rechtslage sortiert, Finanz-Perlen: StockTwits, Polymarket, Stellenanzeigen); Plan „Sentiment und News“ neu gefasst. Tobias: alles übernehmen, auch graue Wege → Quellen-Katalog in `DATENQUELLEN.md` vollständig (inkl. Arctic Shift), Status nur als Hinweis für vor dem Start. Bisherige Repositories aus Startup-Sicht neu bewertet: OpenBB (180 Datenmodelle als Schema-Vorlage, Anbieter-Code übernehmbar, Abschnitt 5), FinceptTerminal (~240 Datenquellen, u. a. OpenFIGI, GLEIF, Wikipedia-Aufrufe, SimFin, Quiver, Abschnitt 6), Überblick Abschnitt 7. Einstiegsabschnitt für neue Chats oben in dieser Datei.
