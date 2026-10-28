@@ -23,6 +23,8 @@ WEBSITE = "https://insider.tobiaszwilling.me"
 STATISCH = ["style.css", "gemeinsam.js", "start.js", "firma.js"]
 INDEXNAME = {"^GDAXI": "dem DAX", "^MDAXI": "dem MDAX"}
 FARBE = {"Kauf": "var(--kauf)", "Verkauf": "var(--verkauf)"}
+# Börsennotiert sind nur stimmrechtslose Vorzugsaktien; die Stimmrechte liegen bei einem festen Kreis
+NUR_VORZUG = {"PAH3.DE", "P911.DE"}
 POSITION = {"in enger Beziehung": "eng verbunden", "Sonstige Führungsperson": "Führungsperson"}
 
 
@@ -146,6 +148,10 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
                  else f"{r.erster_kauf:%Y}–{r.letzter_kauf:%Y}"), "datum")]
              for r in ranking.itertuples()])
 
+    vorzug = ('<p class="erklaerung"><b>An der Börse gehandelt werden nur Vorzugsaktien ohne Stimmrecht.</b> '
+              'Die Prozente beziehen sich auf die Stammaktien. Sie werden den Familien Porsche und Piëch über '
+              'Beteiligungsgesellschaften und Stimmbindungen vollständig zugerechnet (bei der Porsche AG über '
+              'Porsche SE und Volkswagen), deshalb meldet jedes Mitglied die vollen 100 %.</p>' if f["ticker"] in NUR_VORZUG else "")
     if aktionaere.empty:
         ga_html = ('<p class="leer">Keine Halter über den Meldeschwellen laut den Stimmrechtsmitteilungen '
                    'im EQS-Archiv seit 2018. Das heißt nicht, dass es keine Großaktionäre gibt.</p>')
@@ -249,7 +255,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
         Haltern auftauchen (z. B. Stiftung und Stifter), deshalb ergibt die Spalte keine Summe.
         <b>Ausgewertet sind Mitteilungen seit 2018 aus dem EQS-Archiv:</b> Wer seinen Anteil seitdem nicht verändert hat
         (oft Gründerfamilien oder Mutterkonzerne), fehlt hier. Nach Umfirmierungen kann ein Halter doppelt erscheinen.</p>
-      {ga_html}
+      {vorzug}{ga_html}
     </section>
 
     <section class="karte">

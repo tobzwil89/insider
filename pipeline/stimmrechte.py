@@ -65,15 +65,23 @@ def lesen(url: str, html: str | None = None) -> dict:
     anfang = max(text.find("Für den Inhalt der Mitteilung"), text.find("The issuer is solely responsible"))
     if anfang < 0:
         raise eqs.Gedrosselt(f"Meldung ohne Inhalt: {url}")
-    zeit = re.search(r"(\d{2})\.(\d{2})\.(\d{4}) / (\d{2}:\d{2})", text[max(0, anfang - 400): anfang])
-    zeile = {"url": url, "veroeffentlicht": f"{zeit[3]}-{zeit[2]}-{zeit[1]} {zeit[4]}:00" if zeit else "",
+    zeit = re.search(r"(\d{2})\.(\d{2})\.(\d{4})(?: /)? (\d{2}:\d{2})", text[max(0, anfang - 400): anfang])
+    if zeit:
+        veroeffentlicht = f"{zeit[3]}-{zeit[2]}-{zeit[1]} {zeit[4]}:00"
+    else:  # ältere Seiten: Datum nur im EQS-Kopf, z. B. 'Stimmrechtsanteile | 3 September 2008 10:39'
+        kopf = re.search(r"\| (\d{1,2}) (\w+) (\d{4}) (\d{2}:\d{2})", text[:anfang])
+        veroeffentlicht = (f"{kopf[3]}-{eqs.MONATE[kopf[2]]:02d}-{int(kopf[1]):02d} {kopf[4]}:00"
+                           if kopf and kopf[2] in eqs.MONATE else "")
+    zeile = {"url": url, "veroeffentlicht": veroeffentlicht,
              "korrektur": "Korrektur" in text[max(0, anfang - 600): anfang]}
 
     zeilen = [re.sub(r"\s+", " ", z).strip() for z in text[anfang:].split("\n")]
     i3, i4, i5, i6, i7 = (_abschnitt(zeilen, f"{n}. ") for n in range(3, 8))
     i_neu = next((i for i in range(i6, i7) if zeilen[i] in NEU), -1) if 0 <= i6 < i7 else -1
     if min(i3, i4, i5, i_neu) < 0:
-        return dict(zeile, formular="anderes")
+        # Text mitgeben: Mitteilungen vor ~2016 sind Fließtext ohne Formular (Auslesen: stimmrechte_fliesstext.py)
+        ende = text.find("Ende der Mitteilung", anfang)
+        return dict(zeile, formular="anderes", text=text[anfang: ende if ende > 0 else anfang + 6000])
 
     i_letzte = next((i for i in range(i_neu, i7) if zeilen[i] in LETZTE), -1)
     neu = zeilen[i_neu + 1: i_neu + 5]
@@ -107,6 +115,7 @@ def _schluessel(name: str) -> str:
     Ältere Formulare hängen Ort und Land an den Namen; abgeschnitten wird ab dem ersten Teil nach einem Komma,
     der keine Rechtsform ist."""
     name = name.split(" / ")[-1].replace("City and registered office", "")
+    name = re.sub(r"\s*\(\d+\.\)$", "", name)  # 'Wolfgang Dr. Porsche (1.)' = 'Wolfgang Dr. Porsche
     teile = name.split(",")
     behalten = [teile[0]] + [t for t in teile[1:2] if RECHTSFORM.match(t.strip())]
     return re.sub(r"[^a-z0-9]", "", re.sub(r"\bthe\b", "", ",".join(behalten).lower()))

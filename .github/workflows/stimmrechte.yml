@@ -12,6 +12,10 @@ on:
       max_minuten:
         description: "Höchstens so viele Minuten laden"
         default: "320"
+      alt:
+        description: "Archiv vor 2018 laden (statt ab 2018)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -39,7 +43,7 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ]; then
             python stimmrechte_laden.py --tage 14 --max-minuten 60
           else
-            python stimmrechte_laden.py --max-minuten "${{ inputs.max_minuten }}"
+            python stimmrechte_laden.py --max-minuten "${{ inputs.max_minuten }}" ${{ inputs.alt && '--alt' || '' }}
           fi
 
       # Auch nach Fehler oder Abbruch speichern, was bis dahin geladen wurde
@@ -48,7 +52,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add daten/stimmrechte.csv daten/stimmrechte_fortschritt.csv 2>/dev/null || true
+          git add daten/stimmrechte*.csv 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "Nichts Neues"
           else

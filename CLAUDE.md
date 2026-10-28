@@ -111,6 +111,27 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
       (anderer Verteiler). Umfirmierungen erscheinen doppelt (Hugo Boss: PFC S.r.l. 2020 und PFC S.p.A. 2025).
 - [ ] **Block 6 – Lücke vor 2018 schließen** (Entscheidung Tobias): EQS-Archiv vor 2018 laden (alte Formulare
       nach § 21 WpHG a. F. prüfen) und/oder Quelle für VW/Sartorius/Wacker suchen (Unternehmensregister).
+      **Test 28.10.2026** (Talanx, Eventim, Krones; Ergebnisse `.recherche/stimmrechte_vor2018_probe.csv`,
+      `.recherche/fliesstext_probe.py/.csv`): vor 2018 nur 1 / 94 / 13 Mitteilungen. Ab ~2016 Standardformular
+      (Eventim: 28 gelesen), davor **Fließtext ohne Formular** (79 von 108 → `anderes`). Die Daten stehen drin
+      (HDI 89,08 % an Talanx 2012, Nora Kronseder 51,85 % an Krones 2013), aber ein Regex-Leser findet den Namen
+      nur in 10 von 79 Fällen, und der Prozentwert ist oft der falsche (z. B. zugerechneter Teil statt Gesamt).
+      Zusätzlich: Alte Werte können legal veraltet sein (HDI heute ~77 %, von 89 % aus keine Schwelle berührt).
+      Optionen: (a) Fließtext einmalig mit Claude auslesen lassen (API-Schlüssel nötig, Kosten vorher berechnen),
+      (b) Großaktionäre der betroffenen Firmen von Hand pflegen, (c) Lücke lassen. **Tobias 28.10.2026: Option (a),
+      mit DeepSeek** (eigener API-Schlüssel; Empfehlung V4.1-Flash, Probe mit 30 Texten vor dem Gesamtlauf).
+      - [x] **6a – Lader (28.10.2026):** `stimmrechte_laden.py --alt` lädt 2000–2017 mit eigener Fortschrittsliste
+            `stimmrechte_alt_fortschritt.csv`. Formular-Mitteilungen wie gewohnt nach `stimmrechte.csv`; Fließtexte als
+            `formular=anderes` dort und zusätzlich mit Text nach `stimmrechte_texte.csv`. Leser kennt jetzt auch das alte
+            Datumsformat (ohne „/“, sonst aus dem EQS-Kopf). Getestet: Krones (13, ab 2008) und Talanx (1) lokal geladen.
+            Workflow „Stimmrechte laden“ hat den Schalter „Archiv vor 2018“. **Tobias:** pushen, mit Haken starten,
+            wiederholen bis „Alle Firmen fertig“.
+      - [ ] **6b – Auslesen mit DeepSeek** (lokal, Schlüssel in `.env`, steht in `.gitignore`): je Text Halter, Sitz,
+            Schwellendatum, Aktien/Instrumente/Summe als JSON → Zeilen mit `formular=fliesstext` in `stimmrechte.csv`.
+            Erst 30 Texte gegen Handprüfung, dann alle. Anzeige: Hinweis „Stand laut Mitteilung von …“, Text auf der
+            Seite anpassen (Lücke vor 2018 dann kleiner, aber alte Werte können legal veraltet sein).
+- Porsche SE / Porsche AG (28.10.2026): 100 % je Familienmitglied ist korrekt (Stammaktien vollständig zugerechnet,
+  gehandelt werden nur Vorzüge). Hinweis auf der Seite über `seiten.NUR_VORZUG`; „Name (1.)“ = „Name“ im Schlüssel.
 
 ## Entscheidungen (mit Grund)
 
@@ -208,4 +229,6 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
 - **28.10.2026:** Stimmrechte-Historie geprüft: fertig bis auf 2 Auto1-Mitteilungen (Kodierungsfehler bei EQS).
   Leser repariert (Kodierung, zweizeilige Personennamen), Auto1 nachgeladen → Block 3 fertig. Block 4 gebaut und getestet. 53 alte Namen korrigiert.
   Gepusht (f71f27b). Hochtief-Name repariert, Block 5 (Großaktionäre auf den Firmenseiten) gebaut und lokal geprüft.
+  Gepusht (f26ea18). Test Block 6: Mitteilungen vor ~2016 sind Fließtext, Regex-Leser unbrauchbar (Details Block 6).
+  Porsche-Hinweis. Block 6a (Lader vor 2018) gebaut und an Krones/Talanx getestet.
   Lizenz von FinceptTerminal geprüft; Test als Datenquelle als zukünftiger Schritt unter „Offen“ aufgenommen.
