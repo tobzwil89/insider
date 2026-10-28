@@ -1,4 +1,8 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+flatexDEGIRO SE,50077692,DE000FTG1111,GfBk Gesellschaft für Börsenkommunikation mbH,in enger Beziehung,Aktie,Sonstiges,"23,41 EUR","2.340.570,00 EUR",2026-10-27,2026-10-26,,2026-10-28 06:01:37,23.41,EUR,2340570.0,2026-10-28 06:43:24
+Smartbroker Holding AG,50053124,DE000A2GS609,"Kolbinger, André",Vorstand,Aktie,Kauf,"8,24 EUR","247.200,00 EUR",2026-10-27,2026-10-21,Xetra,2026-10-28 06:01:37,8.24,EUR,247200.0,2026-10-28 06:43:24
+KST Beteiligungs AG,20000048,DE000A161309,"Schmitt, Martin",Aufsichtsrat,Aktie,Kauf,"1,11 EUR","6.660,00 EUR",2026-10-27,2026-10-26,Tradegate,2026-10-28 06:01:37,1.11,EUR,6660.0,2026-10-28 06:43:24
+Ernst Russ AG,40003565,DE000A161077,"Schuchmann, Joseph",Vorstand,Aktie,Kauf,"9,00 EUR","31.275,00 EUR",2026-10-26,2026-10-23,Tradegate Berlin Stock Exchange,2026-10-28 06:01:37,9.0,EUR,31275.0,2026-10-28 06:43:24
 Beno Holding AG,40022640,,"Renner, Florian",Vorstand,Anderes auf Aktie/schuldtitel bez. FI,Sonstiges,,,2026-10-26,2026-10-26,,2026-10-26 15:02:02,,,,2026-10-26 16:12:29
 Beno Holding AG,40022640,,PAX Investments GmbH Entwicklung & Beteiligung,in enger Beziehung,Anderes auf Aktie/schuldtitel bez. FI,Sonstiges,,,2026-10-26,2026-10-26,,2026-10-26 15:02:02,,,,2026-10-26 16:12:29
 Beno Holding AG,40022640,,H2 Immobilienobjekte GmbH,in enger Beziehung,Anderes auf Aktie/schuldtitel bez. FI,Sonstiges,,,2026-10-26,2026-10-26,,2026-10-26 15:02:02,,,,2026-10-26 16:12:29
