@@ -45,12 +45,23 @@ def _wert(zeilen: list, i: int) -> str:
     return z.split(":", 1)[1].strip() if ":" in z else z
 
 
+def _reparieren(zeile: str) -> str:
+    """Doppelt kodierten Text zurückwandeln: 'VerÃ¶ffentlichung' → 'Veröffentlichung'.
+    Kommt bei einzelnen EQS-Seiten vor (z. B. Auto1, 05.02.2021); der Seitenkopf ist dort korrekt."""
+    if "Ã" not in zeile and "Â" not in zeile:
+        return zeile
+    try:
+        return zeile.encode("latin-1").decode("utf-8")
+    except UnicodeError:
+        return zeile
+
+
 def lesen(url: str, html: str | None = None) -> dict:
     """Eine Stimmrechtsmitteilung → eine Zeile für stimmrechte.csv."""
     soup = BeautifulSoup(html or eqs._holen(url), "lxml")
     for t in soup(["script", "style", "nav", "header", "footer"]):
         t.decompose()
-    text = soup.get_text("\n", strip=True)
+    text = "\n".join(map(_reparieren, soup.get_text("\n", strip=True).split("\n")))
     anfang = max(text.find("Für den Inhalt der Mitteilung"), text.find("The issuer is solely responsible"))
     if anfang < 0:
         raise eqs.Gedrosselt(f"Meldung ohne Inhalt: {url}")
@@ -69,6 +80,9 @@ def lesen(url: str, html: str | None = None) -> dict:
     letzte = zeilen[i_letzte + 1: i_letzte + 4] if i_letzte >= 0 else ["", "", ""]
     sitz = next((i for i in range(i3 + 2, i4) if zeilen[i].startswith(("Registrierter Sitz", "City of registered"))), -1)
     wer = _wert(zeilen, i3 + 1)
+    if zeilen[i3 + 1].startswith(("Natürliche Person", "Natural person")) and zeilen[i3 + 1].endswith(":") \
+            and i3 + 3 < i4 and not zeilen[i3 + 3].endswith(":"):
+        wer += " " + zeilen[i3 + 3]  # Vorname und Nachname in getrennten Zeilen
     if wer.endswith(":"):  # altes Formular (bis 2017): Name verteilt auf mehrere Zeilen → Name aus dem EQS-Seitenkopf
         kopf = text[:anfang].split("\n")
         i_kopf = next((i for i, z in enumerate(kopf) if re.search(r"\d{1,2} \w+ \d{4} \d{2}:\d{2}$", z)), -1)

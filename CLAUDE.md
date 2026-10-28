@@ -78,9 +78,26 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
         GEA angefangen, aber offen (einzelne Abrufe fehlgeschlagen, vermutlich EQS-Drosselung → nächster Lauf holt nur
         die fehlenden). Airbus und DWS ohne Mitteilungen (Airbus: ausländisch). Ø 159 Mitteilungen je Firma →
         Rest ~8.000, also **noch 2 Läufe**.
+      - **Lauf 2–4** (24.10., alle Erfolg, letzter Commit bed033a, Protokoll „Alle Firmen fertig“). Geprüft 28.10.2026:
+        89 von 90 Firmen fertig, `stimmrechte.csv` 17.396 Mitteilungen aus 83 Firmen (16.997 Stimmrechte, 399 `anderes`).
+        Spalte `geladen` im Fortschritt zählt nur das im jeweiligen Lauf Gelesene (wie bei `eqs_fortschritt.csv`),
+        Bestand ist vollständig (z. B. Delivery Hero 749/749). **Einzig offen: Auto1**, 2 Mitteilungen vom 05.02.2021
+        „ohne Inhalt“. Ursache: Die Seiten haben Inhalt, aber doppelt kodierten Text bei EQS („VerÃ¶ffentlichung“,
+        „StraÃe“), daran scheitert der Leser. Auto1 bleibt deshalb dauerhaft offen und wird bei jedem Lauf erneut versucht.
+        **Behoben 28.10.2026:** `stimmrechte._reparieren` dekodiert solche Zeilen neu (latin-1 → UTF-8). Auto1 lokal
+        nachgeladen (409 Mitteilungen) → **alle 90 Firmen fertig, Block 3 erledigt.**
+      - Dabei gefunden und im Leser behoben: Natürliche Personen mit Vor- und Nachname in getrennten Zeilen wurden nur
+        mit Vornamen gespeichert (57 alte Zeilen, z. B. „Gérald“ statt „Gérald Frère“). 28.10.2026 neu gelesen: 53 korrigiert,
+        4 waren richtig (RAG-Stiftung, AXA). **Offen für Block 5:** Hochtief 14.11.2023 (ACS, 75,71 %) ohne Namen,
+        englisches Formular; vor der Anzeige ansehen, sonst fehlt der Hauptaktionär.
       - 214 × `anderes`: 74 eigene Aktien, 13 × § 43, Korrekturen; **Aroundtown 60** (luxemburgisches Formular, wie bei
         Directors' Dealings nicht unterstützt) und ~40 verstreute (Elmos 9, Delivery Hero 7, Beiersdorf 6 …), noch nicht angesehen.
-- [ ] **Block 4 – Laufend aktuell halten:** neue Mitteilungen im täglichen Lauf.
+- [x] **Block 4 – Laufend aktuell halten (28.10.2026, noch nicht gepusht):** `stimmrechte_laden.py --tage 14` lädt für
+      alle Firmen nur Mitteilungen der letzten 14 Tage, die noch fehlen; Fortschrittsliste bleibt unberührt.
+      Eigener nächtlicher Zeitplan in `stimmrechte.yml` (`37 2 * * *`, höchstens 60 Min.), weil der Lauf **~12 Min.**
+      dauert (EQS-Pause 2 s je Abruf) und das 15-Min.-Limit von „Daten aktualisieren“ sprengen würde. Knopfdruck
+      lädt weiter die Historie. Lokal getestet: 12 Min., 28 neue Mitteilungen (23.–28.10.), keine Duplikate, keine
+      leeren Pflichtfelder. Nach dem Push: am nächsten Morgen unter Actions prüfen, ob der Lauf um ~03:37 Uhr lief.
 - [ ] **Block 5 – Anzeige:** Bereich „Großaktionäre“ auf den Firmenseiten (je Halter letzter Stand, Aktien und Instrumente getrennt).
 
 ## Entscheidungen (mit Grund)
@@ -132,6 +149,18 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
       Unternehmensregister (gratis, nur von Hand). ESEF-Probe 22.10.2026 (`.recherche/esef_probe.md`): filings.xbrl.org
       hat keine deutschen Berichte; freier Weg erst über ESAP (EU-Portal, spätestens 10.07.2027). Tobias (22.10.2026):
       nach hinten verschoben, zuerst Stimmrechte und Rückkäufe aus EQS.
+- [ ] **Zukünftiger Schritt: FinceptTerminal als Datenquelle testen** (Tobias 28.10.2026, nur Daten, kein Code
+      übernehmen). github.com/Fincept-Corporation/FinceptTerminal, C++/Qt-Desktop-Programm, ~33.000 Sterne.
+      Ziel: mehr Finanzdaten für ein vollständiges Bild (Fundamentaldaten, Kennzahlen usw.).
+      Lizenz (gelesen 28.10.2026, Version 2.0): Software AGPL-3.0 nur für privat/einzelne Studierende,
+      sonst kostenpflichtige Lizenz; **Fincept-Daten und -APIs eigener Dienst, gratis nur „individual personal
+      and educational use“**. Strafandrohungen ab 50.000 USD, Gerichtsstand Delhi. Kein Fincept-Code und kein
+      Nachbau des Aussehens (Trade Dress) in die Website.
+      Test (abbrechbar, an SAP/Zalando/Deutz wie bisher): 1) Welche Daten gibt es für DAX/MDAX, wie weit zurück,
+      wie vollständig? 2) Eigene Fincept-Daten oder nur Durchreichen fremder Quellen (Yahoo, FRED …)? Dann lieber
+      die Originalquelle direkt nutzen. 3) Gibt es eine abrufbare Schnittstelle oder nur das Programm?
+      4) **Vor jeder Anzeige auf der Website** schriftlich klären (support@fincept.in), ob die öffentliche Anzeige
+      erlaubt ist: Website ist öffentlich, nicht nur privat. Vergleich mit EODHD/FMP (Punkt darüber).
 - [ ] **Repository-Größe beobachten:** Der Bot committet bei jedem Lauf mehrere MB; GitHub empfiehlt < 1 GB.
       Beim GuruFocus-Ausbau Daten in eigenen Branch oder Release-Dateien auslagern.
 - [ ] Geschwärzte Bachelorarbeit auf der Methode-Seite verlinken? PDF in Dropbox unter
@@ -164,3 +193,6 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
 - **22.10.2026 spät:** Bestandsaufnahme alter Projekte (`BESTANDSAUFNAHME.md`). Tobias: langfristig Sentiment-Score und
   mehr Aktien als DAX/MDAX. Empfehlung: Sentiment zuerst aus EQS-Ad-hoc-Meldungen, Universum zuerst übrige deutsche Aktien, dann USA (SEC).
 - **24.10.2026:** Stand Stimmrechte geprüft: Lauf 1 erfolgreich, 34/90 Firmen, 6.735 Mitteilungen; noch 2 Läufe (Details Block 3).
+- **28.10.2026:** Stimmrechte-Historie geprüft: fertig bis auf 2 Auto1-Mitteilungen (Kodierungsfehler bei EQS).
+  Leser repariert (Kodierung, zweizeilige Personennamen), Auto1 nachgeladen → Block 3 fertig. Block 4 gebaut und getestet. 53 alte Namen korrigiert.
+  Lizenz von FinceptTerminal geprüft; Test als Datenquelle als zukünftiger Schritt unter „Offen“ aufgenommen.

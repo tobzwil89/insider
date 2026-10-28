@@ -1,9 +1,12 @@
 # Per Knopfdruck: Stimmrechtsmitteilungen seit 2018 aus dem EQS-Archiv nachladen.
 # Speichert nach jeder Firma; ein erneuter Start macht dort weiter, wo der letzte aufgehört hat.
 # Abbrechen ist jederzeit möglich ("Cancel workflow"): Das bis dahin Geladene wird trotzdem gespeichert.
+# Täglich nachts: nur neue Mitteilungen der letzten 14 Tage (dauert ~15 Minuten, deshalb nicht in "Daten aktualisieren").
 name: Stimmrechte laden
 
 on:
+  schedule:
+    - cron: "37 2 * * *"
   workflow_dispatch:
     inputs:
       max_minuten:
@@ -32,7 +35,12 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: Stimmrechte laden
-        run: python stimmrechte_laden.py --max-minuten "${{ inputs.max_minuten }}"
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            python stimmrechte_laden.py --tage 14 --max-minuten 60
+          else
+            python stimmrechte_laden.py --max-minuten "${{ inputs.max_minuten }}"
+          fi
 
       # Auch nach Fehler oder Abbruch speichern, was bis dahin geladen wurde
       - name: Ergebnis speichern
