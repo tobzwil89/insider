@@ -121,11 +121,14 @@ def _schluessel(name: str) -> str:
     return re.sub(r"[^a-z0-9]", "", re.sub(r"\bthe\b", "", ",".join(behalten).lower()))
 
 
-def grossaktionaere(df: pd.DataFrame) -> pd.DataFrame:
+def grossaktionaere(df: pd.DataFrame, geprueft: pd.DataFrame | None = None) -> pd.DataFrame:
     """Letzter Stand je Firma und Halter.
     Nur wer mindestens 3 % in Aktien oder 5 % insgesamt hält: Das sind die niedrigsten Schwellen (Aktien 3 %,
     Instrumente und Summe 5 %). Darunter kann ein Halter ohne neue Mitteilung aussteigen, der Stand wäre unsicher.
-    Spalten: firma, halter, aktien, instrumente, summe, schwellendatum, url; sortiert nach Summe."""
+    geprueft: von Hand geprüfte Einträge (daten/grossaktionaere_geprueft.csv). Halter mit Prozentwert ersetzt den
+    automatischen Eintrag desselben Halters, ohne Prozentwert blendet ihn aus; Halter '*' blendet alle automatischen
+    Einträge der Firma vor `stand` aus (z. B. Meldungen eines Vorgängers mit gleichem Namen).
+    Spalten: firma, halter, aktien, instrumente, summe, schwellendatum, url, geprueft; sortiert nach Summe."""
     df = df[df["formular"].eq("stimmrechte") & df["meldepflichtiger"].fillna("").ne("")].copy()
     df["schluessel"] = df["meldepflichtiger"].map(_schluessel)
     df["schwellendatum"] = pd.to_datetime(df["schwellendatum"], errors="coerce")
@@ -135,7 +138,18 @@ def grossaktionaere(df: pd.DataFrame) -> pd.DataFrame:
     namen = df.assign(laenge=df["meldepflichtiger"].str.len()).sort_values("laenge") \
         .groupby("schluessel")["meldepflichtiger"].first()
     letzte["halter"] = letzte["schluessel"].map(namen)
-    return (letzte[(letzte["aktien"] >= 3) | (letzte["summe"] >= 5)]
-            .sort_values(["firma", "summe"], ascending=[True, False])
-            [["firma", "halter", "aktien", "instrumente", "summe", "schwellendatum", "url"]]
+    letzte = letzte[(letzte["aktien"] >= 3) | (letzte["summe"] >= 5)]
+    if geprueft is not None and not geprueft.empty:
+        g = geprueft.assign(stand=pd.to_datetime(geprueft["stand"]), geprueft=pd.to_datetime(geprueft["geprueft"]))
+        for r in g[g["halter"].eq("*")].itertuples():
+            letzte = letzte[~(letzte["firma"].eq(r.firma) & (letzte["schwellendatum"] < r.stand))]
+        einzeln = g[g["halter"].ne("*")].assign(schluessel=lambda x: x["halter"].map(_schluessel))
+        weg = set(zip(einzeln["firma"], einzeln["schluessel"]))
+        letzte = letzte[[k not in weg for k in zip(letzte["firma"], letzte["schluessel"])]]
+        neu = einzeln[einzeln["aktien"].notna()].rename(columns={"stand": "schwellendatum", "quelle": "url"})
+        letzte = pd.concat([letzte, neu.assign(summe=neu["aktien"])])
+    if "geprueft" not in letzte:
+        letzte["geprueft"] = pd.NaT
+    return (letzte.sort_values(["firma", "summe"], ascending=[True, False])
+            [["firma", "halter", "aktien", "instrumente", "summe", "schwellendatum", "url", "geprueft"]]
             .reset_index(drop=True))

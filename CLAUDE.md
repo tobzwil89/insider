@@ -171,7 +171,32 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
             angezeigten 0,12 $ ab (402), die Guthaben-Abfrage hinkt nach. Geprüft: HDI 89,08 % an Talanx, Nora Kronseder 51,85 %.
             - [ ] Rest (806 Texte, 2008–2012): nach dem Aufladen `python3 stimmrechte_fliesstext.py` (holt nur die fehlenden,
                   geschätzt ~0,20 $).
-            - [ ] Anzeige: `stimmrechte_fliesstext.csv` in `grossaktionaere` einbeziehen, Hinweis auf alte Stände.
+            - [ ] Anzeige: **nicht automatisch** (Prüfung 29.10.2026). Mit allen alten Daten 1.276 statt 488 Zeilen,
+                  857 mit Stand vor 2018, viele überholt: Ketten von Tochterfirmen melden gemeinsam, beim Ausstieg nur die
+                  Mutter (Permira bei Hugo Boss, BlackRock-Töchter bei Allianz). Regel „Mitteilung überholt, wenn ein Mitglied
+                  später meldet“ → 951 Zeilen, hilft aber nicht, weil im EQS-Archiv vor 2018 viele Ausstiege ganz fehlen.
+                  Auch bei ≥ 25 % in Aktien (76 Halter, 20 Firmen) etwa die Hälfte falsch: CVC/Evonik, Volvo/Deutz, Perry/LEG,
+                  Hueck/Hella, Wacker/Siltronic (57,8 statt ~31 %), Renk 2011 = alte Renk AG. Richtig: HDI/Talanx,
+                  Kronseder/Krones, KPS+Schulenberg/Eventim, Quandt/BMW, Henkel-Pool, Weichai/Kion, Nemetschek.
+                  **Tobias 29.10.2026: Daten nur als Kandidatenliste, von Hand prüfen.**
+            - [x] **6c – Geprüfte Großaktionäre (29.10.2026, nicht gepusht):** `daten/grossaktionaere_geprueft.csv`
+                  (firma, halter, aktien, stand, geprueft, quelle), eingelesen in `export.py`, verarbeitet in
+                  `stimmrechte.grossaktionaere(df, geprueft)`: Halter mit Wert ersetzt den automatischen Eintrag (Schlüssel
+                  über `_schluessel`), ohne Wert blendet ihn aus, `*` blendet alle automatischen Einträge der Firma vor `stand`
+                  aus. Anzeige: unter dem Datum „geprüft TT.MM.JJJJ“, Link zur Quelle, Satz im Erklärtext.
+                  Von den 20 Kandidaten-Firmen zeigten 9 den großen Halter schon aus Meldungen ab 2018 (Merckle, Faurecia, ACS,
+                  Schaeffler, Nemetschek, Haaß/Fuchs, RAG/Evonik, Porsche SE, Siltronic). Eingetragen: Talanx (HDI 76,7 %),
+                  Krones (Kronseder-Konsortium 51,9 %), Henkel (Aktienbindungsvertrag 61,85 % der Stämme, 19.03.2026), Kion
+                  (Weichai 46,5 %), BMW (Quandt + Klatten zusammen 50,2 %, Einzelwerte ohne Primärquelle), Aroundtown (Avisco
+                  Trust 15,01 %). **Dabei gefundene Fehler, die live waren:** Renk zeigte die Porsche-Familie mit 76 % aus
+                  Meldungen der alten Renk AG (2016–2018) → ausgeblendet, IR-Tabelle 17.07.2026 eingetragen (Seite blockt
+                  Abrufe, Werte aus dem Suchauszug). Hella zeigte Hueck-Pool 60 % von 2015 und Faurecia 80,59 % → Forvia 81,59 %.
+                  Eventim zeigte KPS 50,2 % und Schulenberg 43,2 % → KPS 38,83 % (Platzierung 11/2019; 40 % ist keine Schwelle,
+                  daher keine Mitteilung). Verworfen (überholt): CVC/Evonik, Volvo/Deutz, Perry+Goldman/LEG, UniCredit/Hugo Boss.
+                  Geprüft mit nachgebautem Lauf ohne BaFin/Telegram (Talanx, Renk, Eventim, Henkel korrekt), `docs/` danach zurückgesetzt.
+            - [ ] Bekannt, nicht behoben: Henkel-Familienmeldungen bei EQS landen als `anderes` (Leser), BMW ohne Meldungen
+                  der Familie seit 2018; weitere alte Stände 2015–2017 aus Formularen in der Anzeige (z. B. Deutz Source Markets
+                  2017, Krones Deutsche AM 2016) nicht geprüft. Geprüfte Einträge veralten: etwa jährlich neu abgleichen.
 - Porsche SE / Porsche AG (28.10.2026): 100 % je Familienmitglied ist korrekt (Stammaktien vollständig zugerechnet,
   gehandelt werden nur Vorzüge). Hinweis auf der Seite über `seiten.NUR_VORZUG`; „Name (1.)“ = „Name“ im Schlüssel.
 
@@ -341,3 +366,5 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   „ohne Inhalt“, auch lokal reproduzierbar, Seite hat aber Inhalt → Leserfehler, nicht Drosselung). Außerdem meldet
   `stimmrechte_laden.py` „Alle Firmen fertig“, obwohl Firmen offen sind (irreführend, nicht behoben). 6b: Fließtexte mit
   DeepSeek ausgelesen, bis das Guthaben (1 $) aufgebraucht war: 4.229 von 5.035 Texten (Details Block 6b).
+  Gepusht (967d34a). Automatische Anzeige der alten Daten verworfen (zu viele überholte Stände), stattdessen von Hand
+  geprüfte Liste (6c); dabei Fehler bei Renk, Hella, Eventim gefunden und behoben.

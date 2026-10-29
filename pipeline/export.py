@@ -108,7 +108,8 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     seiten.versionen_eintragen(v)
     rang = rangliste.assign(rang=range(1, len(rangliste) + 1))
     kurs_start = kurse.index.max() - pd.DateOffset(years=KURS_JAHRE)
-    aktionaere = stimmrechte.grossaktionaere(pd.read_csv(DATEN / "stimmrechte.csv"))
+    aktionaere = stimmrechte.grossaktionaere(pd.read_csv(DATEN / "stimmrechte.csv"),
+                                             pd.read_csv(DATEN / "grossaktionaere_geprueft.csv"))
     uebersicht = []
     for ticker, f in mit_seite.groupby("ticker"):
         eigene = zusammen[zusammen["ticker"] == ticker]

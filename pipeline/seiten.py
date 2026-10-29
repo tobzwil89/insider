@@ -160,7 +160,8 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
             [("Halter", ""), ("Aktien", "zahl"), ("Instrumente", "zahl"), ("Zusammen", "zahl"), ("Stand", "")],
             [[(e(r.halter), ""), (f"{zahl(r.aktien, 2)} %", "zahl"), (f"{zahl(r.instrumente, 2)} %", "zahl"),
               (f"<b>{zahl(r.summe, 2)} %</b>", "zahl"),
-              (f'<a href="{e(r.url)}" rel="nofollow">{datum(r.schwellendatum)}</a>', "datum")]
+              (f'<a href="{e(r.url)}" rel="nofollow">{datum(r.schwellendatum)}</a>'
+               + (f'<div class="klein">geprüft {datum(r.geprueft)}</div>' if not _leer(r.geprueft) else ""), "datum")]
              for r in aktionaere.itertuples()])
 
     if meldungen.empty:
@@ -254,7 +255,8 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
         Stand ist das Datum der Schwellenberührung, der Link führt zur Mitteilung. Dieselben Aktien können bei mehreren
         Haltern auftauchen (z. B. Stiftung und Stifter), deshalb ergibt die Spalte keine Summe.
         <b>Ausgewertet sind Mitteilungen seit 2018 aus dem EQS-Archiv:</b> Wer seinen Anteil seitdem nicht verändert hat
-        (oft Gründerfamilien oder Mutterkonzerne), fehlt hier. Nach Umfirmierungen kann ein Halter doppelt erscheinen.</p>
+        (oft Gründerfamilien oder Mutterkonzerne), fehlt hier. Nach Umfirmierungen kann ein Halter doppelt erscheinen.
+        Einträge mit „geprüft“ haben wir von Hand mit veröffentlichten Angaben abgeglichen (Firma oder Wirtschaftspresse, Link zur Quelle).</p>
       {vorzug}{ga_html}
     </section>
 
