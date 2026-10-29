@@ -159,6 +159,19 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
             Schwellendatum, Aktien/Instrumente/Summe als JSON → Zeilen mit `formular=fliesstext` in `stimmrechte.csv`.
             Erst 30 Texte gegen Handprüfung, dann alle. Anzeige: Hinweis „Stand laut Mitteilung von …“, Text auf der
             Seite anpassen (Lücke vor 2018 dann kleiner, aber alte Werte können legal veraltet sein).
+            **Stand 29.10.2026:** `stimmrechte_fliesstext.py` gebaut, schreibt nach `daten/stimmrechte_fliesstext.csv`
+            (eigene Datei, `stimmrechte.csv` unverändert), neueste Jahre zuerst, 8 Anfragen parallel, setzt fort, wo es
+            aufgehört hat. Modell `deepseek-flash`, **ohne Nachdenken** (`thinking: disabled`; Probe ohne und mit Nachdenken
+            identisch, 85 % weniger Ausgabe-Token). Probe 30 Texte (`.recherche/fliesstext_deepseek_probe*.csv`): 10 von Hand
+            gegen den Originaltext geprüft, alle Werte richtig (auch 100 % bei LEG/Porsche und 60 % Goldman bei Kion sind echt);
+            Feld `korrektur` teils uneinheitlich. Gesamtlauf: **4.229 von 5.035 Texten** (2013–2017 vollständig, 2012 433/494,
+            2011 90/228, 2010 38/260, 2008–2009 fehlen), 7.346 Halterzeilen, 32 ohne Prozentwert. Kosten **~0,93 $**
+            (5,0 Mio. Eingabe- + 0,65 Mio. Ausgabe-Token), Guthaben leer (0,05 $). Meine Schätzung vorher (0,20–0,40 $) war
+            falsch, die Probe war für eine Kostenmessung zu klein (Guthaben nur auf Cent genau). DeepSeek lehnte schon bei
+            angezeigten 0,12 $ ab (402), die Guthaben-Abfrage hinkt nach. Geprüft: HDI 89,08 % an Talanx, Nora Kronseder 51,85 %.
+            - [ ] Rest (806 Texte, 2008–2012): nach dem Aufladen `python3 stimmrechte_fliesstext.py` (holt nur die fehlenden,
+                  geschätzt ~0,20 $).
+            - [ ] Anzeige: `stimmrechte_fliesstext.csv` in `grossaktionaere` einbeziehen, Hinweis auf alte Stände.
 - Porsche SE / Porsche AG (28.10.2026): 100 % je Familienmitglied ist korrekt (Stammaktien vollständig zugerechnet,
   gehandelt werden nur Vorzüge). Hinweis auf der Seite über `seiten.NUR_VORZUG`; „Name (1.)“ = „Name“ im Schlüssel.
 
@@ -324,3 +337,7 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   Lizenz von FinceptTerminal geprüft; Test als Datenquelle als zukünftiger Schritt unter „Offen“ aufgenommen.
   Datenbankliste der Nova SBE bewertet: nur für Forschung/Prüfung, nicht für die Website (Notiz unter „Offen“, Fundamentaldaten).
 - **28.10.2026 abends:** OpenBB geprüft und verworfen (Begründung unter „Guru-Depots“). Guru-Depots Block 1–3 gebaut und getestet (Baupost-Einheitenfehler abgefangen). `.env^t^t` in `.env` umbenannt (Schlüssel war nicht von `.gitignore` erfasst). Push-Befehle an Tobias übergeben (Stimmrechte-Action lief parallel, kein Konflikt). Gepusht (b9c18da). Guru-Link in die Fußzeile verschoben, Umbau als offener Punkt notiert. OpenBB-Quellen in `DATENQUELLEN.md` erfasst (17 Anschlüsse im Repository mit Adressen und Schlüsselpflicht, 16 ausgelagerte PyPI-Pakete wie FMP und Yahoo; Korrektur: diese gibt es weiterhin, nur nicht mehr im Repository). last30days-skill für Sentiment/News geprüft (`DATENQUELLEN.md` Abschnitt 4): nicht für die Website, StockTwits sperrt Skript-Abrufe (403), deutsche Foren fehlen; Empfehlung bleibt Sentiment aus EQS. Nachfrage Code-Übernahme beantwortet, Plan „Sentiment und News“ (3 Blöcke) notiert, Freigabe steht aus. Tobias: Startup-Sicht, Stack offen, global → last30days gründlich neu bewertet (Ranking-Engine übernehmbar, Quellen nach Rechtslage sortiert, Finanz-Perlen: StockTwits, Polymarket, Stellenanzeigen); Plan „Sentiment und News“ neu gefasst. Tobias: alles übernehmen, auch graue Wege → Quellen-Katalog in `DATENQUELLEN.md` vollständig (inkl. Arctic Shift), Status nur als Hinweis für vor dem Start. Bisherige Repositories aus Startup-Sicht neu bewertet: OpenBB (180 Datenmodelle als Schema-Vorlage, Anbieter-Code übernehmbar, Abschnitt 5), FinceptTerminal (~240 Datenquellen, u. a. OpenFIGI, GLEIF, Wikipedia-Aufrufe, SimFin, Quiver, Abschnitt 6), Überblick Abschnitt 7. Einstiegsabschnitt für neue Chats oben in dieser Datei.
+- **29.10.2026:** Archiv vor 2018 (6a) per Action geladen: 88 von 90 Firmen. Rheinmetall und Scout24 offen (je 1 Mitteilung
+  „ohne Inhalt“, auch lokal reproduzierbar, Seite hat aber Inhalt → Leserfehler, nicht Drosselung). Außerdem meldet
+  `stimmrechte_laden.py` „Alle Firmen fertig“, obwohl Firmen offen sind (irreführend, nicht behoben). 6b: Fließtexte mit
+  DeepSeek ausgelesen, bis das Guthaben (1 $) aufgebraucht war: 4.229 von 5.035 Texten (Details Block 6b).
