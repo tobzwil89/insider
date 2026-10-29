@@ -9,6 +9,18 @@ Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: ein Startup, eine Fin
 - Alte Projekte (Sentiment-Tracker, StockPulse, GuruFocus-Analyse) und was davon übernehmbar ist: BESTANDSAUFNAHME.md
 - Recherche Datenquellen für den Ausbau (OpenBB, last30days-skill, FinceptTerminal, mit Adressen): DATENQUELLEN.md
 
+## Nächster Schritt (Stand 29.10.2026 abends): Stimmrechte abschließen
+
+Alles bis fb2962f ist gepusht. Tobias' Frage „Können wir Stimmrechte als erledigt sehen?“ → noch nicht. Vorschlag (Antwort von
+Tobias steht aus, zuerst nachfragen):
+1. **Ungeprüfte Stände vor 2018 ausblenden** (wichtig): 61 von 474 angezeigten Einträgen bei 32 Firmen stammen aus Formularen
+   2015–2017 und wurden nie geprüft; bei den 20 geprüften Firmen war etwa jeder zweite alte Stand überholt. Vorschlag: in
+   `stimmrechte.grossaktionaere` automatische Einträge mit `schwellendatum < 2018` weglassen, geprüfte bleiben. Erklärtext anpassen.
+2. **Rheinmetall und Scout24** im Archiv vor 2018: je 1 Mitteilung „ohne Inhalt“ (Leserfehler, Seite hat Inhalt, URLs im Protokoll
+   des Laufs 40873667235). Dazu: `stimmrechte_laden.py` meldet „Alle Firmen fertig“, obwohl Firmen offen sind.
+3. Bleibt als bekannter Rest: Henkel-Poolmeldungen landen als `anderes`; 806 Fließtexte 2008–2012 erst nach DeepSeek-Aufladung.
+Danach Block 6 und das Vorhaben Stimmrechte als erledigt markieren.
+
 ## Einstieg für einen neuen Chat (Stand 28.10.2026)
 
 **Was das ist:** Tobias (Bachelorarbeit Uni Bayreuth, Event Study zu Directors' Dealings) baut aus dem Insider-Monitor
