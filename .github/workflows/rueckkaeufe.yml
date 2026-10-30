@@ -1,0 +1,58 @@
+# Per Knopfdruck: Aktienrückkäufe seit 2018 aus dem EQS-Archiv nachladen.
+# Speichert nach jeder Firma; ein erneuter Start macht dort weiter, wo der letzte aufgehört hat.
+# Abbrechen ist jederzeit möglich ("Cancel workflow"): Das bis dahin Geladene wird trotzdem gespeichert.
+# Täglich nachts: nur neue Meldungen der letzten 14 Tage (dauert einige Minuten, deshalb nicht in "Daten aktualisieren").
+name: Rückkäufe laden
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+    inputs:
+      max_minuten:
+        description: "Höchstens so viele Minuten laden"
+        default: "320"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rueckkaeufe
+  cancel-in-progress: false
+
+jobs:
+  laden:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Rückkäufe laden
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            python rueckkaeufe_laden.py --tage 14 --max-minuten 60
+          else
+            python rueckkaeufe_laden.py --max-minuten "${{ inputs.max_minuten }}"
+          fi
+
+      # Auch nach Fehler oder Abbruch speichern, was bis dahin geladen wurde
+      - name: Ergebnis speichern
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add daten/rueckkaeufe*.csv 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Nichts Neues"
+          else
+            git commit -m "Rückkäufe $(TZ=Europe/Berlin date '+%d.%m.%Y %H:%M')"
+            git pull --rebase
+            git push
+          fi

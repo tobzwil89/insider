@@ -21,7 +21,7 @@ import shutil
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, gurus, ranking as rk, seiten, stimmrechte
+from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, gurus, ranking as rk, rueckkaeufe, seiten, stimmrechte
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
 KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
@@ -110,6 +110,10 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     kurs_start = kurse.index.max() - pd.DateOffset(years=KURS_JAHRE)
     aktionaere = stimmrechte.grossaktionaere(pd.read_csv(DATEN / "stimmrechte.csv"),
                                              pd.read_csv(DATEN / "grossaktionaere_geprueft.csv"))
+    # Rückkäufe nur für Firmen, deren Historie fertig geladen ist (sonst hieße „keine“ nur „noch nicht geladen“)
+    rk_datei, rk_fertig = DATEN / "rueckkaeufe.csv", DATEN / "rueckkaeufe_fortschritt.csv"
+    rueck = rueckkaeufe.jahre(pd.read_csv(rk_datei)) if rk_datei.exists() else pd.DataFrame(columns=["firma"])
+    rk_geladen = set(pd.read_csv(rk_fertig)["name"]) if rk_fertig.exists() else set()
     uebersicht = []
     for ticker, f in mit_seite.groupby("ticker"):
         eigene = zusammen[zusammen["ticker"] == ticker]
@@ -121,7 +125,8 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
         letzter = (verlauf.index[-1], verlauf.iloc[-1]) if len(verlauf) else None
         seiten.schreiben(seiten.DOCS / "firma" / ticker / "index.html", seiten.firmenseite(
             stamm, eigene, ausgewertet[ausgewertet["ticker"] == ticker], rang[rang["ticker"] == ticker], letzter, v,
-            aktionaere[aktionaere["firma"] == stamm["name"]]))
+            aktionaere[aktionaere["firma"] == stamm["name"]],
+            rueck[rueck["firma"] == stamm["name"]] if stamm["name"] in rk_geladen else None))
         uebersicht.append({"ticker": ticker, "name": stamm["name"], "index": stamm["index"],
                            "meldungen": len(eigene),
                            "letzte_meldung": eigene["mitteilungsdatum"].max() if len(eigene) else None})

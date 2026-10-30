@@ -36,7 +36,26 @@ Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: ein Startup, eine Fin
 - **Bekannte Reste:** Leser speichert bei manchen Familienformularen nur Vornamen („Dr. Wolfgang“, „Georg F.W.“,
   „Maria Elisabeth“). Neue Fonds-/Verwalter-Paare tauchen mit neuen Mitteilungen auf → bei der jährlichen Prüfung der
   geprüften Liste mit ansehen. Verschoben (Tobias): Henkel-Poolmeldungen `anderes`, 806 Fließtexte 2008–2012 (DeepSeek).
-**Vorhaben Stimmrechte ist erledigt** (Tobias 30.10.2026). Nächstes laut Plan: Rückkäufe eigener Aktien aus EQS.
+**Vorhaben Stimmrechte ist erledigt** (Tobias 30.10.2026). Rückkäufe: siehe eigenes Vorhaben unten (Block 4 wartet auf Push und Start der Action).
+
+## Geplantes Vorhaben: Landingpage (Planungs-App #9), Plan vom 30.10.2026, noch nichts gebaut
+
+Tobias 30.10.2026: E-Mails sammeln **und** Produkt zeigen; am Ende eine richtige, professionelle Website.
+Englisch, Name noch offen. Testseite als versteckter Unterordner `docs/labor/` (nur #9, nicht #23).
+- [ ] **Phase 0 Botschaft:** Zielgruppe, Kernversprechen, Mitbewerber (OpenInsider, InsiderScreener, Quiver, GuruFocus),
+      3–5 Namensvorschläge. Skills: `positioning-mapper`, `message-house-builder`, `competitor-analysis`.
+- [ ] **Phase 1 Testseite:** `docs/labor/index.html` mit `<meta name="robots" content="noindex">`, `Disallow: /labor/` in
+      `docs/robots.txt` (statisch, nicht von der Pipeline erzeugt), nicht verlinkt. Sitemap kommt aus `seiten.sitemap()`
+      (nur Ticker und Gurus), `labor/` taucht dort nicht auf. Repository ist öffentlich → nichts ist wirklich geheim.
+- [ ] **Phase 2 Design:** 2–3 Richtungen in Google Stitch (Tobias hat Zugang), Screenshots an Claude; Umsetzung als
+      schlichtes HTML/CSS mit Skill `design-taste-frontend` und echten Live-Daten aus `docs/data` (Ticker, Cluster, CAR-Kurve).
+      Stitch-Code nicht 1:1 übernehmen. Stitch-MCP (inoffizielles Paket `@_davideast/stitch-mcp`) erst bei Bedarf.
+- [ ] **Phase 3 E-Mails:** Formulardienst mit Double-Opt-in (Vorschlag Buttondown, später auch für Newsletter #10).
+      **Vor dem Freischalten Datenschutzerklärung nötig** (DSGVO), Impressum gibt es schon.
+- [ ] **Phase 4 Website:** Startseite, Produktbereich, FAQ, später Preise, Careers (#24), Fußzeile für SEO (#22).
+      Eigene Domain vor dem öffentlichen Start. Werbeaussagen mit Ergebnissen (z. B. +0,24 % AAR) nur mit Hinweis
+      „keine Anlageberatung, vergangene Ergebnisse“.
+- [ ] **Phase 5 Messen:** cookielose Statistik (Plausible oder Umami), Anmeldequote.
 
 ## Einstieg für einen neuen Chat (Stand 28.10.2026)
 
@@ -229,6 +248,34 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
 - Porsche SE / Porsche AG (28.10.2026): 100 % je Familienmitglied ist korrekt (Stammaktien vollständig zugerechnet,
   gehandelt werden nur Vorzüge). Hinweis auf der Seite über `seiten.NUR_VORZUG`; „Name (1.)“ = „Name“ im Schlüssel.
 
+## Laufendes Vorhaben: Aktienrückkäufe (Art. 5 MAR) ab 2018
+
+Auftrag Tobias 30.10.2026 (nach Abschluss Stimmrechte). Quelle: EQS-Kategorie `sonstige-kapitalmarktinformationen`
+(Titel nichtssagend, enthält auch Anleihen-/§-50-Meldungen → jede Meldung wird geöffnet). Probe-Skripte `.recherche/rueckkauf_*.py`.
+
+- [x] **Block 1 – Leser (30.10.2026):** `pipeline/rueckkaeufe.py`. Kein einheitliches Format (Datum `2026-10-19`,
+      `19.10.2026`, `04/05/2026`, `16. März 2018`; teils eine Zeile je Handelsplatz; bis ~2019 Text mit festen Spalten,
+      teils nur ein Leerzeichen zwischen Datum und Stückzahl). Gelesen wird jede Folge Datum → Stückzahl → Kurs, je Tag
+      zusammengezählt (Ø Kurs gewichtet). Erkennung: Verordnung 596/2014 oder 2016/1052 oder „Rückkauf/buy-back“
+      (Heidelberg nennt die Verordnung nicht). Kontrollzahl `stueck_text` = letzte Nennung „insgesamt / eine Anzahl von N Aktien“.
+      Test an 13 Firmen: alle Abweichungen liegen an den Meldungen (Telekom 22.04.2024 Text ≠ Tabelle, Mercedes 02.08.2024
+      ohne Werte, Allianz 2018 Zahlendreher, Allianz 02.04.2024 Tabelle verrutscht, SAP 05.08.2025 Datum 07-01 statt 08-01).
+      Nicht bei EQS: BMW (Verteiler seit 2020 gewechselt, wie bei Directors' Dealings), Munich Re nicht geprüft.
+- [x] **Block 2 – Lader + Action (30.10.2026, nicht gepusht):** `rueckkaeufe_laden.py` (wie `stimmrechte_laden.py`:
+      `--max-minuten`, `--tage`, `--firmen`, speichert je Firma, meldet offene Firmen) → `daten/rueckkaeufe.csv`
+      (firma, isin, veroeffentlicht, art, datum, stueck, kurs, stueck_text, url; je Rückkauftag eine Zeile),
+      `daten/rueckkaeufe_fortschritt.csv`. Workflow `.github/workflows/rueckkaeufe.yml` „Rückkäufe laden“: Knopfdruck =
+      Historie (320 Min.), nachts `17 3 * * *` nur 14 Tage. Lokal getestet (SAP, Zalando, Deutz): Abbruch nach 4 Min. und
+      Fortsetzen ohne Doppelte, 184 Meldungen, Kontrollzahl 169/170. Zalando 2024 und 2025 je 100,0 Mio. € = Programmgröße.
+- [x] **Block 3 – Anzeige (30.10.2026, nicht gepusht):** `rueckkaeufe.jahre` (je Firma und Jahr: Handelstage, Stück,
+      Volumen, Ø Kurs, letzter Tag; gleicher Tag aus zwei Meldungen nur einmal), Abschnitt „Aktienrückkäufe“ auf der
+      Firmenseite nach den Großaktionären. Nur für Firmen in `rueckkaeufe_fortschritt.csv`, sonst fehlt der Abschnitt
+      (sonst stünde „keine Rückkäufe“ bei noch nicht geladenen Firmen). Lokal geprüft (SAP, Allianz ohne Abschnitt), `docs/` zurückgesetzt.
+- [ ] **Block 4 – Historie laden (Tobias):** pushen, unter Actions „Rückkäufe laden“ → „Run workflow“, wiederholen bis
+      „Alle Firmen fertig“. Schätzung: ~5.000–8.000 Meldungen à ~3 s ≈ 4–7 h, also 1–2 Läufe. Danach prüfen: Kontrollzahl
+      je Meldung, Firmen ohne Rückkäufe stichprobenartig, `art=anderes` mit „Rückkauf“ im Text.
+- [ ] Später: laufende Programme (Ankündigung nach lit. a: Volumen, Zeitraum) anzeigen; Rückkäufe im Kursdiagramm markieren.
+
 ## Laufendes Vorhaben: Guru-Depots (13F der SEC)
 
 Auftrag Tobias 28.10.2026: Depots bekannter Investoren (Buffett usw.) wie bei GuruFocus. OpenBB (github.com/openbq-org/OpenBB,
@@ -398,3 +445,4 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   Gepusht (967d34a). Automatische Anzeige der alten Daten verworfen (zu viele überholte Stände), stattdessen von Hand
   geprüfte Liste (6c); dabei Fehler bei Renk, Hella, Eventim gefunden und behoben.
 - **30.10.2026:** Stimmrechte: Stände vor 2018 ausgeblendet, Konzernketten/Umfirmierungen zusammengefasst (Hugo Boss nicht mehr über 100 %), Porsche/Traton/Knorr-Bremse geprüft, Rheinmetall/Scout24 (EQS-Seiten defekt) abgeschlossen, Meldung „Alle Firmen fertig“ korrigiert. Danach Doppelungen Brenntag/Nemetschek/Fonds von Hand bereinigt, Vorhaben Stimmrechte abgeschlossen.
+- **30.10.2026 (2):** Landingpage (#9) geplant: Rückfragen geklärt (E-Mails + Schaufenster, Englisch, Name offen, Testseite `docs/labor/`), Plan in 6 Phasen oben unter „Geplantes Vorhaben: Landingpage“. Google Stitch geprüft (MCP-Anbindung nur über inoffizielles Paket). Noch nichts gebaut. Rückkäufe Block 1–3 gebaut (Leser, Lader + Action, Anzeige), lokal getestet, wartet auf Push.

@@ -1,0 +1,95 @@
+"""Aktienrückkäufe aller DAX/MDAX-Firmen seit 2018 aus dem EQS-Archiv laden.
+
+    python3 rueckkaeufe_laden.py                     ab 2018-01-01 bis heute, höchstens 320 Minuten
+    python3 rueckkaeufe_laden.py --max-minuten 30    in Blöcken; ein neuer Aufruf macht dort weiter
+    python3 rueckkaeufe_laden.py --tage 14           nur die letzten 14 Tage, alle Firmen (täglicher Lauf)
+
+Läuft als GitHub Action „Rückkäufe laden“ (kann jederzeit abgebrochen werden). Ergebnis:
+daten/rueckkaeufe.csv (eine Zeile je Rückkauftag und Meldung, andere Meldungen mit art=anderes) und
+daten/rueckkaeufe_fortschritt.csv (welche Firmen fertig sind). Beides wird nach jeder Firma gespeichert.
+"""
+
+import argparse
+import sys
+import time
+
+import pandas as pd
+
+from pipeline import DATEN, eqs, rueckkaeufe
+
+ERGEBNIS = DATEN / "rueckkaeufe.csv"
+FORTSCHRITT = DATEN / "rueckkaeufe_fortschritt.csv"
+SPALTEN = ["firma", "isin", "veroeffentlicht", "art", "datum", "stueck", "kurs", "stueck_text", "url"]
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--von", default="2018-01-01")
+    parser.add_argument("--max-minuten", type=float, default=320)
+    parser.add_argument("--firmen", nargs="*", help="nur diese Firmennamen (zum Testen)")
+    parser.add_argument("--tage", type=int, help="nur neue Meldungen der letzten N Tage, Fortschritt bleibt unberührt")
+    args = parser.parse_args()
+    ende = time.monotonic() + args.max_minuten * 60
+    von = pd.Timestamp.today().normalize() - pd.Timedelta(days=args.tage) if args.tage else pd.Timestamp(args.von)
+
+    firmen = pd.read_csv(DATEN / "firmen.csv", dtype=str, keep_default_na=False)
+    if args.firmen:
+        firmen = firmen[firmen["name"].isin(args.firmen)]
+    fertig = set(pd.read_csv(FORTSCHRITT, dtype=str)["name"]) if FORTSCHRITT.exists() and not args.tage else set()
+    gelesen = set(pd.read_csv(ERGEBNIS, usecols=["url"])["url"]) if ERGEBNIS.exists() else set()
+    # EQS-IDs aus der Directors'-Dealings-Historie wiederverwenden, das spart die Suche
+    bekannt = pd.read_csv(DATEN / "eqs_fortschritt.csv", dtype=str, keep_default_na=False)
+    bekannt = dict(zip(bekannt["name"], bekannt["uuid"]))
+
+    offen_firmen = []
+    for name, gattungen in firmen.groupby("name", sort=True):
+        if name in fertig:
+            continue
+        if time.monotonic() > ende:
+            print("Zeitbudget erreicht, beim nächsten Aufruf geht es weiter")
+            return 0
+        try:
+            uuid = bekannt.get(name) or next((u for u in map(eqs.firma_uuid, gattungen["isin"]) if u), None)
+            links = eqs.dd_links(uuid, von, kategorie=rueckkaeufe.KATEGORIE) if uuid else []
+        except eqs.Gedrosselt as fehler:
+            print(f"{name}: {fehler}, beim nächsten Aufruf erneut")
+            offen_firmen.append(name)
+            continue
+        offen = [u for u, _ in links if u not in gelesen]
+        zeilen, fehlgeschlagen = [], 0
+        for url in offen:
+            try:
+                zeilen += [dict(z, firma=name, isin=gattungen["isin"].iloc[0]) for z in rueckkaeufe.lesen(url)]
+            except Exception as fehler:  # Firma bleibt offen, der nächste Aufruf holt nur die fehlenden
+                fehlgeschlagen += 1
+                print(f"  fehlgeschlagen: {url} ({fehler})")
+            if time.monotonic() > ende:
+                break
+        if zeilen:
+            neu = pd.DataFrame(zeilen).reindex(columns=SPALTEN)
+            neu.to_csv(ERGEBNIS, mode="a", header=not ERGEBNIS.exists(), index=False)
+            gelesen.update(neu["url"])
+        if time.monotonic() > ende:
+            print(f"Zeitbudget erreicht mitten in {name}, beim nächsten Aufruf geht es weiter")
+            return 0
+        if fehlgeschlagen:
+            print(f"{name}: {fehlgeschlagen} Meldungen fehlgeschlagen, Firma bleibt offen")
+            offen_firmen.append(name)
+            continue
+        if args.tage:
+            if offen:
+                print(f"{name}: {len(offen)} neue Meldungen", flush=True)
+            continue
+        pd.DataFrame([{"name": name, "uuid": uuid or "", "meldungen": len(links), "geladen": len(offen)}]) \
+            .to_csv(FORTSCHRITT, mode="a", header=not FORTSCHRITT.exists(), index=False)
+        fertig.add(name)
+        print(f"{name}: {len(links)} Meldungen, {len(offen)} gelesen", flush=True)
+    if offen_firmen:
+        print(f"Noch offen ({len(offen_firmen)}): {', '.join(offen_firmen)}; beim nächsten Aufruf erneut")
+    else:
+        print("Alle Firmen fertig")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

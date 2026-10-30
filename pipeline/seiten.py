@@ -104,9 +104,10 @@ def versionen_eintragen(v: dict) -> None:
 # --- Firmenseite --------------------------------------------------------------------------------
 
 def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, ranking: pd.DataFrame,
-                letzter_kurs: tuple, v: dict, aktionaere: pd.DataFrame) -> str:
+                letzter_kurs: tuple, v: dict, aktionaere: pd.DataFrame, rueckkaeufe: pd.DataFrame | None = None) -> str:
     """f: ticker, name, index, benchmark, isins. ranking: Zeilen dieser Firma mit Spalte 'rang'.
-    aktionaere: Zeilen dieser Firma aus stimmrechte.grossaktionaere."""
+    aktionaere: Zeilen dieser Firma aus stimmrechte.grossaktionaere.
+    rueckkaeufe: Zeilen dieser Firma aus rueckkaeufe.jahre; None = Historie noch nicht geladen, Abschnitt fehlt."""
     index_name = INDEXNAME.get(f["benchmark"], f["benchmark"])
     aktien = meldungen[meldungen["instrument"].eq("Aktie")]
     kaeufe, verkaeufe = aktien[aktien["art"].eq("Kauf")], aktien[aktien["art"].eq("Verkauf")]
@@ -164,6 +165,28 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
               (f'<a href="{e(r.url)}" rel="nofollow">{datum(r.schwellendatum)}</a>'
                + (f'<div class="klein">geprüft {datum(r.geprueft)}</div>' if not _leer(r.geprueft) else ""), "datum")]
              for r in aktionaere.itertuples()])
+
+    if rueckkaeufe is None:
+        rueck_abschnitt = ""
+    else:
+        if rueckkaeufe.empty:
+            rueck_html = '<p class="leer">Keine Aktienrückkäufe seit 2018 laut EQS-Archiv.</p>'
+        else:
+            rueck_html = _tabelle(
+                [("Jahr", ""), ("Handelstage", "zahl"), ("Aktien", "zahl"), ("Volumen", "zahl"), ("Ø Kurs", "zahl"),
+                 ("Letzter Kauf", "")],
+                [[(str(r.jahr), "datum"), (zahl(r.tage), "zahl"), (zahl(r.stueck), "zahl"), (euro(r.volumen), "zahl"),
+                  (f"{zahl(r.kurs, 2)} €", "zahl"), (datum(r.letzter), "datum")]
+                 for r in rueckkaeufe.itertuples()])
+        rueck_abschnitt = f"""
+    <section class="karte">
+      <h2>Aktienrückkäufe</h2>
+      <p class="erklaerung">Eigene Aktien, die die Firma über die Börse zurückgekauft hat, laut ihren wöchentlichen
+        Meldungen nach Art. 5 MAR (EQS-Archiv seit 2018). Volumen = Stückzahl × Tagesdurchschnittskurs, ohne Nebenkosten.
+        Zurückgekaufte Aktien werden meist eingezogen oder für Mitarbeiterprogramme genutzt.</p>
+      {rueck_html}
+    </section>
+"""
 
     if meldungen.empty:
         m_html = '<p class="leer">Seit Beginn der Aufzeichnung keine Meldungen.</p>'
@@ -263,7 +286,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
         Einträge mit „geprüft“ haben wir von Hand mit veröffentlichten Angaben abgeglichen (Firma oder Wirtschaftspresse, Link zur Quelle).</p>
       {vorzug}{ga_html}
     </section>
-
+{rueck_abschnitt}
     <section class="karte">
       <h2>Alle Meldungen</h2>
       {m_html}
