@@ -8,6 +8,7 @@ Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: ein Startup, eine Fin
 - Technische Übersicht (Dateien, Befehle): README.md; Vorbild-Analyse: GURUFOCUS.md
 - Alte Projekte (Sentiment-Tracker, StockPulse, GuruFocus-Analyse) und was davon übernehmbar ist: BESTANDSAUFNAHME.md
 - Recherche Datenquellen für den Ausbau (OpenBB, last30days-skill, FinceptTerminal, mit Adressen): DATENQUELLEN.md
+- Vorschlag Zielarchitektur (Postgres + Python-Sammler auf Server + Next.js, noch nicht entschieden): ARCHITEKTUR.md
 
 ## Stimmrechte abgeschlossen (30.10.2026), nächstes Vorhaben: Rückkäufe
 
@@ -38,24 +39,24 @@ Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: ein Startup, eine Fin
   geprüften Liste mit ansehen. Verschoben (Tobias): Henkel-Poolmeldungen `anderes`, 806 Fließtexte 2008–2012 (DeepSeek).
 **Vorhaben Stimmrechte ist erledigt** (Tobias 30.10.2026). Rückkäufe: siehe eigenes Vorhaben unten (Block 4 wartet auf Push und Start der Action).
 
-## Geplantes Vorhaben: Landingpage (Planungs-App #9), Plan vom 30.10.2026, noch nichts gebaut
+## Marketing und Website (Planungs-App #9), Stand 30.10.2026
 
-Tobias 30.10.2026: E-Mails sammeln **und** Produkt zeigen; am Ende eine richtige, professionelle Website.
-Englisch, Name noch offen. Testseite als versteckter Unterordner `docs/labor/` (nur #9, nicht #23).
-- [ ] **Phase 0 Botschaft:** Zielgruppe, Kernversprechen, Mitbewerber (OpenInsider, InsiderScreener, Quiver, GuruFocus),
-      3–5 Namensvorschläge. Skills: `positioning-mapper`, `message-house-builder`, `competitor-analysis`.
-- [ ] **Phase 1 Testseite:** `docs/labor/index.html` mit `<meta name="robots" content="noindex">`, `Disallow: /labor/` in
-      `docs/robots.txt` (statisch, nicht von der Pipeline erzeugt), nicht verlinkt. Sitemap kommt aus `seiten.sitemap()`
-      (nur Ticker und Gurus), `labor/` taucht dort nicht auf. Repository ist öffentlich → nichts ist wirklich geheim.
-- [ ] **Phase 2 Design:** 2–3 Richtungen in Google Stitch (Tobias hat Zugang), Screenshots an Claude; Umsetzung als
-      schlichtes HTML/CSS mit Skill `design-taste-frontend` und echten Live-Daten aus `docs/data` (Ticker, Cluster, CAR-Kurve).
-      Stitch-Code nicht 1:1 übernehmen. Stitch-MCP (inoffizielles Paket `@_davideast/stitch-mcp`) erst bei Bedarf.
-- [ ] **Phase 3 E-Mails:** Formulardienst mit Double-Opt-in (Vorschlag Buttondown, später auch für Newsletter #10).
-      **Vor dem Freischalten Datenschutzerklärung nötig** (DSGVO), Impressum gibt es schon.
-- [ ] **Phase 4 Website:** Startseite, Produktbereich, FAQ, später Preise, Careers (#24), Fußzeile für SEO (#22).
-      Eigene Domain vor dem öffentlichen Start. Werbeaussagen mit Ergebnissen (z. B. +0,24 % AAR) nur mit Hinweis
-      „keine Anlageberatung, vergangene Ergebnisse“.
-- [ ] **Phase 5 Messen:** cookielose Statistik (Plausible oder Umami), Anmeldequote.
+**Verworfen und gelöscht (30.10.2026):** eigene Testseite `docs/labor/` (Design ohne Absprache, zu eng auf Insiderdaten,
+kein zentraler CTA) und ein Google-Stitch-Entwurf (KI-Einheitsbrei, erfundene Zahlen wie „14.800 Abonnenten“ oder eine
+„Uni-Mannheim-Studie“ → wäre abmahnfähig). Lehre: erst Strategie, dann Marke, dann Texte, dann Design, dann Bau.
+
+**Entscheidungen Tobias:** Deutsch und Englisch von Anfang an. Positionierung „GuruFocus für Europa, wesentlich
+günstiger“ + „Folge den Profis“, Sentiment-Analyse als großer Bestandteil (ob GuruFocus Sentiment hat: ungeprüft).
+CTA: Newsletter, Formular mit **EmailOctopus** (läuft schon in `roleplay-landing`). Brauchbare Idee aus Stitch:
+„Sonntags-Report“ mit den spannendsten Insiderkäufen der Woche.
+
+**Empfehlung Claude (Tobias hat zugestimmt, mit Schritt 1 zu beginnen):** Aufwendige Website erst, wenn das Produkt steht
+(dann echter Designer oder hochwertige Vorlage, nicht generiert). Jetzt:
+- [ ] 1. Positionierung in einer Sitzung: Zielgruppe, Versprechen, Angebot, Preisidee, Name (Arbeitsname offen).
+- [ ] 2. Newsletter starten: schlichtes EmailOctopus-Formular, verlinkt von der jetzigen Seite; Skript, das samstags
+      einen Entwurf des Sonntags-Reports aus den eigenen Daten vorbereitet.
+- [ ] 3. Mit 5–10 Anlegern sprechen.
+- [ ] 4. Weiter am Produkt (Datenbank, Sentiment); Website danach.
 
 ## Einstieg für einen neuen Chat (Stand 28.10.2026)
 
@@ -271,10 +272,45 @@ Auftrag Tobias 30.10.2026 (nach Abschluss Stimmrechte). Quelle: EQS-Kategorie `s
       Volumen, Ø Kurs, letzter Tag; gleicher Tag aus zwei Meldungen nur einmal), Abschnitt „Aktienrückkäufe“ auf der
       Firmenseite nach den Großaktionären. Nur für Firmen in `rueckkaeufe_fortschritt.csv`, sonst fehlt der Abschnitt
       (sonst stünde „keine Rückkäufe“ bei noch nicht geladenen Firmen). Lokal geprüft (SAP, Allianz ohne Abschnitt), `docs/` zurückgesetzt.
-- [ ] **Block 4 – Historie laden (Tobias):** pushen, unter Actions „Rückkäufe laden“ → „Run workflow“, wiederholen bis
-      „Alle Firmen fertig“. Schätzung: ~5.000–8.000 Meldungen à ~3 s ≈ 4–7 h, also 1–2 Läufe. Danach prüfen: Kontrollzahl
-      je Meldung, Firmen ohne Rückkäufe stichprobenartig, `art=anderes` mit „Rückkauf“ im Text.
+- [x] **Block 4 – Historie laden (30.10.2026):** Läufe 14:29 (4 h 10 min) und 18:54 melden „Alle Firmen fertig“.
+      90 Firmen, 16.144 Zeilen (15.321 Rückkauftage, 823 `anderes`). Kontrollzahl: 2.939 Meldungen stimmen, 192 ohne,
+      150 „Abweichungen“ sind nur die kumulierte Programmsumme (BASF, Brenntag, Puma: Differenz zur Vormeldung passt),
+      83 echte Abweichungen, davon 48 Scout24 (2019–2024), Rest einzeln (Allianz, Telekom, Commerzbank, Talanx …).
+- [ ] **Fehler auf der Live-Seite:** 34 Firmen haben bei EQS **0 Meldungen** in der Kategorie (u. a. BMW, K+S, Rheinmetall,
+      Volkswagen) und bekommen trotzdem „Keine Aktienrückkäufe seit 2018 laut EQS-Archiv.“ BMW (Verteiler gewechselt)
+      und K+S (Programm 2023) haben aber zurückgekauft → bei 0 Meldungen besser „keine Daten“ statt „keine Rückkäufe“.
+- [ ] Offen aus der Prüfung: Scout24-Abweichungen ansehen; `art=anderes` mit „Rückkauf“ im Text (braucht die Meldungstexte).
 - [ ] Später: laufende Programme (Ankündigung nach lit. a: Volumen, Zeitraum) anzeigen; Rückkäufe im Kursdiagramm markieren.
+
+## Geplantes Vorhaben: Fundamentaldaten (Planung #6), Stand 30.10.2026
+
+Auftrag Tobias 30.10.2026: viele Fundamentaldaten, mindestens die Datenpunkte der AlleAktien-Karte (Beispiel Atoss):
+Kennzahlen (Marktkap., KGV TTM, KGVe, KUV, KBV), Rentabilität (Gewinnmarge, EK-Rendite, ROCE, FCF-Rendite,
+Dividendenrendite), Risiko (Nettoverschuldung/EBIT und /EBITDA, max. EBIT-Rückgang 10 J., Gewinnkontinuität 10 J.),
+Umsatz und EBIT als Balken (4 Jahre + 3 Jahre Schätzung), Wachstum 10 J. und 3 J. Schätzung, Renditeerwartung,
+Qualitätsscore aus 10 Kriterien, Kategorie (Peter-Lynch-Art), Burggraben-Text. Nur Plan, noch nichts gebaut.
+
+Befund Recherche (30.10.2026):
+- **Yahoo** (yfinance, getestet an Atoss, SAP, Deutz): nur **4 Jahre** GuV, 5 Jahre Bilanz/Cashflow; Schätzungen nur
+  laufendes und nächstes Jahr, nur Umsatz und Gewinn je Aktie, **kein EBIT**. Werte plausibel (Atoss Umsatz 2025
+  189 Mio., SAP 36,8 Mrd.), Deutz-Umsatzschätzung +1 J. auffällig (3,7 statt 2,4 Mrd.). Reicht nicht für 10-Jahres-Werte.
+  Öffentliche Anzeige laut Nutzungsbedingungen nicht erlaubt (grau).
+- **EODHD** Fundamentals Data Feed 59,99 €/Monat (49,99 € jährlich), laut Anbieter Nicht-US-Firmen ab 2000.
+  Mehrjahres-Schätzungen nicht erwähnt. **Gewerbliche Nutzung nur mit eigenem Vertrag, Preis auf Anfrage.**
+- **FMP** 22–149 $/Monat, nicht-US-Börsen vermutlich erst im teuersten Tarif (nicht an der Quelle bestätigt, Seite
+  blockt Abrufe). Hat Mehrjahres-Schätzungen (Umsatz, EBIT, EPS). **Anzeige auf einer Website nur mit eigenem
+  „Data Display and Licensing Agreement“, Preis auf Anfrage**, normaler Tarif deckt das nicht.
+- Die frühere Annahme „EODHD/FMP ~20–30 €/Monat“ (Offen, ARCHITEKTUR.md) ist für Fundamentaldaten mit
+  Anzeigerecht **falsch**: Fundamentaldaten kosten ab ~50–60 €/Monat privat, Anzeigelizenz extra.
+- SEC companyfacts nur für 4 Firmen, ESEF/Unternehmensregister nicht automatisierbar, ESAP erst bis 07/2027 (s. Offen).
+- Banken und Versicherer (Allianz, Munich Re, Hannover Rück, Talanx, Deutsche Bank, Commerzbank) brauchen eigene
+  Kennzahlen (EBIT, ROCE, Nettoverschuldung ergeben dort keinen Sinn).
+
+Vorschlag Claude (Freigabe Tobias steht aus): Lizenzanfragen an EODHD und FMP parallel; einen Monat EODHD privat zur
+Probe (10 Firmen gegen Geschäftsberichte); dann Leser → `daten/fundamental.csv` (lang: ISIN, Jahr, Posten, Wert,
+Quelle, Abrufdatum) → eigene Kennzahlen mit offengelegten Formeln → Abschnitt auf der Firmenseite. Statische Seite
+reicht dafür (90 Firmen × 20 Jahre ist klein), passt später in die Datenbank aus ARCHITEKTUR.md. Schätzungen
+(2026e–2028e) als eigener späterer Block, Burggraben-Text nicht automatisch.
 
 ## Laufendes Vorhaben: Guru-Depots (13F der SEC)
 
@@ -446,3 +482,9 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   geprüfte Liste (6c); dabei Fehler bei Renk, Hella, Eventim gefunden und behoben.
 - **30.10.2026:** Stimmrechte: Stände vor 2018 ausgeblendet, Konzernketten/Umfirmierungen zusammengefasst (Hugo Boss nicht mehr über 100 %), Porsche/Traton/Knorr-Bremse geprüft, Rheinmetall/Scout24 (EQS-Seiten defekt) abgeschlossen, Meldung „Alle Firmen fertig“ korrigiert. Danach Doppelungen Brenntag/Nemetschek/Fonds von Hand bereinigt, Vorhaben Stimmrechte abgeschlossen.
 - **30.10.2026 (2):** Landingpage (#9) geplant: Rückfragen geklärt (E-Mails + Schaufenster, Englisch, Name offen, Testseite `docs/labor/`), Plan in 6 Phasen oben unter „Geplantes Vorhaben: Landingpage“. Google Stitch geprüft (MCP-Anbindung nur über inoffizielles Paket). Noch nichts gebaut. Rückkäufe Block 1–3 gebaut (Leser, Lader + Action, Anzeige), lokal getestet, wartet auf Push.
+- **30.10.2026 (3):** Landingpage Phase 0+1: Testseite `docs/labor/` gebaut (Arbeitsname Boardtrades, Englisch, Live-Tafel, Event-Study-Kurve, Cluster-Stapel, Abdeckung, Fragen, Warteliste ohne Anschluss), `robots.txt` sperrt `/labor/`. Geprüft bei 1440/768/390 px. Nicht gepusht.
+- **30.10.2026 (4):** Tobias lehnt Testseiten-Design ab; neue Reihenfolge Marketing → Stitch → Bau, EmailOctopus statt Buttondown. `docs/labor/` und `robots.txt`-Änderung nicht pushen.
+- **30.10.2026 (5):** Verworfene Landingpage-Arbeit gelöscht (`docs/labor/`, `.taste-skill/`, `robots.txt`/`.gitignore` zurückgesetzt). Abschnitt „Marketing und Website“ neu gefasst: erst Positionierung, dann Newsletter.
+- **30.10.2026 (6):** Rückkäufe Block 4 geprüft (Planung #60): Historie vollständig geladen, Kontrollzahlen ausgewertet, Fehler „keine Rückkäufe“ bei Firmen ohne EQS-Meldungen gefunden (noch nicht behoben).
+- **30.10.2026 (7):** `ARCHITEKTUR.md` geschrieben (Planung #7): heutige Grenzen, empfohlenes Ziel, Weg in 5 Blöcken, offene Entscheidungen. Nichts gebaut.
+- **30.10.2026 (8):** Fundamentaldaten (#6) recherchiert: Yahoo nur 4 Jahre, Bezahlanbieter brauchen für die öffentliche Anzeige eigene Lizenz (Preis auf Anfrage). Plan notiert unter „Geplantes Vorhaben: Fundamentaldaten“, nichts gebaut.
