@@ -1,4 +1,14 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+FCR Immobilien Aktiengesellschaft,40022612,DE000A1YC913,MAMBO Vermögensverwaltung GmbH,in enger Beziehung,Aktie,Kauf,"9,50 EUR","204.383,00 EUR",2026-10-30,2026-10-28,,2026-10-30 17:34:17,9.5,EUR,204383.0,2026-10-30 19:53:34
+tk accelis Group AG & Co. KGaA,40036903,DE000TKCC1S8,"Wodera, Daniel",Vorstand,Aktie,Kauf,"27,18 EUR","81.531,78 EUR",2026-10-30,2026-10-29,Xetra,2026-10-30 17:28:01,27.18,EUR,81531.78,2026-10-30 19:53:34
+Knorr-Bremse Aktiengesellschaft,40002863,DE000KBX1006,"Llistosella, Marc",Vorstand,Aktie,Kauf,"88,10 EUR","52.860,00 EUR",2026-10-30,2026-10-30,Tradegate,2026-10-30 17:28:01,88.1,EUR,52860.0,2026-10-30 19:53:34
+Knorr-Bremse Aktiengesellschaft,40002863,DE000KBX1006,"Weber, Frank Markus",Vorstand,Aktie,Kauf,"88,70 EUR","49.139,80 EUR",2026-10-30,2026-10-30,XETRA,2026-10-30 17:28:01,88.7,EUR,49139.8,2026-10-30 19:53:34
+Knorr-Bremse Aktiengesellschaft,40002863,DE000KBX1006,"Lange, Dr. Nicolas",Vorstand,Aktie,Kauf,"89,87 EUR","49.970,15 EUR",2026-10-30,2026-10-30,XETRA,2026-10-30 17:28:01,89.87,EUR,49970.15,2026-10-30 19:53:34
+Knorr-Bremse Aktiengesellschaft,40002863,DE000KBX1006,"Mayfeld, Dr. Claudia",Vorstand,Aktie,Kauf,"87,65 EUR","52.590,00 EUR",2026-10-30,2026-10-30,XETRA,2026-10-30 17:28:01,87.65,EUR,52590.0,2026-10-30 19:53:34
+Knorr-Bremse Aktiengesellschaft,40002863,DE000KBX1006,"Spies, Bernd",Vorstand,Aktie,Kauf,"88,95 EUR","49.456,20 EUR",2026-10-30,2026-10-30,European Investor Exchange,2026-10-30 17:28:01,88.95,EUR,49456.2,2026-10-30 19:53:34
+Basler Aktiengesellschaft,40001692,DE0005102008,"Mehl, Hardy",Vorstand,Aktie,Kauf,"24,17 EUR","50.027,45 EUR",2026-10-30,2026-10-29,XETRA,2026-10-30 17:28:01,24.17,EUR,50027.45,2026-10-30 19:53:34
+tk accelis Group AG & Co. KGaA,40036903,DE000TKCC1S8,"Henne, Ilse Irene Albert",Vorstand,Aktie,Sonstiges,"27,80 EUR","90.572,40 EUR",2026-10-30,2026-10-27,,2026-10-30 17:21:02,27.8,EUR,90572.4,2026-10-30 19:53:34
+tk accelis Group AG & Co. KGaA,40036903,DE000TKCC1S8,"Dienstuhl, Dr. Volkmar",Aufsichtsrat,Aktie,Sonstiges,"27,80 EUR","88.237,20 EUR",2026-10-30,2026-10-27,,2026-10-30 17:21:02,27.8,EUR,88237.2,2026-10-30 19:53:34
 Symrise AG,40005903,DE000SYM9999,"Friede, Michael",Vorstand,Aktie,Kauf,"89,70 EUR","35.252,10 EUR",2026-10-28,2026-10-28,BOERSE HANNOVER - EUROPEAN INVESTOR EXCHANGE,2026-10-29 08:46:12,89.7,EUR,35252.1,2026-10-29 09:29:58
 Drägerwerk AG & Co. KGaA,40000971,DE0005550602,Dr. Heinrich Dräger GmbH,in enger Beziehung,Aktie,Kauf,"344.227,20 EUR","4.677,00 EUR",2026-10-28,2026-10-27,,2026-10-28 14:36:41,344227.2,EUR,4677.0,2026-10-28 18:27:22
 Drägerwerk AG & Co. KGaA,40000971,DE0005550602,Dr. Heinrich Dräger GmbH,in enger Beziehung,Aktie,Kauf,"73,60 EUR","344.227,20 EUR",2026-10-28,2026-10-27,,2026-10-28 14:36:41,73.6,EUR,344227.2,2026-10-28 18:27:22
