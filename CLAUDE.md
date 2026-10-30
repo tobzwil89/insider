@@ -9,7 +9,7 @@ Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: ein Startup, eine Fin
 - Alte Projekte (Sentiment-Tracker, StockPulse, GuruFocus-Analyse) und was davon übernehmbar ist: BESTANDSAUFNAHME.md
 - Recherche Datenquellen für den Ausbau (OpenBB, last30days-skill, FinceptTerminal, mit Adressen): DATENQUELLEN.md
 
-## Nächster Schritt (Stand 30.10.2026): Stimmrechte pushen, dann als erledigt markieren
+## Stimmrechte abgeschlossen (30.10.2026), nächstes Vorhaben: Rückkäufe
 
 30.10.2026 umgesetzt (nicht gepusht, Tobias pusht): Auslöser war Tobias' Hinweis „Hugo Boss über 100 %“.
 - **Stände vor 2018 ausgeblendet** (Tobias: ja): automatische Einträge mit Schwellendatum < 2018 fallen weg, geprüfte bleiben.
@@ -27,11 +27,16 @@ Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: ein Startup, eine Fin
 - **Rheinmetall/Scout24:** kein Leserfehler, EQS zeigt bei je einer Mitteilung (2016) einen fremden KKR-Pressetext →
   `stimmrechte.DEFEKT` (als `anderes`), beide Firmen fertig. `stimmrechte_laden.py` meldet offene Firmen jetzt
   („Noch offen (n): …“), getestet mit simuliertem Fehler.
-- **Bekannte Reste:** Brenntag Kühne + Treuhänder Stähelin (je 20,10 %, verschiedene Tage) doppelt; Nemetschek Ralf (45,65 %,
-  2022) und Georg (45,07 %, 2026) doppelt; Fondsgesellschaft + eigener Fonds (Artisan, Flossbach SICAV) doppelt.
-  Leser speichert bei manchen Familienformularen nur Vornamen („Dr. Wolfgang“, „Georg F.W.“, „Maria Elisabeth“).
-  Verschoben (Tobias): Henkel-Poolmeldungen `anderes`, 806 Fließtexte 2008–2012 (DeepSeek).
-Danach Block 6 und das Vorhaben Stimmrechte als erledigt markieren, weiter mit Rückkäufen.
+- **Von Hand nachgetragen (30.10.2026, nach den Mitteilungen geprüft):** Brenntag Kühne Holding 20,10 % (Stähelin meldet als
+  Testamentsvollstrecker, eine Zeile); Fonds stecken im Anteil ihres Verwalters → Fonds ausgeblendet: Artisan Funds (Brenntag,
+  Adidas), Flossbach SICAV (Brenntag, Bechtle), First Eagle Global Fund (Merck); FMC: alte Dodge-&-Cox-Meldung 2022 aus,
+  Fonds 2026 bleibt. Nemetschek: Ralf 2022 ausgeblendet (dieselbe Nemetschek-Stiftung, heute 45,07 % laut Georg 02.07.2026).
+  Ergebnis 303 Zeilen. Rebase-Konflikt in `daten/stimmrechte.csv` (Bot hatte angehängt) gelöst, beide Teile behalten, Sicherung
+  im Branch `sicherung-vor-rebase` (nach erfolgreichem Push löschbar: `git branch -D sicherung-vor-rebase`).
+- **Bekannte Reste:** Leser speichert bei manchen Familienformularen nur Vornamen („Dr. Wolfgang“, „Georg F.W.“,
+  „Maria Elisabeth“). Neue Fonds-/Verwalter-Paare tauchen mit neuen Mitteilungen auf → bei der jährlichen Prüfung der
+  geprüften Liste mit ansehen. Verschoben (Tobias): Henkel-Poolmeldungen `anderes`, 806 Fließtexte 2008–2012 (DeepSeek).
+**Vorhaben Stimmrechte ist erledigt** (Tobias 30.10.2026). Nächstes laut Plan: Rückkäufe eigener Aktien aus EQS.
 
 ## Einstieg für einen neuen Chat (Stand 28.10.2026)
 
@@ -162,7 +167,7 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
       **Lücke (auf der Seite benannt):** nur Mitteilungen ab 2018, stabile Großaktionäre fehlen (HDI bei Talanx,
       Schulenberg bei Eventim, Kronseder bei Krones). Volkswagen, Sartorius, Wacker: gar keine Mitteilungen bei EQS
       (anderer Verteiler). Umfirmierungen erscheinen doppelt (Hugo Boss: PFC S.r.l. 2020 und PFC S.p.A. 2025).
-- [ ] **Block 6 – Lücke vor 2018 schließen** (Entscheidung Tobias): EQS-Archiv vor 2018 laden (alte Formulare
+- [x] **Block 6 – Lücke vor 2018 schließen** (abgeschlossen 30.10.2026: ab 2018 automatisch, davor nur geprüfte Einträge) (Entscheidung Tobias): EQS-Archiv vor 2018 laden (alte Formulare
       nach § 21 WpHG a. F. prüfen) und/oder Quelle für VW/Sartorius/Wacker suchen (Unternehmensregister).
       **Test 28.10.2026** (Talanx, Eventim, Krones; Ergebnisse `.recherche/stimmrechte_vor2018_probe.csv`,
       `.recherche/fliesstext_probe.py/.csv`): vor 2018 nur 1 / 94 / 13 Mitteilungen. Ab ~2016 Standardformular
@@ -392,4 +397,4 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   DeepSeek ausgelesen, bis das Guthaben (1 $) aufgebraucht war: 4.229 von 5.035 Texten (Details Block 6b).
   Gepusht (967d34a). Automatische Anzeige der alten Daten verworfen (zu viele überholte Stände), stattdessen von Hand
   geprüfte Liste (6c); dabei Fehler bei Renk, Hella, Eventim gefunden und behoben.
-- **30.10.2026:** Stimmrechte: Stände vor 2018 ausgeblendet, Konzernketten/Umfirmierungen zusammengefasst (Hugo Boss nicht mehr über 100 %), Porsche/Traton/Knorr-Bremse geprüft, Rheinmetall/Scout24 (EQS-Seiten defekt) abgeschlossen, Meldung „Alle Firmen fertig“ korrigiert.
+- **30.10.2026:** Stimmrechte: Stände vor 2018 ausgeblendet, Konzernketten/Umfirmierungen zusammengefasst (Hugo Boss nicht mehr über 100 %), Porsche/Traton/Knorr-Bremse geprüft, Rheinmetall/Scout24 (EQS-Seiten defekt) abgeschlossen, Meldung „Alle Firmen fertig“ korrigiert. Danach Doppelungen Brenntag/Nemetschek/Fonds von Hand bereinigt, Vorhaben Stimmrechte abgeschlossen.
