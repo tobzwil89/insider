@@ -56,8 +56,17 @@ def _reparieren(zeile: str) -> str:
         return zeile
 
 
+# EQS zeigt hier einen fremden Pressetext (KKR) statt der Mitteilung, geprüft 30.10.2026
+DEFEKT = {
+    "https://www.eqs-news.com/de/news/stimmrechtsanteile/deutsche-bank-aktiengesellschaft-frankfurt-germany-deutschland/c7f93dec-bfb3-4eb6-8d05-c7e1876897bd_en",
+    "https://www.eqs-news.com/de/news/stimmrechtsanteile/allianz-global-investors-gmbh-frankfurt-main-deutschland/405e7a19-144a-4c4a-bd26-d2d36e173c74_en",
+}
+
+
 def lesen(url: str, html: str | None = None) -> dict:
     """Eine Stimmrechtsmitteilung → eine Zeile für stimmrechte.csv."""
+    if url in DEFEKT:
+        return {"url": url, "formular": "anderes"}
     soup = BeautifulSoup(html or eqs._holen(url), "lxml")
     for t in soup(["script", "style", "nav", "header", "footer"]):
         t.decompose()
@@ -128,7 +137,8 @@ def grossaktionaere(df: pd.DataFrame, geprueft: pd.DataFrame | None = None) -> p
     geprueft: von Hand geprüfte Einträge (daten/grossaktionaere_geprueft.csv). Halter mit Prozentwert ersetzt den
     automatischen Eintrag desselben Halters, ohne Prozentwert blendet ihn aus; Halter '*' blendet alle automatischen
     Einträge der Firma vor `stand` aus (z. B. Meldungen eines Vorgängers mit gleichem Namen).
-    Spalten: firma, halter, aktien, instrumente, summe, schwellendatum, url, geprueft; sortiert nach Summe."""
+    Spalten: firma, halter, weitere (gleicher Bestand am gleichen Tag), aktien, instrumente, summe, schwellendatum,
+    url, geprueft; sortiert nach Aktien."""
     df = df[df["formular"].eq("stimmrechte") & df["meldepflichtiger"].fillna("").ne("")].copy()
     df["schluessel"] = df["meldepflichtiger"].map(_schluessel)
     df["schwellendatum"] = pd.to_datetime(df["schwellendatum"], errors="coerce")
@@ -138,7 +148,34 @@ def grossaktionaere(df: pd.DataFrame, geprueft: pd.DataFrame | None = None) -> p
     namen = df.assign(laenge=df["meldepflichtiger"].str.len()).sort_values("laenge") \
         .groupby("schluessel")["meldepflichtiger"].first()
     letzte["halter"] = letzte["schluessel"].map(namen)
+    # Konzernkette: Wer je am selben Tag denselben Bestand gemeldet hat wie ein anderer (Mutter, Tochter,
+    # Familie), gehört zur selben Kette. Je Kette zählt der neueste Stand; ältere Meldungen mit anderem Wert sind
+    # überholt (vor dem Schwellenfilter: Parsifal 3,05 % ist überholt, weil David Zorub für dieselbe Kette 2,92 %
+    # meldet). Gleicher Wert an verschiedenen Tagen reicht nicht: runde Werte wie 25,1 % kommen oft zufällig vor
+    kette = {}
+    def wurzel(k):
+        while kette.get(k, k) != k:
+            k = kette[k]
+        return k
+    for (firma, *_), h in df[df["aktien"] > 0].groupby(["firma", "schwellendatum", "aktien", "instrumente"])["schluessel"]:
+        for k in h.iloc[1:]:
+            kette[wurzel((firma, k))] = wurzel((firma, h.iloc[0]))
+    letzte["kette"] = [wurzel(k) for k in zip(letzte["firma"], letzte["schluessel"])]
+    neuester = letzte.sort_values("schwellendatum").groupby("kette")[["aktien", "instrumente"]].transform("last") \
+        .reindex(letzte.index)
+    letzte = letzte[letzte["aktien"].eq(neuester["aktien"]) & letzte["instrumente"].eq(neuester["instrumente"])]
     letzte = letzte[(letzte["aktien"] >= 3) | (letzte["summe"] >= 5)]
+    # Stände vor 2018 nicht zeigen: ungeprüft und oft überholt (Ausstiege fehlen im EQS-Archiv)
+    letzte = letzte[letzte["schwellendatum"] >= "2018-01-01"]
+    # Umfirmierung: Ein Halter mit gleichem Namensanfang meldet später genau diesen Stand als seinen vorherigen
+    # (PFC S.r.l. 15,01 % → PFC S.p.A. meldet 2025 „vorher 15,01 %“) → alter Name ist überholt
+    nachfolger = df[["firma", "schluessel", "schwellendatum", "aktien_vorher", "instrumente_vorher"]].rename(
+        columns={"schluessel": "neu", "schwellendatum": "spaeter", "aktien_vorher": "aktien",
+                 "instrumente_vorher": "instrumente"})
+    treffer = letzte.reset_index().merge(nachfolger, on=["firma", "aktien", "instrumente"])
+    treffer = treffer[(treffer["spaeter"] > treffer["schwellendatum"]) & treffer["neu"].ne(treffer["schluessel"])
+                      & treffer["neu"].str[:4].eq(treffer["schluessel"].str[:4])]  # sonst Zufallstreffer
+    letzte = letzte.drop(treffer["index"].unique())
     if geprueft is not None and not geprueft.empty:
         g = geprueft.assign(stand=pd.to_datetime(geprueft["stand"]), geprueft=pd.to_datetime(geprueft["geprueft"]))
         for r in g[g["halter"].eq("*")].itertuples():
@@ -147,9 +184,15 @@ def grossaktionaere(df: pd.DataFrame, geprueft: pd.DataFrame | None = None) -> p
         weg = set(zip(einzeln["firma"], einzeln["schluessel"]))
         letzte = letzte[[k not in weg for k in zip(letzte["firma"], letzte["schluessel"])]]
         neu = einzeln[einzeln["aktien"].notna()].rename(columns={"stand": "schwellendatum", "quelle": "url"})
-        letzte = pd.concat([letzte, neu.assign(summe=neu["aktien"])])
+        letzte = pd.concat([letzte, neu.assign(summe=neu["aktien"], kette=neu["halter"])])
     if "geprueft" not in letzte:
         letzte["geprueft"] = pd.NaT
-    return (letzte.sort_values(["firma", "summe"], ascending=[True, False])
-            [["firma", "halter", "aktien", "instrumente", "summe", "schwellendatum", "url", "geprueft"]]
+    # Eine Zeile je Kette und Bestand, neuester Stand vorn
+    letzte = letzte.sort_values("schwellendatum", ascending=False).groupby(
+        ["firma", "kette", "aktien", "instrumente"], dropna=False, as_index=False).agg(
+        halter=("halter", "first"), weitere=("halter", lambda h: ", ".join(h.iloc[1:])),
+        schwellendatum=("schwellendatum", "first"), summe=("summe", "first"), url=("url", "first"),
+        geprueft=("geprueft", "first"))
+    return (letzte.sort_values(["firma", "aktien", "summe"], ascending=[True, False, False])
+            [["firma", "halter", "weitere", "aktien", "instrumente", "summe", "schwellendatum", "url", "geprueft"]]
             .reset_index(drop=True))

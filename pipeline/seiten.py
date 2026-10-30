@@ -151,14 +151,15 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
     vorzug = ('<p class="erklaerung"><b>An der Börse gehandelt werden nur Vorzugsaktien ohne Stimmrecht.</b> '
               'Die Prozente beziehen sich auf die Stammaktien. Sie werden den Familien Porsche und Piëch über '
               'Beteiligungsgesellschaften und Stimmbindungen vollständig zugerechnet (bei der Porsche AG über '
-              'Porsche SE und Volkswagen), deshalb meldet jedes Mitglied die vollen 100 %.</p>' if f["ticker"] in NUR_VORZUG else "")
+              'Porsche SE und Volkswagen), deshalb meldet jedes Mitglied die vollen 100 %. Hier stehen sie in einer Zeile.</p>' if f["ticker"] in NUR_VORZUG else "")
     if aktionaere.empty:
         ga_html = ('<p class="leer">Keine Halter über den Meldeschwellen laut den Stimmrechtsmitteilungen '
                    'im EQS-Archiv seit 2018. Das heißt nicht, dass es keine Großaktionäre gibt.</p>')
     else:
         ga_html = _tabelle(
             [("Halter", ""), ("Aktien", "zahl"), ("Instrumente", "zahl"), ("Zusammen", "zahl"), ("Stand", "")],
-            [[(e(r.halter), ""), (f"{zahl(r.aktien, 2)} %", "zahl"), (f"{zahl(r.instrumente, 2)} %", "zahl"),
+            [[(e(r.halter) + (f'<div class="klein">dieselben Aktien auch bei: {e(r.weitere)}</div>' if r.weitere else ""), ""),
+              (f"{zahl(r.aktien, 2)} %", "zahl"), (f"{zahl(r.instrumente, 2)} %", "zahl"),
               (f"<b>{zahl(r.summe, 2)} %</b>", "zahl"),
               (f'<a href="{e(r.url)}" rel="nofollow">{datum(r.schwellendatum)}</a>'
                + (f'<div class="klein">geprüft {datum(r.geprueft)}</div>' if not _leer(r.geprueft) else ""), "datum")]
@@ -251,9 +252,12 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
     <section class="karte">
       <h2>Großaktionäre</h2>
       <p class="erklaerung">Stimmrechtsanteile laut der letzten Stimmrechtsmitteilung je Halter (§§ 33 ff. WpHG),
-        gezählt ab 3 % in Aktien oder 5 % zusammen mit Instrumenten (z. B. Optionen, Wertpapierleihe).
-        Stand ist das Datum der Schwellenberührung, der Link führt zur Mitteilung. Dieselben Aktien können bei mehreren
-        Haltern auftauchen (z. B. Stiftung und Stifter), deshalb ergibt die Spalte keine Summe.
+        gezählt ab 3 % in Aktien oder 5 % zusammen mit Instrumenten. Stand ist das Datum der Schwellenberührung,
+        der Link führt zur Mitteilung. <b>Was jemand besitzt, steht in der Spalte Aktien.</b> Instrumente sind
+        keine Aktien, sondern Rechte darauf (Optionen, Wertpapierleihe, Derivate): Hinter derselben Aktie stehen oft
+        mehrere Instrumente, etwa bei Käufer und Verkäufer einer Option. Die Spalten Instrumente und Zusammen
+        lassen sich deshalb nicht addieren und können über 100 % ergeben. Melden Mutter, Tochter oder Familienmitglieder
+        dieselben Aktien, steht das in einer Zeile.
         <b>Ausgewertet sind Mitteilungen seit 2018 aus dem EQS-Archiv:</b> Wer seinen Anteil seitdem nicht verändert hat
         (oft Gründerfamilien oder Mutterkonzerne), fehlt hier. Nach Umfirmierungen kann ein Halter doppelt erscheinen.
         Einträge mit „geprüft“ haben wir von Hand mit veröffentlichten Angaben abgeglichen (Firma oder Wirtschaftspresse, Link zur Quelle).</p>

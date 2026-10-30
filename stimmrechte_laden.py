@@ -51,6 +51,7 @@ def main() -> int:
     bekannt = pd.read_csv(DATEN / "eqs_fortschritt.csv", dtype=str, keep_default_na=False)
     bekannt = dict(zip(bekannt["name"], bekannt["uuid"]))
 
+    offen_firmen = []
     for name, gattungen in firmen.groupby("name", sort=True):
         if name in fertig:
             continue
@@ -62,6 +63,7 @@ def main() -> int:
             links = eqs.dd_links(uuid, von, bis, kategorie=stimmrechte.KATEGORIE) if uuid else []
         except eqs.Gedrosselt as fehler:
             print(f"{name}: {fehler}, beim nächsten Aufruf erneut")
+            offen_firmen.append(name)
             continue
         offen = [u for u, _ in links if u not in gelesen]
         zeilen, fehlgeschlagen = [], 0
@@ -86,6 +88,7 @@ def main() -> int:
             return 0
         if fehlgeschlagen:
             print(f"{name}: {fehlgeschlagen} Mitteilungen fehlgeschlagen, Firma bleibt offen")
+            offen_firmen.append(name)
             continue
         if args.tage:
             if offen:
@@ -95,7 +98,10 @@ def main() -> int:
             .to_csv(fortschritt, mode="a", header=not fortschritt.exists(), index=False)
         fertig.add(name)
         print(f"{name}: {len(links)} Mitteilungen, {len(offen)} gelesen", flush=True)
-    print("Alle Firmen fertig")
+    if offen_firmen:
+        print(f"Noch offen ({len(offen_firmen)}): {', '.join(offen_firmen)}; beim nächsten Aufruf erneut")
+    else:
+        print("Alle Firmen fertig")
     return 0
 
 

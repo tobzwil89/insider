@@ -9,17 +9,29 @@ Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: ein Startup, eine Fin
 - Alte Projekte (Sentiment-Tracker, StockPulse, GuruFocus-Analyse) und was davon übernehmbar ist: BESTANDSAUFNAHME.md
 - Recherche Datenquellen für den Ausbau (OpenBB, last30days-skill, FinceptTerminal, mit Adressen): DATENQUELLEN.md
 
-## Nächster Schritt (Stand 29.10.2026 abends): Stimmrechte abschließen
+## Nächster Schritt (Stand 30.10.2026): Stimmrechte pushen, dann als erledigt markieren
 
-Alles bis fb2962f ist gepusht. Tobias' Frage „Können wir Stimmrechte als erledigt sehen?“ → noch nicht. Vorschlag (Antwort von
-Tobias steht aus, zuerst nachfragen):
-1. **Ungeprüfte Stände vor 2018 ausblenden** (wichtig): 61 von 474 angezeigten Einträgen bei 32 Firmen stammen aus Formularen
-   2015–2017 und wurden nie geprüft; bei den 20 geprüften Firmen war etwa jeder zweite alte Stand überholt. Vorschlag: in
-   `stimmrechte.grossaktionaere` automatische Einträge mit `schwellendatum < 2018` weglassen, geprüfte bleiben. Erklärtext anpassen.
-2. **Rheinmetall und Scout24** im Archiv vor 2018: je 1 Mitteilung „ohne Inhalt“ (Leserfehler, Seite hat Inhalt, URLs im Protokoll
-   des Laufs 40873667235). Dazu: `stimmrechte_laden.py` meldet „Alle Firmen fertig“, obwohl Firmen offen sind.
-3. Bleibt als bekannter Rest: Henkel-Poolmeldungen landen als `anderes`; 806 Fließtexte 2008–2012 erst nach DeepSeek-Aufladung.
-Danach Block 6 und das Vorhaben Stimmrechte als erledigt markieren.
+30.10.2026 umgesetzt (nicht gepusht, Tobias pusht): Auslöser war Tobias' Hinweis „Hugo Boss über 100 %“.
+- **Stände vor 2018 ausgeblendet** (Tobias: ja): automatische Einträge mit Schwellendatum < 2018 fallen weg, geprüfte bleiben.
+- **Doppelzählungen** in `stimmrechte.grossaktionaere`: (a) *Konzernkette*: Halter, die je am selben Tag denselben Bestand
+  gemeldet haben, bilden eine Kette; je Kette gilt der neueste Stand (vor dem 3-%-Filter, damit Unterschreitungen zählen:
+  Parsifal 3,05 % → David Zorub 2,92 %); gleicher Bestand → eine Zeile, weitere Namen klein darunter („dieselben Aktien
+  auch bei“). (b) *Umfirmierung*: ein Halter mit gleichem Namensanfang (4 Zeichen) meldet später genau diesen Stand als
+  „vorher“ (PFC S.r.l. → PFC S.p.A., Norwegen-Schreibweisen). Ohne Namensbedingung 83 Treffer mit Fehlern (Bund/Hensoldt,
+  Bertermann/Auto1) → verworfen. Ebenso verworfen: gleicher Wert ab 10 % an verschiedenen Tagen (löschte Bund 25,1 %).
+- Sortierung nach Aktien statt Zusammen; Erklärtext: Instrumente sind keine Aktien, Spalten Instrumente/Zusammen nicht addierbar.
+- Geprüfte Liste ergänzt: Porsche, Porsche SE, Traton → eine Zeile „Familien Porsche und Piëch“ (100 / 100 / 87,52 %,
+  Mitteilungen 04.04.2025, `*` vor 05.04.2025); Knorr-Bremse: Heinz Hermann Thiele ausgeblendet (Erbfall 2021, Stiftung 58,99 %).
+- Ergebnis: 309 Zeilen bei 83 Firmen, keine Firma mehr über 100 % in Aktien. Hugo Boss 70,2 %
+  (Ashley 49,41, Zignago/PFC 14,15, Silchester 5,08, Banken/Händler 1,6). Screenshot geprüft, `docs/` zurückgesetzt.
+- **Rheinmetall/Scout24:** kein Leserfehler, EQS zeigt bei je einer Mitteilung (2016) einen fremden KKR-Pressetext →
+  `stimmrechte.DEFEKT` (als `anderes`), beide Firmen fertig. `stimmrechte_laden.py` meldet offene Firmen jetzt
+  („Noch offen (n): …“), getestet mit simuliertem Fehler.
+- **Bekannte Reste:** Brenntag Kühne + Treuhänder Stähelin (je 20,10 %, verschiedene Tage) doppelt; Nemetschek Ralf (45,65 %,
+  2022) und Georg (45,07 %, 2026) doppelt; Fondsgesellschaft + eigener Fonds (Artisan, Flossbach SICAV) doppelt.
+  Leser speichert bei manchen Familienformularen nur Vornamen („Dr. Wolfgang“, „Georg F.W.“, „Maria Elisabeth“).
+  Verschoben (Tobias): Henkel-Poolmeldungen `anderes`, 806 Fließtexte 2008–2012 (DeepSeek).
+Danach Block 6 und das Vorhaben Stimmrechte als erledigt markieren, weiter mit Rückkäufen.
 
 ## Einstieg für einen neuen Chat (Stand 28.10.2026)
 
@@ -380,3 +392,4 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   DeepSeek ausgelesen, bis das Guthaben (1 $) aufgebraucht war: 4.229 von 5.035 Texten (Details Block 6b).
   Gepusht (967d34a). Automatische Anzeige der alten Daten verworfen (zu viele überholte Stände), stattdessen von Hand
   geprüfte Liste (6c); dabei Fehler bei Renk, Hella, Eventim gefunden und behoben.
+- **30.10.2026:** Stimmrechte: Stände vor 2018 ausgeblendet, Konzernketten/Umfirmierungen zusammengefasst (Hugo Boss nicht mehr über 100 %), Porsche/Traton/Knorr-Bremse geprüft, Rheinmetall/Scout24 (EQS-Seiten defekt) abgeschlossen, Meldung „Alle Firmen fertig“ korrigiert.
