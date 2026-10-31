@@ -143,7 +143,7 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
         f_gattung = fonds[fonds["isin"] == isin]
         if g["gattung"] == "vorzug":
             return {"aktionaere": ga.iloc[0:0], "eigene": eigene, "norwegen": None, "gattung": "vorzug",
-                    "fonds": fonds_us.je_firma(f_gattung, [], anzahl)}
+                    "fonds": fonds_us.je_firma(f_gattung, [], anzahl), "stamm_aktionaere": ga}
         return {"aktionaere": ga, "eigene": eigene or eigene_aktien.get(name), "norwegen": None, "gattung": "stamm",
                 "fonds": fonds_us.je_firma(f_gattung, halter, anzahl)}
     # Rückkäufe nur für Firmen, deren Historie fertig geladen ist (sonst hieße „keine“ nur „noch nicht geladen“)

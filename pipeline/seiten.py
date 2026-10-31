@@ -326,7 +326,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
 
 
 def _prozent_text(x) -> str:
-    return f"{zahl(x, 2)} %" if x < 10 else f"{zahl(x, 1)} %"
+    return f"{zahl(x, 2)} %" if x < 0.1 else f"{zahl(x, 1)} %"
 
 
 def aktionaersstruktur(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: dict | None = None,
@@ -338,7 +338,11 @@ def aktionaersstruktur(aktionaere: pd.DataFrame, eigene: dict | None = None, fon
     Staatsfonds, US-Fonds (eine Zeile, Aufteilung klein), Rest grau. gattung 'vorzug': Ring über die Vorzugsaktien,
     die Stimmrechte (stamm_aktionaere) stehen als Satz darunter. Nichts bekannt → leerer Text."""
     halter = aktionaere.sort_values("aktien", ascending=False)
-    gross = halter[halter["aktien"] >= 1].head(4)
+    gross = halter[halter["aktien"] >= 1]
+    # 8 Farben: Halter ab 1 % einzeln, solange neben den übrigen Segmenten Farben frei sind
+    frei = 8 - sum(map(bool, [eigene, norwegen, fonds]))
+    if len(gross) + (len(halter) > len(gross)) > frei:
+        gross = gross.head(frei - 1)
     klein = halter.drop(gross.index)
     segmente = []  # (Name-HTML, Anteil, Stand-HTML)
 
@@ -388,7 +392,7 @@ def aktionaersstruktur(aktionaere: pd.DataFrame, eigene: dict | None = None, fon
         farbe = f"var(--serie-{i + 1})"
         stufen.append(f"{farbe} {start:.2f}% {start + max(wert - luecke, 0.2):.2f}%, "
                       f"var(--flaeche) {start + max(wert - luecke, 0.2):.2f}% {start + wert:.2f}%")
-        zeilen.append([(f'<span class="ring-farbe" style="background:{farbe}"></span><div>{name}</div>', "ring-name"),
+        zeilen.append([(f'<div class="ring-name"><span class="ring-farbe" style="background:{farbe}"></span><div>{name}</div></div>', ""),
                        (_prozent_text(wert), "zahl"), (stand, "datum")])
         start += wert
     if rest > 0.05:
@@ -396,8 +400,8 @@ def aktionaersstruktur(aktionaere: pd.DataFrame, eigene: dict | None = None, fon
         erklaerung = ("Streubesitz und alle übrigen Anleger (für Vorzugsaktien gibt es keine Stimmrechtsmitteilungen)"
                       if gattung == "vorzug" else "Streubesitz: Anleger unter 3 % (nicht meldepflichtig)"
                       + ("" if eigene else ", eigene Aktien unter 3 %") + (", Fonds außerhalb der USA" if fonds else ""))
-        zeilen.append([(f'<span class="ring-farbe" style="background:var(--ring-rest)"></span>'
-                        f'<div>Übrige Aktien<div class="klein">{erklaerung}</div></div>', "ring-name"),
+        zeilen.append([(f'<div class="ring-name"><span class="ring-farbe" style="background:var(--ring-rest)"></span>'
+                        f'<div>Übrige Aktien<div class="klein">{erklaerung}</div></div></div>', ""),
                        (_prozent_text(rest), "zahl"), ("", "datum")])
     titel = {"stamm": "Stammaktien (mit Stimmrecht)", "vorzug": "Vorzugsaktien (ohne Stimmrecht)"}.get(gattung, "Aktien")
     beschreibung = "; ".join(f"{re.sub('<[^>]+>', '', n.split('<div')[0])} {zahl(w, 1)} %" for n, w, _ in gesehen)
@@ -412,7 +416,8 @@ def aktionaersstruktur(aktionaere: pd.DataFrame, eigene: dict | None = None, fon
             f'style="background:conic-gradient({", ".join(stufen)})"><div class="ring-mitte">'
             f'<b>{zahl(bekannt, 0)} %</b><span>mit Namen bekannt</span></div></div>'
             f'<div class="ring-tabelle">'
-            + _tabelle([("Halter", ""), (f"Anteil an den {titel}" if gattung else "Anteil", "zahl"), ("Stand", "")], zeilen)
+            + (f'<p class="klein ring-bezug">Anteile bezogen auf die {titel}.</p>' if gattung else "")
+            + _tabelle([("Halter", ""), ("Anteil", "zahl"), ("Stand", "")], zeilen)
             + f'</div></div>{stimmrechte_satz}')
 
 

@@ -801,3 +801,9 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **31.10.2026 (Logos 2):** Logos auf Firmenseiten und in der Firmenliste eingebaut, lokal geprüft, nicht gepusht.
 - **31.10.2026 (Logos 3):** Logo groß rechts im Firmenkopf (Wunsch Tobias), lokal geprüft; Ursache „live keine Logos“: Bot baut nur bei neuen Meldungen neu.
 - **31.10.2026 (8):** Zykliker-Regel auf 2× ≥ 40 % verschärft (15 statt 29). Git geprüft: lokal = GitHub (51225c6), Eulerpool-Einbau vollständig gepusht, Action seit #66 grün, Live-Seiten 200. Parallel offen aus anderer Sitzung: `seiten.py`/`style.css` (Logo groß, Aktionärsstruktur), `logo/`, `newsletter/2026-11-01.md`.
+- **31.10.2026 (Design System):** Rhodus-Design-System in Claude Design angelegt (privat): https://claude.ai/artifact/X1njLe2gDXmPDRtszcsTRN
+  Inhalt: Markenhandbuch, Farben (Markenfarben + alle Farben der Live-Seite aus `docs/style.css`, hell/dunkel), Schriftgrößen der Seite,
+  Abstände, Ecken, Logos aus `logo/kit/`, Cinzel, Bausteine Kachel, Karte, Hinweisband, Sonntags-Report-Formular. Quelldateien im
+  Scratchpad der Sitzung (nicht gesichert; Bearbeiten über das Artefakt). **Offen (Tobias):** Schrift für Text/Zahlen (Karte „Schriftwahl“:
+  Systemschrift, Source Sans 3, IBM Plex Sans, Source Serif 4), Website auf Grün/Creme umstellen oder neutral lassen, Untertitel.
+  Landingpage-Entwürfe in Claude Design erst später (Website erst, wenn das Produkt steht).
