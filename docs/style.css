@@ -183,3 +183,17 @@ footer p { margin: 4px 0; }
 .report-formular { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 4px; }
 .report-formular input { flex: 1 1 220px; padding: 8px 10px; font: inherit; border: 1px solid var(--achse); border-radius: 6px; background: var(--flaeche); color: var(--text); }
 .report-formular button { padding: 8px 16px; font: inherit; border: 0; border-radius: 6px; background: var(--kauf); color: #fff; cursor: pointer; }
+
+/* Aktionärsring (Großaktionäre) */
+:root { --ring-rest: color-mix(in srgb, var(--text-3) 35%, var(--flaeche)); }
+.ring-block { display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px; margin: 0 0 20px; }
+.ring { position: relative; width: 180px; height: 180px; border-radius: 50%; flex: none; }
+.ring-mitte { position: absolute; inset: 30px; border-radius: 50%; background: var(--flaeche);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.ring-mitte b { font-size: 26px; font-variant-numeric: tabular-nums; }
+.ring-mitte span { font-size: 12px; color: var(--text-3); max-width: 90px; }
+.ring-legende { list-style: none; padding: 0; margin: 0; flex: 1; min-width: 240px; max-width: 460px; font-size: 14px; }
+.ring-legende li { display: grid; grid-template-columns: 12px 1fr auto; column-gap: 10px; align-items: baseline; padding: 3px 0; }
+.ring-legende .klein { grid-column: 2; }
+.ring-legende .zahl { grid-column: 3; grid-row: 1; text-align: right; font-variant-numeric: tabular-nums; }
+.ring-farbe { width: 12px; height: 12px; border-radius: 3px; align-self: center; }

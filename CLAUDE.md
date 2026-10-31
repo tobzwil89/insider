@@ -39,6 +39,46 @@ Das ist Tobias' **Startup** (Produktname Rhodus), kein Uni-Projekt mehr. Ziel: e
   geprüften Liste mit ansehen. Verschoben (Tobias): Henkel-Poolmeldungen `anderes`, 806 Fließtexte 2008–2012 (DeepSeek).
 **Vorhaben Stimmrechte ist erledigt** (Tobias 30.10.2026). Rückkäufe: siehe eigenes Vorhaben unten (Block 4 wartet auf Push und Start der Action).
 
+## Geplantes Vorhaben: Aktionärsring (Planungs-App #65), Stand 31.10.2026
+
+Auftrag Tobias 31.10.2026: Auf der Firmenseite soll man sehen, wer wie viel hält, aufgeteilt auf fast 100 %. Heute stehen
+dort im Median ~36 % Großaktionäre, der Rest fehlt und wirkt unvollständig. **Darstellung: Ring** (Entscheidung Tobias),
+Aussehen nach Entwurf von Tobias (nicht selbst gestalten). Grundsatz: Der Ring zeigt 100 %, aber nicht 100 % mit Namen;
+der unbekannte Rest wird benannt, nie erfunden (Aktienregister nicht öffentlich, Meldepflicht erst ab 3 %).
+
+**Test N-PORT (31.10.2026, Skripte `.recherche/nport_test.py`, `.recherche/nport_netto.py`, Treffer
+`.recherche/2026q2_nport_treffer.csv`):** SEC-Datensatz „Form N-PORT Data Sets“
+(`www.sec.gov/files/dera/data/form-n-port-data-sets/<JJJJ>q<N>_nport.zip`, ~440 MB gepackt je Quartal, alle US-Fonds mit
+vollständigen Beständen, Stichtag bis ~3 Monate alt). Direkt aus dem Zip gelesen (25 s), Tabellen IDENTIFIERS (ISIN) →
+FUND_REPORTED_HOLDING (Stück, nur `UNIT=NS`, `ASSET_CAT=EC`) → FUND_REPORTED_INFO/REGISTRANT/SUBMISSION; je Fonds
+(`SERIES_ID`) nur der neueste Bericht; Prozent = Stück / Gesamtstimmrechte aus der letzten Stimmrechtsmitteilung.
+Ergebnis (2026q2, Stichtage meist 31.03.2026):
+- US-Fonds halten im Median **10,7 %** (DAX 14,1, MDAX 7,6; Spitze Brenntag 31 %, Lanxess 25 %).
+- **Netto nach Abzug der Überschneidung** (Fondsfamilie steckt schon im Großaktionär, z. B. iShares in BlackRock, MFS bei
+  Zalando): Median **+8,7 Prozentpunkte** mit Namen. Mit Namen zusammen dann Median 48 % statt 36 %.
+  Beispiele (groß → zusammen): SAP 26 → 36 %, Zalando 22 → 33 %, Siemens 10 → 22 %, Allianz 8 → 17 %, Hugo Boss 70 → 78 %.
+  32 von 81 Firmen bleiben unter 40 % mit Namen. Erwartung vorher (10–25 Pp.) war zu hoch, die Wirklichkeit liegt am unteren Rand.
+- ADR/andere ISIN bringen wenig (SAP +0,4 %). Fehlende Treffer: Fresenius, Qiagen (andere ISIN, vgl. `EP_KENNUNG`);
+  Firmen mit zwei Gattungen (VW, Henkel, Sartorius, BMW, Porsche) brauchen Gesamtzahl je Gattung, sonst falsche Prozente.
+- Fondsfamilien-Zuordnung im Test grob über Stichwörter → im echten Bau saubere Tabelle Fondsgesellschaft → Konzern.
+
+**Plan (Schritt für Schritt, je Schritt abbrechbar):**
+- [x] 1. **Ring gebaut (31.10.2026, nicht gepusht).** Tobias: „einfach einen Ring, in unseren Farben“ (kein Entwurf nötig).
+      `seiten.aktionaersring(aktionaere)` über der Großaktionärs-Tabelle: CSS-Ring (`conic-gradient`, kein Skript), nur Spalte
+      Aktien (Instrumente sind keine Aktien), Halter ≥ 1 % einzeln (höchstens 7), kleinere als „Weitere gemeldete Halter“,
+      Summe auf 100 % gedeckelt; Blau `--kauf` in abnehmender Stärke, Rest „Übrige Aktien“ (Streubesitz, Halter unter 3 %,
+      eigene Aktien) in `--ring-rest` (Grau, im dunklen Modus kräftiger als `--gitter`). Mitte: „x % mit Namen bekannt“.
+      Stile `.ring*` am Ende von `style.css`. 85 Firmenseiten mit Ring. Geprüft per Bildschirmfoto hell/dunkel, 950 und 520 px
+      (SAP 26 %, Hugo Boss 70 %, Allianz 8 %). Sicherung vorher: `.recherche/sicherung_ring/`.
+- [ ] 2. Eigene Aktien als Segment (Quelle: Meldungen zu eigenen Aktien/Rückkäufe, Bestand nicht immer gemeldet → prüfen).
+- [ ] 3. N-PORT-Lader: vierteljährlich Zip laden, nur unsere ISINs behalten (kleine CSV), Zip wieder löschen; Tabelle
+      Fondsgesellschaft → Konzern; Überschneidung mit Großaktionären abziehen; zwei Gattungen und andere ISINs lösen.
+      Anzeige: „US-Fonds laut SEC, Stand <Stichtag>“, größte Gesellschaften mit Namen.
+- [ ] 4. Optional: Norwegischer Staatsfonds (Norges Bank veröffentlicht alle Bestände, gratis; grob 1–2 % je Firma).
+- [ ] 5. Optional: Aufteilung des grauen Rests nach Anlegertyp aus Geschäftsbericht/IR (institutionell/privat), nur
+      von Hand und mit Quelle.
+- USA-Aktien später: 13F + 13D/13G + Form 4 decken dort meist 70–90 % mit Namen ab.
+
 ## Marketing und Website (Planungs-App #9), Stand 30.10.2026
 
 **Verworfen und gelöscht (30.10.2026):** eigene Testseite `docs/labor/` (Design ohne Absprache, zu eng auf Insiderdaten,
@@ -646,8 +686,10 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **31.10.2026 (7):** Sonntags-Report: `sonntags_report.py` (Entwurf aus eigenen Daten) und `newsletter/GESPRAECHE.md` (Leitfaden Anlegergespräche). Formular wartet auf EmailOctopus-Liste von Tobias.
 - **31.10.2026 (8):** EmailOctopus für den Newsletter verworfen (1 Formular im Gratistarif), Kit eingerichtet: Anmeldekarte auf der Startseite, Datenschutzabsatz, Verbindung geprüft.
 - **31.10.2026 (9):** Testanmeldungen (gmx, proton) kommen bei Kit an („Unconfirmed“, 2 Mails verschickt), Bestätigungsmails erreichen Tobias aber nicht → Absenderadresse prüfen. Kit-MCP (`app.kit.com/mcp`, in `~/.claude.json`) verbunden, braucht aber Bezahltarif → unbrauchbar. Formular nach unten verschoben (nicht gepusht).
+- **31.10.2026 (10):** Ursache gefunden: Absender war tobzwilling@proton.me, proton.me hat DMARC `p=quarantine` (streng) → Kits Mails gelten als gefälscht. Lösung: Sendedomain tobiaszwilling.me bei Kit (über „Set this up for me“, DNS bei Namecheap: CNAME `ckespa`, `cka._domainkey`, `cka2._domainkey` auf convertkit.com, TXT `_dmarc` `v=DMARC1; p=none;`, alle geprüft), Weiterleitung `report@tobiaszwilling.me` → gmx. Offen: Validate in Kit (wartete auf DNS), Absender `report@` anlegen und als Default setzen, Testanmeldung wiederholen.
 - **31.10.2026 (7):** Eulerpool in Sammler und Kennzahlen eingebaut (EBIT 10 J. bei 91 statt 7 Firmen, Schätzungen bis 3 Jahre), alle Firmen gegen AAQS abgeglichen, ROCE/Verschuldung auf Geschäftsjahr umgestellt (ROCE 96 % gleich mit AlleAktien). Offen: Zykliker-Schwelle (29 statt 13).
 - **31.10.2026 (Logo):** MVP-Logo begonnen, nur Bildzeichen (Name noch offen), Graustufen, Wirkung „seriös, belegt“ + „modern, Tech“, Einsatz Sonntags-Report, Website + Favicon, Social Media. Drei Konzepte in `logo/` (v1 verworfen: QR-Code-, Uhrzeiger-, Audio-Wirkung). Übersicht `logo/konzepte-v2.png`, Empfehlung A „Innenblick“. Wartet auf Tobias' Wahl; danach Logo-Paket (Farbe, Favicon, Icons).
 - **31.10.2026 (Logo 2):** Tobias verwirft die Tech-Entwürfe: Logo soll elitär, „old money“, seriös wirken, Schriftzug in Serifenschrift. Name jetzt Rhodus. Drei neue Konzepte in `logo/` (Übersicht `logo/rhodus-konzepte-v3.png`): A Inschrift (Cinzel), B Privatbank (Bodoni Moda, Empfehlung), C Münze (Rose von Rhodos, Ring, Cormorant Garamond). Schriften frei lizenziert (OFL, Google Fonts) in `logo/schriften/`, Umwandlung in Pfade mit `logo/bauen.py`. Wartet auf Tobias' Wahl.
 - **31.10.2026 (Logo 3):** Tobias wählt A „Inschrift“. Logo-Paket fertig in `logo/kit/` (Richtlinien `logo/kit/RICHTLINIEN.md`): Schriftzug, Monogramm + kräftige Kleinversion, Farben Rhodus-Grün #1E3B2F / Creme #F3EEE2, Favicon-Satz auf grüner Kachel (dunkle Tabs), Profilbild, Newsletter-Kopf 1200×300, Präsentationstafeln. Neu bauen mit `python3 logo/paket.py` (im Ordner `logo/`). Noch nicht auf Website/Newsletter eingesetzt.
 - **31.10.2026 (Logo 4):** Aufgeräumt: alle verworfenen Entwürfe, Konzeptübersichten, Testbilder, `bauen.py` und die Schriften Bodoni Moda/Cormorant gelöscht. In `logo/` bleiben nur `kit/`, `paket.py`, `text2path.py`, `praesentation.json` und `schriften/Cinzel.ttf` + `OFL.txt`. Rechtscheck: Schrift (OFL) erlaubt Logo-Nutzung; Urheberrecht am R gibt es nicht (keine Schöpfungshöhe), Schutz nur über eine Marke (Empfehlung: zuerst Wortmarke RHODUS beim DPMA, 290 € für Klassen 36, 41, 42; Bildzeichen vorher in TMview als Bildmarke suchen).
+- **31.10.2026 (Aktionärsring):** Bachelorarbeits-Bezug aus Notiz und Gedächtnis entfernt (Tobias: längst durch, Startup). Ring für die Aktionärsstruktur beschlossen; N-PORT-Test: US-Fonds bringen netto Median +8,7 Pp. mit Namen (36 → 48 %). Plan unter „Geplantes Vorhaben: Aktionärsring“, Planungs-App #65. Danach Schritt 1 gebaut: Ring auf den Firmenseiten (lokal geprüft, nicht gepusht).

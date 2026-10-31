@@ -17,6 +17,7 @@ from pathlib import Path
 import pandas as pd
 
 from pipeline import AUSGABE
+from pipeline.kennzahlen import DECKEL, KRITERIEN
 
 DOCS = AUSGABE.parent
 WEBSITE = "https://insider.tobiaszwilling.me"
@@ -105,10 +106,11 @@ def versionen_eintragen(v: dict) -> None:
 
 def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, ranking: pd.DataFrame,
                 letzter_kurs: tuple, v: dict, aktionaere: pd.DataFrame, rueckkaeufe: pd.DataFrame | None = None,
-                rueck_ohne_meldungen: bool = False) -> str:
+                kennzahlen: dict | None = None, rueck_ohne_meldungen: bool = False) -> str:
     """f: ticker, name, index, benchmark, isins. ranking: Zeilen dieser Firma mit Spalte 'rang'.
     aktionaere: Zeilen dieser Firma aus stimmrechte.grossaktionaere.
     rueckkaeufe: Zeilen dieser Firma aus rueckkaeufe.jahre; None = Historie noch nicht geladen, Abschnitt fehlt.
+    kennzahlen: Zeile aus kennzahlen.csv; None = Abschnitt fehlt.
     rueck_ohne_meldungen: EQS führt für die Firma keine Rückkaufmeldungen → „keine Daten“ statt „keine Rückkäufe“."""
     index_name = INDEXNAME.get(f["benchmark"], f["benchmark"])
     aktien = meldungen[meldungen["instrument"].eq("Aktie")]
@@ -159,7 +161,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
         ga_html = ('<p class="leer">Keine Halter über den Meldeschwellen laut den Stimmrechtsmitteilungen '
                    'im EQS-Archiv seit 2018. Das heißt nicht, dass es keine Großaktionäre gibt.</p>')
     else:
-        ga_html = _tabelle(
+        ga_html = aktionaersring(aktionaere) + _tabelle(
             [("Halter", ""), ("Aktien", "zahl"), ("Instrumente", "zahl"), ("Zusammen", "zahl"), ("Stand", "")],
             [[(e(r.halter) + (f'<div class="klein">dieselben Aktien auch bei: {e(r.weitere)}</div>' if r.weitere else ""), ""),
               (f"{zahl(r.aktien, 2)} %", "zahl"), (f"{zahl(r.instrumente, 2)} %", "zahl"),
@@ -260,7 +262,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
       </div>
       <div id="kurs"></div>
     </section>
-
+{fundamental_abschnitt(kennzahlen)}
     <section class="karte">
       <h2>Kursreaktion je Ereignis</h2>
       <p class="erklaerung">Abnormale Rendite (CAR) gegenüber dem Marktmodell mit {e(index_name)},
@@ -310,6 +312,138 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
   <script src="../../firma.js?v={v['firma.js']}"></script>
 </body>
 </html>
+"""
+
+
+# --- Finanzkennzahlen (Planung #6, nur lokal: kennzahlen.csv liegt nicht im Repository) --------------
+
+def aktionaersring(aktionaere: pd.DataFrame) -> str:
+    """Ring über 100 % der Aktien: gemeldete Halter (nur Spalte Aktien, Instrumente sind keine Aktien) in Blau,
+    der Rest in Grau. Halter unter 1 % werden zu „weitere gemeldete Halter“ zusammengefasst."""
+    halter = aktionaere[aktionaere["aktien"] > 0].sort_values("aktien", ascending=False)
+    teile = [(r.halter, r.aktien) for r in halter.itertuples() if r.aktien >= 1][:7]
+    klein = halter["aktien"].sum() - sum(w for _, w in teile)
+    if klein > 0.05:
+        teile.append(("Weitere gemeldete Halter", klein))
+    bekannt, start, stufen, legende = 0.0, 0.0, [], []
+    for i, (name, wert) in enumerate(teile):
+        wert = min(wert, 100 - bekannt)  # Schutz, falls Meldungen zusammen über 100 % ergeben
+        if wert <= 0:
+            break
+        farbe = f"color-mix(in srgb, var(--kauf) {max(100 - i * 11, 25)}%, var(--flaeche))"
+        stufen.append(f"{farbe} {start:.2f}% {start + wert:.2f}%")
+        legende.append(f'<li><span class="ring-farbe" style="background:{farbe}"></span>{e(name)}'
+                       f'<span class="zahl">{zahl(wert, 1)} %</span></li>')
+        bekannt += wert
+        start += wert
+    rest = 100 - bekannt
+    if rest > 0.05:
+        stufen.append(f"var(--ring-rest) {start:.2f}% 100%")
+        legende.append('<li><span class="ring-farbe" style="background:var(--ring-rest)"></span>Übrige Aktien'
+                       '<div class="klein">Streubesitz, Halter unter 3 % (nicht meldepflichtig), eigene Aktien</div>'
+                       f'<span class="zahl">{zahl(rest, 1)} %</span></li>')
+    beschreibung = "; ".join(f"{n} {zahl(w, 1)} %" for n, w in teile) + f"; übrige Aktien {zahl(rest, 1)} %"
+    return (f'<div class="ring-block"><div class="ring" role="img" aria-label="Aktionärsstruktur: {e(beschreibung)}" '
+            f'style="background:conic-gradient({", ".join(stufen)})"><div class="ring-mitte">'
+            f'<b>{zahl(bekannt, 0)} %</b><span>mit Namen bekannt</span></div></div>'
+            f'<ul class="ring-legende">{"".join(legende)}</ul></div>')
+
+
+def _betrag(x, waehrung) -> str:
+    if _leer(x):
+        return "–"
+    zeichen = "€" if waehrung in ("EUR", None) or _leer(waehrung) else waehrung
+    return f"{zahl(x / 1e9, 1)} Mrd. {zeichen}" if abs(x) >= 1e9 else f"{zahl(x / 1e6, 1)} Mio. {zeichen}"
+
+
+def _faktor(x, stellen: int = 1) -> str:
+    return "–" if _leer(x) else ("−" if x < 0 else "") + zahl(abs(x), stellen) + "×"
+
+
+def _liste(titel: str, zeilen: list) -> str:
+    dl = "".join(f"<dt>{e(n)}</dt><dd>{w}</dd>" for n, w in zeilen)
+    return f'<div class="fk-gruppe"><h3>{e(titel)}</h3><dl>{dl}</dl></div>'
+
+
+def _balken(titel: str, reihe: dict, waehrung) -> str:
+    """Senkrechte Balken je Jahr, Schätzungen („2026e“) heller. reihe: {Jahr: Wert}."""
+    werte = [w for w in reihe.values() if not _leer(w)]
+    if not werte:
+        return ""
+    hoch = max(abs(w) for w in werte) or 1
+    saeulen = "".join(
+        f'<div class="fk-saeule{" schaetzung" if str(j).endswith("e") else ""}{" minus" if w < 0 else ""}" '
+        f'title="{e(j)}: {e(_betrag(w, waehrung))}"><div class="fk-balken" style="height:{abs(w) / hoch * 100:.1f}%">'
+        f'</div><div class="fk-jahr">{e(str(j)[2:] if len(str(j)) >= 4 else j)}</div></div>'
+        for j, w in reihe.items() if not _leer(w))
+    return (f'<div class="fk-diagramm"><h3>{e(titel)} <span class="klein">je Geschäftsjahr, helle Säulen = '
+            f'Schätzung, höchster Wert {e(_betrag(hoch, waehrung))}</span></h3><div class="fk-saeulen">{saeulen}</div></div>')
+
+
+KATEGORIE_TEXT = {  # Einteilung nach Peter Lynch, Regeln in kennzahlen.kategorie
+    "Schnell wachsend": "Umsatz wächst seit 10 Jahren um mindestens 12 % pro Jahr (Lynch: Fast Grower).",
+    "Solide wachsend": "Umsatz wächst um 5 bis 12 % pro Jahr (Lynch: Stalwart).",
+    "Langsam wachsend": "Umsatz wächst um weniger als 5 % pro Jahr (Lynch: Slow Grower).",
+    "Zykliker": "Operatives Ergebnis ist in 10 Jahren mindestens zweimal um ein Viertel eingebrochen (Lynch: Cyclical).",
+    "Turnaround": "Verlust im letzten Geschäftsjahr oder in zwei der letzten drei (Lynch: Turnaround).",
+    "Substanzwert": "Börsenwert unter 80 % des Buchwerts (Lynch: Asset Play).",
+}
+
+
+def fundamental_abschnitt(k: dict | None) -> str:
+    """k: Zeile dieser Firma aus kennzahlen.csv (Reihen als JSON-Text). None → kein Abschnitt."""
+    if not k:
+        return ""
+    w = k["waehrung"]
+    finanz = k["finanzwert"] is True or k["finanzwert"] == "True"
+    ebit = "EBIT" if k["ebit_reihe"] == "ebit" else "EBITDA"
+    pct = lambda x: "–" if _leer(x) else zahl(x * 100, 1) + " %"
+    kennzahlen = _liste("Bewertung", [
+        ("Börsenwert", _betrag(k["marktkap"], w)), ("KGV (letzte 12 Monate)", zahl(k["kgv_ttm"], 1)),
+        ("KGV (Schätzung)", zahl(k["kgv_forward"], 1)), ("KUV", zahl(k["kuv"], 1)), ("KBV", zahl(k["kbv"], 1))])
+    rentabilitaet = _liste("Rentabilität", [
+        ("Gewinnmarge", pct(k["gewinnmarge"])), ("Eigenkapitalrendite", pct(k["ek_rendite"])),
+        ("ROCE", pct(k["roce"])), ("FCF-Rendite", pct(k["fcf_rendite"])),
+        ("Dividendenrendite", pct(k["dividendenrendite"]))])
+    risiko = _liste("Risiko", [
+        ("Nettoverschuldung / EBIT", _faktor(k["verschuldung_ebit"])),
+        ("Nettoverschuldung / EBITDA", _faktor(k["verschuldung_ebitda"])),
+        (f"Größter {ebit}-Rückgang (10 J.)", pct(k["max_rueckgang_ebit_10j"])),
+        ("Jahre mit Gewinn (10 J.)", "–" if _leer(k["gewinnjahre_10j"]) else f"{int(k['gewinnjahre_10j'])} von 10"),
+        ("Gewinnanstiege (10 J.)", "–" if _leer(k["gewinnanstiege_10j"]) else f"{int(k['gewinnanstiege_10j'])} von 10")])
+    wachstum = _liste("Wachstum pro Jahr", [
+        ("Umsatz 10 J.", prozent(k["umsatz_wachstum_10j"])), ("Umsatz 3 J.", prozent(k["umsatz_wachstum_3j"])),
+        ("Umsatz nächstes Jahr (Schätzung)", prozent(k["umsatz_wachstum_1je"])),
+        (f"{ebit} 10 J.", prozent(k["ebit_wachstum_10j"])),
+        ("Gewinn je Aktie 3 J. (Schätzung)", prozent(k["eps_wachstum_3je"])),
+        ("Renditeerwartung", prozent(k["renditeerwartung"]) + (
+            f'<div class="klein">Wachstum auf {zahl(DECKEL * 100)} % gedeckelt</div>'
+            if k["renditeerwartung_gedeckelt"] in (True, "True") else ""))])
+    punkte = []
+    for schluessel, text, _, _ in KRITERIEN:
+        wert = k[schluessel]
+        zeichen, klasse = ("–", "offen") if _leer(wert) else ("✓", "ja") if wert in (True, "True") else ("✗", "nein")
+        punkte.append(f'<li class="{klasse}"><span>{zeichen}</span>{e(text)}</li>')
+    check = (f'<div class="fk-check"><h3>Qualitätscheck: {int(k["q_erfuellt"])} von {int(k["q_bewertbar"])} '
+             f'<span class="klein">bewertbaren Kriterien erfüllt</span></h3><ul>{"".join(punkte)}</ul></div>')
+    kat = KATEGORIE_TEXT.get(k["kategorie"])
+    kategorie = (f'<p class="fk-kategorie"><b>Kategorie: {e(k["kategorie"])}</b> · {e(kat)}</p>' if kat else "")
+    balken = _balken("Umsatz", json.loads(k["reihe_umsatz"]), w) + \
+        ("" if finanz else _balken(k["reihe_ebit_art"], json.loads(k["reihe_ebit"]), w))
+    hinweis = (" <b>Bank oder Versicherung:</b> EBIT, ROCE und Nettoverschuldung sind hier nicht aussagekräftig und fehlen."
+               if finanz else "")
+    return f"""
+    <section class="karte">
+      <h2>Finanzkennzahlen</h2>
+      <p class="erklaerung">Geschäftsjahr {e(k['letztes_gj'])}, Bewertung zum aktuellen Kurs. Selbst berechnet aus
+        TradingView, Eulerpool, onvista und SEC. {e(ebit)}-Werte über 10 Jahre {"aus dem EBIT" if ebit == "EBIT" else
+        "aus dem EBITDA, weil das EBIT nur für die letzten Jahre vorliegt"}. Renditeerwartung = erwartetes Wachstum
+        des Gewinns je Aktie + Dividendenrendite.{hinweis}</p>
+      {kategorie}
+      <div class="fk-gruppen">{kennzahlen}{rentabilitaet}{risiko}{wachstum}</div>
+      <div class="fk-diagramme">{balken}</div>
+      {check}
+    </section>
 """
 
 

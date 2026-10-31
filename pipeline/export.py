@@ -118,6 +118,9 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     # Firmen, für die EQS gar keine Meldungen dieser Kategorie führt (z. B. BMW, anderer Verteiler):
     # dort heißt „nichts gefunden“ nur „keine Daten“, nicht „keine Rückkäufe“
     rk_ohne = set(rk_fortschritt.loc[rk_fortschritt["meldungen"].eq(0), "name"]) - set(rueck["firma"])
+    # Finanzkennzahlen nur, wenn lokal berechnet (daten/kennzahlen.csv steht in .gitignore → nie in der Action)
+    kz_datei = DATEN / "kennzahlen.csv"
+    kz = {r["isin"]: r for r in pd.read_csv(kz_datei).to_dict("records")} if kz_datei.exists() else {}
     uebersicht = []
     for ticker, f in mit_seite.groupby("ticker"):
         eigene = zusammen[zusammen["ticker"] == ticker]
@@ -131,7 +134,7 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
             stamm, eigene, ausgewertet[ausgewertet["ticker"] == ticker], rang[rang["ticker"] == ticker], letzter, v,
             aktionaere[aktionaere["firma"] == stamm["name"]],
             rueck[rueck["firma"] == stamm["name"]] if stamm["name"] in rk_geladen else None,
-            rueck_ohne_meldungen=stamm["name"] in rk_ohne))
+            next((kz[i] for i in stamm["isins"] if i in kz), None), stamm["name"] in rk_ohne))
         uebersicht.append({"ticker": ticker, "name": stamm["name"], "index": stamm["index"],
                            "meldungen": len(eigene),
                            "letzte_meldung": eigene["mitteilungsdatum"].max() if len(eigene) else None})
