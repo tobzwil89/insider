@@ -271,3 +271,98 @@ globalen Datenbank), Wikipedia-Aufrufe (Aufmerksamkeit, frei, mit Forschung bele
 | Politiker | Quiver, OpenSecrets, congress.gov (Abschnitt 6); OpenBB `government_trades` |
 | Erwartungen | Polymarket, Kalshi |
 | Makro/Zinsen | EZB, FRED, Zentralbanken, Statistikämter (Abschnitte 1, 6) |
+
+## 8. Fundamentaldaten weltweit: Abdeckung je Markt (31.10.2026)
+
+Geprüft mit `.recherche/maerkte_probe.py`: je Land die 50 größten Aktien (Hauptnotiz) im TradingView-Screener
+(`scanner.tradingview.com/<markt>/scan`, ohne Schlüssel). „Jahre“ = Länge der Umsatzreihe (höchstens 20).
+
+| Markt | Aktien | Jahre (Median) | ≥ 10 Jahre | Gewinnschätzung | EBIT-Schätzung |
+|---|---|---|---|---|---|
+| USA (`america`) | 7.556 | 20 | 96 % | 98 % | 98 % |
+| Deutschland | 428 | 20 | 92 % | 98 % | 98 % |
+| China (A-Aktien, `china`) | 5.238 | 20 | 92 % | 96 % | 100 % |
+| Hongkong | 2.391 | 20 | 82 % | 98 % | 100 % |
+| Taiwan | 2.357 | 20 | 98 % | 98 % | 98 % |
+| Südkorea | 2.632 | 20 | 90 % | 100 % | 100 % |
+| Japan | 3.867 | 20 | 98 % | 100 % | 100 % |
+| Indien | 5.428 | 20 | 94 % | 98 % | 98 % |
+| Großbritannien | 1.071 | 20 | 98 % | 100 % | 100 % |
+| Frankreich, Schweiz, Italien, Schweden, Kanada, Australien, Singapur | je 200–2.500 | 20 | 94–100 % | 94–100 % | 94–100 % |
+| Niederlande, Spanien, Norwegen, Finnland, Belgien, Polen, Brasilien, Mexiko | je 90–700 | 20 | 78–94 % | 86–100 % | 88–100 % |
+| Dänemark, Österreich | 135 / 63 | 20 | 94 / 92 % | 84 / 72 % | 86 / 72 % |
+| Saudi-Arabien (`ksa`), Südafrika (`rsa`) | – | 20 | 68 / 96 % | 92 / 100 % | – |
+| Indonesien, Türkei | 841 / 620 | 20 | 74 / 86 % | 68 / 68 % | 72 / 72 % |
+
+**Kleinere Firmen** (weiter hinten in der Liste): USA Rang 1.000 noch 70 % mit ≥ 10 Jahren und 98 % Schätzungen,
+Rang 3.000 (ab ~300 Mio. USD) nur noch Median 6 Jahre, 48 % Schätzungen. Deutschland Rang 200 (ab ~120 Mio. €):
+76 % / 84 %. Japan Rang 1.500: 90 % / 52 %; China Rang 2.000: 62 % / 64 %; Korea Rang 1.000: 66 % / 30 %.
+→ Historie reicht weit, **Schätzungen dünnen bei Nebenwerten aus** (vor allem Asien).
+
+**onvista** (per ISIN): auch große Auslandswerte (Toyota, Samsung, Tencent, ASML, Nestlé, Apple) mit 4 Jahren Bilanz und
+Gewinnschätzungen bis 2028; **keine** chinesischen A-Aktien (Kweichow Moutai leer) und kein Indien (Reliance 404).
+
+**Nasdaq** (`api.nasdaq.com/api/analyst/<TICKER>/earnings-forecast`): US-Gewinnschätzungen für 4 Jahre, eingebaut
+(`fundamental.nasdaq`). Späte Jahre oft nur 1–2 Analysten.
+
+**SEC für ausländische Firmen (offiziell!):** Firmen mit US-Notierung reichen Jahresberichte (20-F) mit XBRL ein, teils
+nach IFRS (`ifrs-full` statt `us-gaap`): Toyota 2007–2024, Sony 2007–2024, Alibaba 2012–2025, TSMC, ASML, Novo Nordisk,
+SAP, Shell je ~10–11 Jahre. `fundamental.sec` liest bisher nur `us-gaap` → mit IFRS-Bezeichnungen (`Revenue`,
+`ProfitLossFromOperatingActivities`, `ProfitLossAttributableToOwnersOfParent`, `EquityAttributableToOwnersOfParent` …)
+erweiterbar. Das wäre der einzige **offizielle** Gratisweg für große Auslandswerte (rechtlich zeigbar).
+
+**Bewertung:** Für die Daten ist TradingView der globale Grundstock (alle großen Märkte, 20 Jahre). Engpass ist nicht
+die Abdeckung, sondern die Rechtslage (grau) und Schätzungen bei Nebenwerten. Offizielle Ergänzungen: SEC (USA +
+ausländische Firmen mit US-Notierung); EU ab ESAP (2027).
+
+## 9. Eulerpool-API (geprüft 31.10.2026, Webseiten und Test mit Gratis-Schlüssel)
+
+Anbieter: Eulerpool Research Systems (eulerpool.com/developers). Laut eigenen Seiten: 85.000+ Aktien in 130 Ländern,
+Jahres- und Quartalsabschlüsse, Kennzahlen, Analystenschätzungen, Insider, Dividenden; Abruf als REST mit Schlüssel.
+
+| Tarif | Preis | Abrufe/Monat | Nutzung |
+|---|---|---|---|
+| Free | 0 $ | 100.000 (harte Grenze) | privat, Bewertung, Uni, interner Prototyp; öffentlich nur mit „Data by Eulerpool“ |
+| Builder | 99 $/Monat (990 $/Jahr) | 1 Mio. | **gewerblich, Anzeige für Nutzer erlaubt**, ohne Quellenhinweis |
+| Startup / Scale | 4.990 / 19.900 $/Jahr | 10 Mio. / unbegrenzt | dazu abgeleitete Daten verkaufen, Speichern, Weiterverkauf |
+| Enterprise | auf Anfrage | – | Rohdaten-Weitergabe, KI-Training |
+
+- **Schätzungen im Gratistarif nur „Limited“**, voll erst ab Builder. Wie viele Jahre voraus: auf den Seiten nicht angegeben.
+- Werbeaussage „100 Jahre Finanzdaten für jede Firma der Welt“ ist unglaubwürdig → vor jeder Nutzung an echten Firmen prüfen.
+- Die Seiten widersprechen sich (Gratis: „Commercial products“ erlaubt vs. „personal and evaluation use“; Weitergabe ab
+  Builder vs. nur Enterprise). Maßgeblich laut Anbieter: Nutzungsbedingungen und Bestellformular.
+- **Bewertung:** Für unsere lokale Prüfung passt der Gratistarif (interner Prototyp). Interessant vor allem für den
+  Livegang: Builder mit 99 $/Monat ist der erste **konkrete Preis mit Anzeigerecht**, den wir gefunden haben
+  (EODHD/FMP: Preis nur auf Anfrage).
+- Nächster Schritt: Gratis-Schlüssel (Tobias, ohne Kreditkarte) → in `.env` als `EULERPOOL_API_KEY` → Probe an Atoss,
+  SAP, Deutz, Toyota, Samsung: EBIT-Historie außerhalb der USA, Schätzhorizont im Gratistarif, Abruf per ISIN.
+  Bedarf: ~106 Firmen × ~5 Abrufe ≈ 500 je Lauf, also weit unter 100.000.
+
+**Test mit Gratis-Schlüssel (31.10.2026,** `.recherche/eulerpool_probe.py`, `.recherche/eulerpool_test.py`,
+Schnittstellenbeschreibung `api.eulerpool.com/api/1/documentation/yaml` → `.recherche/eulerpool_dl/spec.yaml`, 449 Adressen):
+- Schlüssel als Parameter `?token=` (nicht als Header, Blog-Adresse `/v1/financials/…` gibt es nicht). Kennung: ISIN,
+  Ticker, WKN. Kontingent steht im Antwortkopf (`x-ratelimit-remaining`).
+- `/api/1/equity/incomestatement/<ISIN>`: **GuV mit EBIT über 25–43 Jahre** (Atoss ab 1998, SAP 1991, Allianz 1995,
+  Toyota 1989, Samsung 1997, Kweichow Moutai 1998, Reliance 1998, Apple 1983). Werte in **ganzen Millionen**
+  Berichtswährung. Enthält auch Schätzjahre bis ~2030 → Ist-Jahre selbst abtrennen.
+- `/api/1/equity/estimates/<ISIN>`: Schätzungen für Umsatz, EBIT, Gewinn je Aktie bis 2030/2031 mit Analystenzahl
+  (Atoss, Deutz, Allianz, Reliance, Kweichow Moutai; Toyota/Apple weniger EBIT-Jahre). **Bei SAP kam die Antwort
+  verschlüsselt** (`iv`, `salt`, `ciphertext`) → vermutlich das „Limited“ des Gratistarifs. **Nicht entschlüsseln**
+  (Umgehung eines Schutzes, gegen die Bedingungen); solche Firmen fallen auf andere Quellen zurück.
+- Abweichung zu unseren Quellen gering: EBIT 2025 Atoss 68 Mio. (onvista 70,1), SAP 10.293 Mio. (onvista 10.593).
+- `/api/1/aaqs/by-isin/<ISIN>` und `/api/1/partner/alleaktien/fundamentals`: **Eulerpool ist der Datenlieferant von
+  AlleAktien.** AAQS liefert genau die Werte der AlleAktien-Karte (Atoss: Umsatzwachstum 15,46 %, EBIT-Wachstum 19,63 %,
+  ROCE 61,6 %, Verschuldung/EBIT −1,24, Score 10). Nur als **Prüfmaßstab** für unsere eigenen Formeln nutzen, nicht
+  anzeigen (fremdes Produkt eines Wettbewerbers).
+- **Bewertung:** schließt beide Lücken (EBIT 10+ Jahre weltweit, Schätzungen für 3+ Jahre) und deckt auch China-A und
+  Indien ab, die onvista nicht hat. Gratistarif erlaubt interne Prototypen → passt für lokal.
+
+**Eingebaut 31.10.2026** (`pipeline/fundamental.py`, `pipeline/kennzahlen.py`, Stand in `CLAUDE.md`). Weitere Befunde:
+- Einheiten: Jahresabschlüsse in Millionen (GuV auf ganze Millionen gerundet), Schätzungen in ganzen Einheiten.
+- Das Feld `equity` der Jahresbilanz ist unbrauchbar (Atoss 2018: −2,5 Mio.); die Jahresbilanz grenzt anders ab als die
+  Quartalsbilanz (Atoss 2025 kurzfristige Verbindlichkeiten 66,3 vs. 49,5 Mio.). AlleAktien rechnet mit der Quartalsbilanz
+  (`/equity/balance-sheet-quarterly`, Feld `netDebt` = Schulden − Bargeld). Nicht von uns genutzt.
+- Keine Währungsangabe in den Abschlüssen (Berichtswährung, Qiagen USD); `/equity/profile` nennt die Handelswährung.
+- Kennung: ISIN, Ticker oder WKN; Vorzugs-/Stammaktien teils nur unter einer Gattung (Henkel, Fuchs, Sartorius).
+- Weitere Adressen gesehen, nicht genutzt: `/equity/financials-ltm` (12 Monate), Quartals-GuV, `/equity/metrics`.
+

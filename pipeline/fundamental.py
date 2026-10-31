@@ -5,6 +5,9 @@ Drei Quellen, alle ohne Schlüssel:
   dazu aktuelle Kennzahlen und Schätzungen für das nächste Geschäftsjahr.
 - onvista (inoffiziell, per ISIN): 4 Jahre Bilanz/GuV mit EBIT und Eigenkapital, Schätzungen bis ~2029.
 - SEC companyfacts (offiziell, nur US-Firmen): ~15 Jahre vollständige Abschlüsse.
+- Nasdaq (inoffiziell, nur US-Firmen): Gewinnschätzungen je Aktie für bis zu 4 Geschäftsjahre.
+- Eulerpool (Gratis-Schlüssel EULERPOOL_API_KEY in .env, nur interner Prototyp): GuV mit EBIT über 25+ Jahre weltweit,
+  Bilanz, Cashflow, Schätzungen für Umsatz/EBIT/Gewinn je Aktie bis ~2030; ohne Schlüssel übersprungen.
 
 Ergebnis: daten/fundamental.csv im langen Format, eine Zeile je Firma, Quelle, Periode und Posten.
 Jeder Lauf ersetzt die Datei (neuester Stand je Quelle). Periode: Geschäftsjahr („2025“), Schätzung („2026e“)
@@ -14,6 +17,7 @@ Aufruf: python3 -m pipeline.fundamental
 """
 
 import datetime as dt
+import os
 import re
 import time
 
@@ -48,7 +52,7 @@ TV_AKTUELL = ["close", "market_cap_basic", "price_earnings_ttm", "price_sales_cu
               "free_cash_flow_ttm", "dividends_yield_current", "net_debt_fy", "total_debt_fy",
               "cash_n_short_term_invest_fy", "total_equity_fy", "shrhldrs_equity_fy", "ebit_ttm", "ebitda_ttm",
               "total_revenue_ttm", "net_income_ttm", "earnings_per_share_diluted_ttm", "oper_income_fy",
-              "total_current_liabilities_fy", "total_assets_fy", "total_shares_outstanding_fundamental",
+              "total_current_liabilities_fy", "total_assets_fy", "total_shares_outstanding_fundamental", "cash_n_equivalents_fy",
               "net_debt_to_ebitda_fy", "cash_f_operating_activities_ttm", "dps_common_stock_prim_issue_fy",
               "number_of_employees"]
 # TradingView: Schätzungen für das nächste Geschäftsjahr
@@ -182,6 +186,84 @@ def sec(ticker: str, isin: str, symbol: str, ciks: dict, heute: str) -> list[dic
     return zeilen
 
 
+def nasdaq(ticker: str, isin: str, symbol: str, heute: str) -> list[dict]:
+    """Konsens-Gewinnschätzung je Aktie je Geschäftsjahr („Sep 2028“ → „2028e“), dazu die Zahl der Analysten."""
+    time.sleep(0.5)
+    r = requests.get(f"https://api.nasdaq.com/api/analyst/{ticker}/earnings-forecast", headers=BROWSER, timeout=60)
+    r.raise_for_status()
+    zeilen = []
+    for z in ((r.json().get("data") or {}).get("yearlyForecast") or {}).get("rows") or []:
+        jahr = f"{z['fiscalEnd'][-4:]}e"
+        zeilen.append(_zeile(isin, symbol, "nasdaq", jahr, "eps_schaetzung", z["consensusEPSForecast"], "USD", heute))
+        zeilen.append(_zeile(isin, symbol, "nasdaq", jahr, "analysten", z["noOfEstimates"], "", heute))
+    return zeilen
+
+
+EULERPOOL = "https://api.eulerpool.com/api/1"
+# Abschlüsse in ganzen Millionen Berichtswährung (→ ×1e6), außer Gewinn je Aktie
+EP_ABSCHLUESSE = {"incomestatement": "guv", "balancesheet": "bilanz", "cashflowstatement": "cf"}
+EP_JE_AKTIE = {"diluted_eps"}
+# Eulerpool kennt unsere ISIN nicht (andere Aktiengattung bzw. neue ISIN) → andere Kennung derselben Firma
+EP_KENNUNG = {"DE000FRE5EN2": "DE0005785604", "DE0006048408": "DE0006048432",  # Fresenius, Henkel Vz.
+              "DE000A3E5D56": "DE000A3E5D64", "DE0007165631": "DE0007165607"}  # Fuchs Vz., Sartorius St.
+
+
+def eulerpool_schluessel() -> str | None:
+    """EULERPOOL_API_KEY aus der Umgebung oder aus .env (steht in .gitignore). Nie ausgeben."""
+    if os.environ.get("EULERPOOL_API_KEY"):
+        return os.environ["EULERPOOL_API_KEY"]
+    env = DATEN.parent / ".env"
+    if env.exists():
+        for z in env.read_text().splitlines():
+            if z.startswith("EULERPOOL_API_KEY="):
+                return z.split("=", 1)[1].strip().strip("\"'")
+    return None
+
+
+def eulerpool(isin: str, symbol: str, schluessel: str, heute: str) -> list[dict]:
+    """GuV, Bilanz, Cashflow (Präfix guv./bilanz./cf., Ist-Jahre „2025“, Schätzjahre der GuV „2026e“),
+    Analystenschätzungen (Präfix schaetzung., immer „JJJJe“, schon in ganzen Einheiten) und AAQS (Quelle „aaqs“,
+    nur zur Prüfung unserer Formeln, nie anzeigen). Verschlüsselte Antworten (iv/salt/ciphertext, Gratistarif)
+    werden übersprungen, nie entschlüsselt. Währung fehlt in den Antworten → leer (Berichtswährung)."""
+    def hole(pfad):
+        time.sleep(0.3)
+        r = requests.get(f"{EULERPOOL}/{pfad}/{EP_KENNUNG.get(isin, isin)}", params={"token": schluessel},
+                         timeout=60)
+        if r.status_code == 404:
+            return None
+        r.raise_for_status()
+        return r.json()
+
+    zeilen = []
+    for pfad, praefix in EP_ABSCHLUESSE.items():
+        d = hole(f"equity/{pfad}")
+        if not isinstance(d, list):
+            continue
+        for z in d:
+            p = z.get("period", "")
+            periode = p[:4] + ("e" if p.endswith("e") else "")
+            for feld, wert in z.items():
+                if isinstance(wert, (int, float)) and not isinstance(wert, bool) and feld != "year":
+                    zeilen.append(_zeile(isin, symbol, "eulerpool", periode, f"{praefix}.{feld}",
+                                         wert if feld in EP_JE_AKTIE else wert * 1e6, "", heute))
+    d = hole("equity/estimates")
+    if isinstance(d, list):
+        for z in d:
+            if z.get("quarter") is not None or not z.get("year"):
+                continue
+            for feld in ["revenueEstimate", "ebitEstimate", "epsEstimate", "revenueAnalysts", "ebitAnalysts",
+                         "epsAnalysts"]:
+                if z.get(feld) is not None:
+                    zeilen.append(_zeile(isin, symbol, "eulerpool", f"{z['year']}e", f"schaetzung.{feld}",
+                                         float(z[feld]), "", heute))
+    d = hole("aaqs/by-isin")
+    if isinstance(d, dict) and "ciphertext" not in d:
+        for feld, wert in d.items():
+            if isinstance(wert, (int, float)) and not isinstance(wert, bool):
+                zeilen.append(_zeile(isin, symbol, "aaqs", "aktuell", feld, wert, "", heute))
+    return zeilen
+
+
 def laden() -> pd.DataFrame:
     heute = dt.date.today().isoformat()
     firmen = pd.read_csv(DATEN / "firmen.csv").dropna(subset=["ticker"])  # ohne Ticker = alte Zweit-ISIN
@@ -208,6 +290,25 @@ def laden() -> pd.DataFrame:
     for ticker, symbol in USA_TEST.items():
         zeilen += sec(ticker, us_isin.get(symbol, ""), symbol, ciks, heute)
     print(f"mit SEC: {len(zeilen)} Zeilen")
+    for ticker, symbol in USA_TEST.items():
+        try:
+            zeilen += nasdaq(ticker, us_isin.get(symbol, ""), symbol, heute)
+        except requests.RequestException as fehler:
+            print(f"Nasdaq {ticker}: {fehler}")
+    print(f"mit Nasdaq: {len(zeilen)} Zeilen")
+
+    schluessel = eulerpool_schluessel()
+    if schluessel:
+        isins = list(firmen["isin"][firmen["isin"].isin(symbole)]) + [us_isin[s] for s in USA_TEST.values()
+                                                                      if us_isin.get(s)]
+        for isin in isins:
+            try:
+                zeilen += eulerpool(isin, symbole.get(isin, ""), schluessel, heute)
+            except requests.RequestException as fehler:
+                print(f"Eulerpool {isin}: {str(fehler).split('?')[0]}")  # Adresse ohne Schlüssel
+        print(f"mit Eulerpool: {len(zeilen)} Zeilen")
+    else:
+        print("Eulerpool übersprungen (kein EULERPOOL_API_KEY)")
 
     df = pd.DataFrame(zeilen)
     df.to_csv(DATEI, index=False)
