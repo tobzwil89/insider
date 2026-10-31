@@ -284,33 +284,54 @@ Auftrag Tobias 30.10.2026 (nach Abschluss Stimmrechte). Quelle: EQS-Kategorie `s
 
 ## Geplantes Vorhaben: Fundamentaldaten (Planung #6), Stand 30.10.2026
 
-Auftrag Tobias 30.10.2026: viele Fundamentaldaten, mindestens die Datenpunkte der AlleAktien-Karte (Beispiel Atoss):
-Kennzahlen (Marktkap., KGV TTM, KGVe, KUV, KBV), Rentabilität (Gewinnmarge, EK-Rendite, ROCE, FCF-Rendite,
-Dividendenrendite), Risiko (Nettoverschuldung/EBIT und /EBITDA, max. EBIT-Rückgang 10 J., Gewinnkontinuität 10 J.),
-Umsatz und EBIT als Balken (4 Jahre + 3 Jahre Schätzung), Wachstum 10 J. und 3 J. Schätzung, Renditeerwartung,
-Qualitätsscore aus 10 Kriterien, Kategorie (Peter-Lynch-Art), Burggraben-Text. Nur Plan, noch nichts gebaut.
+Auftrag Tobias 30.10.2026: viele Finanzkennzahlen, mindestens die Datenpunkte der AlleAktien-Karte (Beispiel Atoss).
+**Vorgaben Tobias:** kein Geld ausgeben, global denken (nicht nur Europa), erst nur lokal testen (nicht live) →
+Lizenzfragen erst vor dem Start. Erster Plan (Bezahlanbieter EODHD/FMP) von Tobias verworfen.
 
-Befund Recherche (30.10.2026):
-- **Yahoo** (yfinance, getestet an Atoss, SAP, Deutz): nur **4 Jahre** GuV, 5 Jahre Bilanz/Cashflow; Schätzungen nur
-  laufendes und nächstes Jahr, nur Umsatz und Gewinn je Aktie, **kein EBIT**. Werte plausibel (Atoss Umsatz 2025
-  189 Mio., SAP 36,8 Mrd.), Deutz-Umsatzschätzung +1 J. auffällig (3,7 statt 2,4 Mrd.). Reicht nicht für 10-Jahres-Werte.
-  Öffentliche Anzeige laut Nutzungsbedingungen nicht erlaubt (grau).
-- **EODHD** Fundamentals Data Feed 59,99 €/Monat (49,99 € jährlich), laut Anbieter Nicht-US-Firmen ab 2000.
-  Mehrjahres-Schätzungen nicht erwähnt. **Gewerbliche Nutzung nur mit eigenem Vertrag, Preis auf Anfrage.**
-- **FMP** 22–149 $/Monat, nicht-US-Börsen vermutlich erst im teuersten Tarif (nicht an der Quelle bestätigt, Seite
-  blockt Abrufe). Hat Mehrjahres-Schätzungen (Umsatz, EBIT, EPS). **Anzeige auf einer Website nur mit eigenem
-  „Data Display and Licensing Agreement“, Preis auf Anfrage**, normaler Tarif deckt das nicht.
-- Die frühere Annahme „EODHD/FMP ~20–30 €/Monat“ (Offen, ARCHITEKTUR.md) ist für Fundamentaldaten mit
-  Anzeigerecht **falsch**: Fundamentaldaten kosten ab ~50–60 €/Monat privat, Anzeigelizenz extra.
-- SEC companyfacts nur für 4 Firmen, ESEF/Unternehmensregister nicht automatisierbar, ESAP erst bis 07/2027 (s. Offen).
-- Banken und Versicherer (Allianz, Munich Re, Hannover Rück, Talanx, Deutsche Bank, Commerzbank) brauchen eigene
-  Kennzahlen (EBIT, ROCE, Nettoverschuldung ergeben dort keinen Sinn).
+Gratis-Quellen getestet (30.10.2026, Atoss/SAP/Deutz/Apple/Toyota; Probe-Dateien im Scratchpad, nicht gesichert):
+- **TradingView-Screener** (`scanner.tradingview.com/<markt>/scan` per POST, `…/symbol?symbol=XETR:AOF&fields=…`,
+  Feldliste `…/global/metainfo`, 4.143 Felder), ohne Schlüssel, alle Märkte (Deutschland 40.159, USA 20.061 Zeilen).
+  **20 Jahre** je Firma: Umsatz, Bruttogewinn, EBITDA, Gewinn, Gewinn je Aktie, Dividende, FCF, Capex, Bilanzsumme,
+  Schulden (`*_fy_h`, auch Quartale `*_fq_h`). Aktuell: Marktkap., KGV, KUV, KBV, Margen, EK-Rendite, ROCE, ROIC,
+  Nettoverschuldung, EBIT TTM; Schätzung nächstes Jahr (Umsatz, EBIT, EBITDA, Gewinn, FCF, Dividende).
+  **Fehlt:** EBIT- und Eigenkapital-Historie, Schätzungen über 1 Jahr. Abgleich Atoss mit AlleAktien (04.10.2026):
+  Gewinnmarge 25,6 = 25,6 %, Umsatzwachstum 10 J. 15,5 = 15,5 %, Nettoverschuldung/EBITDA −1,6 = −1,6; EK-Rendite
+  54,6 statt 49,8 und ROCE 67,4 statt 61,6 (andere Definition) → solche Kennzahlen selbst rechnen.
+- **SEC companyfacts** (offiziell): USA ~15 Jahre vollständige Abschlüsse inkl. EBIT (Apple ab 2009).
+- **onvista** (`api.onvista.de/api/v1/stocks/ISIN:<ISIN>/snapshot`, per ISIN): 4 Jahre Bilanz/GuV (EBIT, Eigenkapital),
+  **Schätzungen bis 2028e/2029e** (Gewinn je Aktie, KGV, Dividende; EBIT-Schätzung bei Atoss leer).
+- **Yahoo**: 4 Jahre GuV, 5 Jahre Bilanz/Cashflow, Schätzungen 2 Jahre (nur Umsatz, Gewinn je Aktie).
+- **Nasdaq** (inoffiziell): USA 4 Jahre, Gewinnschätzungen 4 Jahre (Apple bis 2029).
+- **stockanalysis.com**: 5 Jahre, Schätzungen 1 Jahr, Rest hinter Bezahlschranke. **MarketScreener**: 403 (Cloudflare).
+- Nicht getestet (brauchen Gratis-Schlüssel): Finnhub, Alpha Vantage, SimFin, FMP/EODHD-Gratisstufe.
 
-Vorschlag Claude (Freigabe Tobias steht aus): Lizenzanfragen an EODHD und FMP parallel; einen Monat EODHD privat zur
-Probe (10 Firmen gegen Geschäftsberichte); dann Leser → `daten/fundamental.csv` (lang: ISIN, Jahr, Posten, Wert,
-Quelle, Abrufdatum) → eigene Kennzahlen mit offengelegten Formeln → Abschnitt auf der Firmenseite. Statische Seite
-reicht dafür (90 Firmen × 20 Jahre ist klein), passt später in die Datenbank aus ARCHITEKTUR.md. Schätzungen
-(2026e–2028e) als eigener späterer Block, Burggraben-Text nicht automatisch.
+Lücken: EBIT älter als 4 Jahre außerhalb der USA (Ersatz: EBITDA oder Gewinn aus TradingView, so beschriften);
+Umsatz-/EBIT-Schätzungen für 3 Jahre (nur 1 Jahr; Gewinn je Aktie 3–4 Jahre über onvista/Nasdaq).
+
+Plan (Tobias 31.10.2026: „so machen“), nur lokal, in abbrechbaren Blöcken:
+- [x] **1. Sammler (31.10.2026):** `python3 -m pipeline.fundamental` (~1,5 Min.) → `daten/fundamental.csv` (5 MB, lang:
+      isin, symbol, quelle, periode, posten, wert, waehrung, abgerufen; jeder Lauf ersetzt die Datei). TradingView
+      (ein Abruf für alle, `price_conversion: to_symbol` → alles in Handelswährung, auch Qiagen USD→EUR), onvista je ISIN
+      (Posten mit Präfix `bilanz.`/`kennzahl.`/`bewertung.`, Geschäftsjahr „24/25“ → „2025“), SEC für 10 US-Testfirmen
+      (`USA_TEST`, ein Wert je Jahr über das SEC-Feld `frame`). Symbole per ISIN (Hauptnotiz, sonst Xetra, sonst
+      Yahoo-Kürzel; Qiagen hat bei TradingView eine neuere ISIN). Atoss als Zusatzfirma (`ZUSATZ`) für den Abgleich.
+      Ergebnis: alle 95 Firmen, Umsatz im Median 20 Jahre (unter 10 nur junge Firmen: Porsche, Renk, TKMS, Aumovio …).
+      **Abgleich der Quellen:** Umsatz TradingView vs. onvista 94 % auf 1 % gleich, Gewinn 84 %; Abweichungen durch
+      angepasste Vorjahre (Continental 2024 nach Aumovio-Abspaltung, Rheinmetall 2024) und Banken/Versicherer
+      (andere Umsatzdefinition). SEC: Banken (AXP, BAC) ohne EBIT, JNJ/AXP Lücken, ältere Jahre teils angepasst.
+- [x] **2. Kennzahlen (31.10.2026):** `python3 -m pipeline.kennzahlen` → `daten/kennzahlen.csv` (eine Zeile je Firma,
+      Formeln im Modul). Beide CSV in `.gitignore` (inoffizielle Quellen, öffentliches Repository → nur lokal).
+      Abgleich Atoss mit der AlleAktien-Karte (AA rechnete am 04.10. mit Kurs 83 €, wir mit 94,30 €): exakt gleich
+      Gewinnmarge 25,6 %, EK-Rendite 49,8 % (Gewinn / Eigenkapital am Jahresende), Umsatzwachstum 10 J. 15,5 %,
+      max. EBIT-Rückgang 0 %, Gewinnanstiege 10/10; nah dran EBIT-Wachstum 10 J. 19,9 statt 19,6 % (EBITDA als Ersatz),
+      Nettoverschuldung/EBITDA −1,5 statt −1,6, Renditeerwartung 15,5 statt 16,5 %; ROCE 66 statt 62 % (andere
+      Kapitalbasis). Kursabhängige Werte (KGV, KBV, Dividendenrendite) passen nach Umrechnung auf den Kurs.
+      Bekannte Schwächen: Renditeerwartung = Gewinnwachstum je Aktie 3 J. (onvista) + Dividendenrendite → bei
+      niedriger Ausgangsbasis unplausibel hoch (Deutz 60 %, Rheinmetall 67 %); fehlt für US-Firmen (keine onvista-Daten,
+      Nasdaq hätte Gewinnschätzungen); Siemens-Verschuldung enthält die Finanzsparte (3,0 × EBITDA); EBIT 10 J. nur USA.
+- [ ] 3. Lokale Anzeige auf der Firmenseite (nicht pushen): Kennzahlen, Rentabilität, Risiko, Balken Umsatz/EBIT, Wachstum.
+- [ ] 4. Eigener Qualitätscheck (10 Kriterien, eigene Schwellen) und Kategorie nach Peter Lynch per Regel.
+      Burggraben-Text nicht automatisch.
 
 ## Laufendes Vorhaben: Guru-Depots (13F der SEC)
 
@@ -487,4 +508,5 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **30.10.2026 (5):** Verworfene Landingpage-Arbeit gelöscht (`docs/labor/`, `.taste-skill/`, `robots.txt`/`.gitignore` zurückgesetzt). Abschnitt „Marketing und Website“ neu gefasst: erst Positionierung, dann Newsletter.
 - **30.10.2026 (6):** Rückkäufe Block 4 geprüft (Planung #60): Historie vollständig geladen, Kontrollzahlen ausgewertet, Fehler „keine Rückkäufe“ bei Firmen ohne EQS-Meldungen gefunden (noch nicht behoben).
 - **30.10.2026 (7):** `ARCHITEKTUR.md` geschrieben (Planung #7): heutige Grenzen, empfohlenes Ziel, Weg in 5 Blöcken, offene Entscheidungen. Nichts gebaut.
-- **30.10.2026 (8):** Fundamentaldaten (#6) recherchiert: Yahoo nur 4 Jahre, Bezahlanbieter brauchen für die öffentliche Anzeige eigene Lizenz (Preis auf Anfrage). Plan notiert unter „Geplantes Vorhaben: Fundamentaldaten“, nichts gebaut.
+- **30.10.2026 (8):** Fundamentaldaten (#6): erster Plan (Bezahlanbieter) von Tobias verworfen (kein Geld, global, nur lokal). Gratis-Quellen getestet, TradingView-Screener liefert 20 Jahre für alle Märkte; neuer Plan unter „Geplantes Vorhaben: Fundamentaldaten“, nichts gebaut.
+- **31.10.2026:** Fundamentaldaten (#6) Block 1 (Sammler TradingView/onvista/SEC) und Block 2 (Kennzahlen) gebaut und gegen AlleAktien-Karte Atoss geprüft; Daten nur lokal (`.gitignore`), nicht gepusht.
