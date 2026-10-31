@@ -6,3 +6,6 @@ __pycache__/
 # Fundamentaldaten aus inoffiziellen Quellen: vorerst nur lokal (Planung #6)
 daten/fundamental.csv
 daten/kennzahlen.csv
+
+# Prüfseite für Firmenlogos (erzeugt von logos_laden.py)
+logos_uebersicht.html

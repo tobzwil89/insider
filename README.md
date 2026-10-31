@@ -13,6 +13,7 @@ python3 -m pipeline.firmen            # DAX/MDAX-Liste neu aufbauen (nach Index√
 python3 historie.py                   # EQS-Archiv 2018 bis 21.10.2025 laden (setzt bei Abbruch fort)
 python3 historie.py --reparieren      # EQS-Meldungen ohne Volumen oder W√§hrung neu lesen
 python3 stimmrechte_laden.py          # Stimmrechtsmitteilungen seit 2018 laden (setzt bei Abbruch fort)
+python3 logos_laden.py                # fehlende Firmenlogos nach docs/logos/ laden (Wikidata, Vorrang daten/logos_hand.csv)
 ```
 
 Lokal ansehen: `cd docs && python3 -m http.server`, dann http://localhost:8000
