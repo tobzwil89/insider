@@ -104,10 +104,12 @@ def versionen_eintragen(v: dict) -> None:
 # --- Firmenseite --------------------------------------------------------------------------------
 
 def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, ranking: pd.DataFrame,
-                letzter_kurs: tuple, v: dict, aktionaere: pd.DataFrame, rueckkaeufe: pd.DataFrame | None = None) -> str:
+                letzter_kurs: tuple, v: dict, aktionaere: pd.DataFrame, rueckkaeufe: pd.DataFrame | None = None,
+                rueck_ohne_meldungen: bool = False) -> str:
     """f: ticker, name, index, benchmark, isins. ranking: Zeilen dieser Firma mit Spalte 'rang'.
     aktionaere: Zeilen dieser Firma aus stimmrechte.grossaktionaere.
-    rueckkaeufe: Zeilen dieser Firma aus rueckkaeufe.jahre; None = Historie noch nicht geladen, Abschnitt fehlt."""
+    rueckkaeufe: Zeilen dieser Firma aus rueckkaeufe.jahre; None = Historie noch nicht geladen, Abschnitt fehlt.
+    rueck_ohne_meldungen: EQS führt für die Firma keine Rückkaufmeldungen → „keine Daten“ statt „keine Rückkäufe“."""
     index_name = INDEXNAME.get(f["benchmark"], f["benchmark"])
     aktien = meldungen[meldungen["instrument"].eq("Aktie")]
     kaeufe, verkaeufe = aktien[aktien["art"].eq("Kauf")], aktien[aktien["art"].eq("Verkauf")]
@@ -169,7 +171,11 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
     if rueckkaeufe is None:
         rueck_abschnitt = ""
     else:
-        if rueckkaeufe.empty:
+        if rueck_ohne_meldungen:
+            rueck_html = ('<p class="leer">Keine Daten: Das EQS-Archiv enthält für diese Firma keine Rückkaufmeldungen '
+                          'seit 2018. Das heißt nicht, dass es keine Rückkäufe gab; viele Firmen veröffentlichen '
+                          'über einen anderen Verteiler.</p>')
+        elif rueckkaeufe.empty:
             rueck_html = '<p class="leer">Keine Aktienrückkäufe seit 2018 laut EQS-Archiv.</p>'
         else:
             rueck_html = _tabelle(

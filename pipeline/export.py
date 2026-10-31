@@ -113,7 +113,11 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     # Rückkäufe nur für Firmen, deren Historie fertig geladen ist (sonst hieße „keine“ nur „noch nicht geladen“)
     rk_datei, rk_fertig = DATEN / "rueckkaeufe.csv", DATEN / "rueckkaeufe_fortschritt.csv"
     rueck = rueckkaeufe.jahre(pd.read_csv(rk_datei)) if rk_datei.exists() else pd.DataFrame(columns=["firma"])
-    rk_geladen = set(pd.read_csv(rk_fertig)["name"]) if rk_fertig.exists() else set()
+    rk_fortschritt = pd.read_csv(rk_fertig) if rk_fertig.exists() else pd.DataFrame(columns=["name", "meldungen"])
+    rk_geladen = set(rk_fortschritt["name"])
+    # Firmen, für die EQS gar keine Meldungen dieser Kategorie führt (z. B. BMW, anderer Verteiler):
+    # dort heißt „nichts gefunden“ nur „keine Daten“, nicht „keine Rückkäufe“
+    rk_ohne = set(rk_fortschritt.loc[rk_fortschritt["meldungen"].eq(0), "name"]) - set(rueck["firma"])
     uebersicht = []
     for ticker, f in mit_seite.groupby("ticker"):
         eigene = zusammen[zusammen["ticker"] == ticker]
@@ -126,7 +130,8 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
         seiten.schreiben(seiten.DOCS / "firma" / ticker / "index.html", seiten.firmenseite(
             stamm, eigene, ausgewertet[ausgewertet["ticker"] == ticker], rang[rang["ticker"] == ticker], letzter, v,
             aktionaere[aktionaere["firma"] == stamm["name"]],
-            rueck[rueck["firma"] == stamm["name"]] if stamm["name"] in rk_geladen else None))
+            rueck[rueck["firma"] == stamm["name"]] if stamm["name"] in rk_geladen else None,
+            rueck_ohne_meldungen=stamm["name"] in rk_ohne))
         uebersicht.append({"ticker": ticker, "name": stamm["name"], "index": stamm["index"],
                            "meldungen": len(eigene),
                            "letzte_meldung": eigene["mitteilungsdatum"].max() if len(eigene) else None})

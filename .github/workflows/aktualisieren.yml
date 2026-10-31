@@ -10,6 +10,8 @@ on:
     # (am 22.10.2026 nur 3 von ~34 Läufen mit "*/30").
     - cron: "13,43 * * * *"
     - cron: "15 17 * * 1-5"
+  # Hauptauslöser ist cron-job.org (alle 30 Min., ruft workflow_dispatch mit immer=false über die GitHub-API auf),
+  # weil GitHub von den geplanten Läufen oben nur ~6 am Tag startet (geprüft 24.–31.10.2026). schedule bleibt als Reserve.
   workflow_dispatch:
     inputs:
       immer:
