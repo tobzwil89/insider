@@ -225,10 +225,11 @@ def kategorie(z: dict, gewinn: pd.Series, ergebnis10: pd.Series) -> str | None:
     if gewinn.iloc[-1] <= 0 or (letzte3 <= 0).sum() >= 2:
         return "Turnaround"  # Verlust im letzten Jahr oder in 2 der letzten 3 Jahre
     vorjahr = ergebnis10.shift(1)
-    einbrueche = ((vorjahr > 0) & (ergebnis10 <= vorjahr * 0.75)).sum()
+    einbrueche = ((vorjahr > 0) & (ergebnis10 <= vorjahr * 0.60)).sum()
     if not z["finanzwert"] and einbrueche >= 2:
-        return "Zykliker"  # operatives Ergebnis in 10 Jahren mindestens zweimal um ≥ 25 % zum Vorjahr eingebrochen
-        # (einmal reicht nicht: sonst wäre jede Firma mit Corona-Delle 2020 ein Zykliker)
+        return "Zykliker"  # operatives Ergebnis in 10 Jahren mindestens zweimal um ≥ 40 % zum Vorjahr eingebrochen
+        # (einmal reicht nicht: sonst wäre jede Firma mit Corona-Delle 2020 ein Zykliker; 2× ≥ 25 % ergab mit echtem
+        # EBIT 29 Zykliker inkl. DHL, Zalando, Fresenius → Tobias 31.10.2026: strenger)
     if z["kbv"] is not None and 0 < z["kbv"] < 0.8 and not z["finanzwert"]:
         return "Substanzwert"  # Börsenwert deutlich unter dem Buchwert (Lynch: „Asset Play“)
     wachstum = z["umsatz_wachstum_10j"] if z["umsatz_wachstum_10j"] is not None else z["umsatz_wachstum_3j"]
