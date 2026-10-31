@@ -70,14 +70,54 @@ Ergebnis (2026q2, Stichtage meist 31.03.2026):
       eigene Aktien) in `--ring-rest` (Grau, im dunklen Modus kräftiger als `--gitter`). Mitte: „x % mit Namen bekannt“.
       Stile `.ring*` am Ende von `style.css`. 85 Firmenseiten mit Ring. Geprüft per Bildschirmfoto hell/dunkel, 950 und 520 px
       (SAP 26 %, Hugo Boss 70 %, Allianz 8 %). Sicherung vorher: `.recherche/sicherung_ring/`.
-- [ ] 2. Eigene Aktien als Segment (Quelle: Meldungen zu eigenen Aktien/Rückkäufe, Bestand nicht immer gemeldet → prüfen).
-- [ ] 3. N-PORT-Lader: vierteljährlich Zip laden, nur unsere ISINs behalten (kleine CSV), Zip wieder löschen; Tabelle
-      Fondsgesellschaft → Konzern; Überschneidung mit Großaktionären abziehen; zwei Gattungen und andere ISINs lösen.
-      Anzeige: „US-Fonds laut SEC, Stand <Stichtag>“, größte Gesellschaften mit Namen.
+- [x] 2. **Eigene Aktien im Ring (31.10.2026, nicht gepusht).** Quelle: Mitteilungen nach § 40 Abs. 1 Satz 2 WpHG (Firma meldet
+      ihren Bestand, wenn er 3, 5 oder 10 % berührt), die schon als `anderes` in `stimmrechte.csv` lagen. Rückkäufe taugen
+      nicht (Einziehungen unbekannt). `stimmrechte.eigene_aktien_lesen` (Formular DE/EN: Abschnitt 3 Datum, „Neu“/„Resulting
+      situation“ → Anteil und Gesamtzahl), `stimmrechte.eigene_aktien` (letzter Stand je Firma ab 2018, **nur ≥ 3 %**, weil
+      darunter keine Meldepflicht mehr besteht). `stimmrechte_laden.eigene_aktien_nachladen()` läuft am Ende jedes Aufrufs
+      (auch nachts) und liest nur fehlende → `daten/stimmrechte_eigene_aktien.csv` (wird von der Action über
+      `daten/stimmrechte*.csv` mit committet). Erstlauf lokal: 123 Mitteilungen in 5 Min., keine Lesefehler.
+      **11 Firmen mit ≥ 3 %:** SAP 5,0, Scout24 5,0, Salzgitter 4,9, United Internet 10,0 (2023), FMC, Mercedes, DHL, Ionos,
+      Hochtief (2020), Lanxess (2019), Munich Re (2019) je ~3 %. Alte Stände können zwischen den Schwellen (3–5, 5–10 %)
+      veraltet sein → Datum mit Link steht in der Legende. Segment „Eigene Aktien der Firma“ in `--sonstiges` (Mittelgrau),
+      zählt zu „mit Namen bekannt“ (SAP 26 → 31 %). Keine Firma steht zugleich als eigener Großaktionär drin (geprüft).
+      Geprüft per Bildschirmfoto hell/dunkel.
+      **Nebenbefund (nicht behoben):** Halternamen mit Ort, z. B. „Salzgitter Aktiengesellschaft, Salzgitter,, Deutschland“ bei Aurubis.
+- [x] 3. **US-Fonds im Ring (31.10.2026, nicht gepusht).** `pipeline/fonds_us.py`: `laden()` liest das neueste Quartal von
+      der SEC-Seite, lädt nur, wenn es in `daten/fonds_us.csv` noch fehlt (Zip in temporären Ordner, danach gelöscht,
+      ~1,5 Min.), behält nur unsere ISINs, je ISIN und Fondsträger eine Zeile (isin, gesellschaft, stueck, fonds, stichtag,
+      quartal; 2026q3: 9.508 Zeilen, 94 Firmen, 650 KB; nur das neueste Quartal). `KONZERNE`: Fondsträger → Konzern
+      (iShares → BlackRock, EUPAC/New Perspective … → Capital Group, Hartford → auch Wellington usw.) mit Muster für
+      Großaktionärsnamen. `je_firma` rechnet in % der Gesamtstimmrechte (letzte Stimmrechtsmitteilung) und lässt Konzerne
+      weg, die schon als Großaktionär gemeldet sind (geprüft: SAP ohne iShares, Zalando ohne MFS, Brenntag ohne Artisan,
+      Harris, Hartford). Ring: bis 4 Konzerne einzeln „(US-Fonds)“, Rest „Weitere US-Fonds“, dunkleres Blau, Stand und
+      Hinweis unter dem ersten Eintrag. **Nicht bei Firmen mit zwei Gattungen** (VW, Henkel, Sartorius, BMW, Fuchs …)
+      und Porsche (`NUR_VORZUG`), weil die Stimmrechte nur Stammaktien zählen. Workflow „Stimmrechte laden“: nachts
+      Schritt „US-Fonds laden“ (`continue-on-error`), committet `daten/fonds_us.csv` mit.
+      **Ergebnis: Median „mit Namen bekannt“ 49 % (vorher 36 %), 73 Seiten mit US-Fonds.** SAP 26 → 41 % (mit eigenen
+      Aktien), Allianz 8 → 18 %, Siemens 10 → 22 %, Hugo Boss 70 → 77 %, Brenntag 70 %. Bildschirmfoto hell/dunkel geprüft.
+      Offen: Fresenius/Qiagen ohne Treffer (andere ISIN), Vorzugsaktien-Firmen ohne Fonds (bräuchten Gesamtzahl je
+      Gattung), „Weitere US-Fonds“ oft 4–6 % (Zuordnungstabelle bei Bedarf erweitern).
 - [ ] 4. Optional: Norwegischer Staatsfonds (Norges Bank veröffentlicht alle Bestände, gratis; grob 1–2 % je Firma).
 - [ ] 5. Optional: Aufteilung des grauen Rests nach Anlegertyp aus Geschäftsbericht/IR (institutionell/privat), nur
       von Hand und mit Quelle.
 - USA-Aktien später: 13F + 13D/13G + Form 4 decken dort meist 70–90 % mit Namen ab.
+
+## Laufendes Vorhaben: Firmenlogos, Stand 31.10.2026
+
+Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): einmal laden, lokal in `docs/logos/` speichern
+(keine fremden Dienste beim Seitenaufruf), von Hand durchsehen, erst danach auf der Website einbauen.
+- [x] 1. **Skript (31.10.2026, nicht gepusht):** `python3 logos_laden.py` (`--neu` lädt alles neu) → `docs/logos/<ISIN>.svg|png|jpg`
+      (1,4 MB), Liste `daten/logos.csv` (isin, name, datei, quelle, url), Übersicht `logos_uebersicht.html` (im
+      Projektordner, nicht in `docs/`, in `.gitignore`). Quelle Wikidata (ISIN P946 → Logo P154, Datei von Commons);
+      `daten/logos_hand.csv` (isin,url) hat Vorrang. Per ISIN 88 von 97; die übrigen per Namenssuche bei Wikidata
+      gefunden und in die Handliste eingetragen (Fresenius 2. ISIN, Qiagen, Aroundtown, Fuchs ×2, Jenoptik, Renk, Schaeffler).
+      **Ergebnis 97 von 97.** Hochtief fehlte bei Wikidata und Commons → SVG von hochtief.com in die Handliste. Keine SVG enthält `<script>`.
+- [ ] 2. **Tobias:** Übersicht durchsehen. Verdacht auf veraltete Logos (Claude, nicht geprüft): Nordex (mit „acciona“),
+      TUI (mit „Aktiengesellschaft“), Jenoptik (blaues Kästchen), Hella (Forvia-Doppellogo), Porsche AG (Wappen statt Schriftzug),
+      Fuchs (kleines PNG mit Werbespruch).
+- [ ] 3. Einbau auf Firmenseite und in Tabellen (Platzhalter mit Anfangsbuchstaben, wenn kein Logo), erst nach Freigabe.
+- Rechtlich: Logos nur zur Kennzeichnung der Firma zeigen, kein Anschein einer Partnerschaft → zu „vor dem Livegang klären“.
 
 ## Marketing und Website (Planungs-App #9), Stand 30.10.2026
 
@@ -687,9 +727,13 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **31.10.2026 (8):** EmailOctopus für den Newsletter verworfen (1 Formular im Gratistarif), Kit eingerichtet: Anmeldekarte auf der Startseite, Datenschutzabsatz, Verbindung geprüft.
 - **31.10.2026 (9):** Testanmeldungen (gmx, proton) kommen bei Kit an („Unconfirmed“, 2 Mails verschickt), Bestätigungsmails erreichen Tobias aber nicht → Absenderadresse prüfen. Kit-MCP (`app.kit.com/mcp`, in `~/.claude.json`) verbunden, braucht aber Bezahltarif → unbrauchbar. Formular nach unten verschoben (nicht gepusht).
 - **31.10.2026 (10):** Ursache gefunden: Absender war tobzwilling@proton.me, proton.me hat DMARC `p=quarantine` (streng) → Kits Mails gelten als gefälscht. Lösung: Sendedomain tobiaszwilling.me bei Kit (über „Set this up for me“, DNS bei Namecheap: CNAME `ckespa`, `cka._domainkey`, `cka2._domainkey` auf convertkit.com, TXT `_dmarc` `v=DMARC1; p=none;`, alle geprüft), Weiterleitung `report@tobiaszwilling.me` → gmx. Offen: Validate in Kit (wartete auf DNS), Absender `report@` anlegen und als Default setzen, Testanmeldung wiederholen.
+- **31.10.2026 (11):** Sendedomain tobiaszwilling.me bei Kit verifiziert. Weiterleitung `report@` → gmx kam nicht an (GMX nimmt weitergeleitete Kit-Mails nicht), Ziel auf tobzwilling@proton.me geändert → Absender „Rhodus“ <report@tobiaszwilling.me> bestätigt. Offen: als Default setzen, Testanmeldung.
+- **31.10.2026 (12):** Bestätigungsmail von report@tobiaszwilling.me kommt bei Proton an (authentifiziert), bei GMX nicht: Kontakt steht auf „Unconfirmed“, nicht „Bounced“ → vermutlich GMX-Verzögerung/Ordner „Unbekannt“ bei neuer Domain. Offen: am 01.11. GMX erneut prüfen; Bestätigungsmail auf Deutsch (Text-Vorschlag im Chat: Betreff „Bitte bestätige deine Anmeldung zum Sonntags-Report“), eigene Postadresse in Kit statt Seattle; Push der Formular-Verschiebung.
+- **31.10.2026 (13):** Bestätigungsmail in Kit auf Deutsch angepasst (Tobias). Offen: eigene Postadresse in Kit (statt Seattle), GMX-Zustellung am 01.11. prüfen, Push der Formular-Verschiebung.
 - **31.10.2026 (7):** Eulerpool in Sammler und Kennzahlen eingebaut (EBIT 10 J. bei 91 statt 7 Firmen, Schätzungen bis 3 Jahre), alle Firmen gegen AAQS abgeglichen, ROCE/Verschuldung auf Geschäftsjahr umgestellt (ROCE 96 % gleich mit AlleAktien). Offen: Zykliker-Schwelle (29 statt 13).
 - **31.10.2026 (Logo):** MVP-Logo begonnen, nur Bildzeichen (Name noch offen), Graustufen, Wirkung „seriös, belegt“ + „modern, Tech“, Einsatz Sonntags-Report, Website + Favicon, Social Media. Drei Konzepte in `logo/` (v1 verworfen: QR-Code-, Uhrzeiger-, Audio-Wirkung). Übersicht `logo/konzepte-v2.png`, Empfehlung A „Innenblick“. Wartet auf Tobias' Wahl; danach Logo-Paket (Farbe, Favicon, Icons).
 - **31.10.2026 (Logo 2):** Tobias verwirft die Tech-Entwürfe: Logo soll elitär, „old money“, seriös wirken, Schriftzug in Serifenschrift. Name jetzt Rhodus. Drei neue Konzepte in `logo/` (Übersicht `logo/rhodus-konzepte-v3.png`): A Inschrift (Cinzel), B Privatbank (Bodoni Moda, Empfehlung), C Münze (Rose von Rhodos, Ring, Cormorant Garamond). Schriften frei lizenziert (OFL, Google Fonts) in `logo/schriften/`, Umwandlung in Pfade mit `logo/bauen.py`. Wartet auf Tobias' Wahl.
 - **31.10.2026 (Logo 3):** Tobias wählt A „Inschrift“. Logo-Paket fertig in `logo/kit/` (Richtlinien `logo/kit/RICHTLINIEN.md`): Schriftzug, Monogramm + kräftige Kleinversion, Farben Rhodus-Grün #1E3B2F / Creme #F3EEE2, Favicon-Satz auf grüner Kachel (dunkle Tabs), Profilbild, Newsletter-Kopf 1200×300, Präsentationstafeln. Neu bauen mit `python3 logo/paket.py` (im Ordner `logo/`). Noch nicht auf Website/Newsletter eingesetzt.
 - **31.10.2026 (Logo 4):** Aufgeräumt: alle verworfenen Entwürfe, Konzeptübersichten, Testbilder, `bauen.py` und die Schriften Bodoni Moda/Cormorant gelöscht. In `logo/` bleiben nur `kit/`, `paket.py`, `text2path.py`, `praesentation.json` und `schriften/Cinzel.ttf` + `OFL.txt`. Rechtscheck: Schrift (OFL) erlaubt Logo-Nutzung; Urheberrecht am R gibt es nicht (keine Schöpfungshöhe), Schutz nur über eine Marke (Empfehlung: zuerst Wortmarke RHODUS beim DPMA, 290 € für Klassen 36, 41, 42; Bildzeichen vorher in TMview als Bildmarke suchen).
-- **31.10.2026 (Aktionärsring):** Bachelorarbeits-Bezug aus Notiz und Gedächtnis entfernt (Tobias: längst durch, Startup). Ring für die Aktionärsstruktur beschlossen; N-PORT-Test: US-Fonds bringen netto Median +8,7 Pp. mit Namen (36 → 48 %). Plan unter „Geplantes Vorhaben: Aktionärsring“, Planungs-App #65. Danach Schritt 1 gebaut: Ring auf den Firmenseiten (lokal geprüft, nicht gepusht).
+- **31.10.2026 (Aktionärsring):** Bachelorarbeits-Bezug aus Notiz und Gedächtnis entfernt (Tobias: längst durch, Startup). Ring für die Aktionärsstruktur beschlossen; N-PORT-Test: US-Fonds bringen netto Median +8,7 Pp. mit Namen (36 → 48 %). Plan unter „Geplantes Vorhaben: Aktionärsring“, Planungs-App #65. Danach Schritt 1 gebaut: Ring auf den Firmenseiten (lokal geprüft, nicht gepusht). Schritt 2: eigene Aktien aus § 40-Mitteilungen als Segment (11 Firmen ≥ 3 %). Schritt 3: US-Fonds (N-PORT) als Segmente, nächtlich automatisch; Median mit Namen 36 → 49 %.
+- **31.10.2026 (Logos):** `logos_laden.py` gebaut: Firmenlogos von Wikidata/Commons nach `docs/logos/`, 97 von 97 (Hochtief von hochtief.com), Übersicht `logos_uebersicht.html`. Wartet auf Durchsicht durch Tobias, noch nicht auf der Website.
