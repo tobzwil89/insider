@@ -149,7 +149,10 @@ Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): 
       Firmenseite, weiße Kachel auch im dunklen Modus, ohne Logo Anfangsbuchstabe), Feld `logo` in `firmen.json`
       (`export.py`), kleines Logo in der Firmenliste der Startseite (`start.js`), Stile `.firmenlogo`/`.titelzeile` am Ende
       von `style.css`. Lokal geprüft per Bildschirmfoto (SAP hell, Hochtief dunkel 420 px, Firmenliste): 94 von 94 Seiten mit Logo.
-      Die Firmenseiten baut der Bot beim nächsten Lauf neu. Noch nicht in Ticker, Cluster und Ranking (nur Firmenname).
+      Die Firmenseiten baut der Bot beim nächsten Lauf neu.
+      **Nachtrag 31.10.2026 (Tobias):** Logo groß rechts im Kopf der Firmenseite (`.firmenkopf`, `.firmenlogo.gross` 220×96,
+      unter 600 px 112×52) statt klein vor dem Namen. Live fehlten die Logos nach dem Push, weil der Bot ohne neue BaFin-Meldung
+      nicht neu rechnet (und `--immer` nur werktags) → nach Änderungen an `seiten.py` Action „Daten aktualisieren“ mit „immer“ starten. Noch nicht in Ticker, Cluster und Ranking (nur Firmenname).
 - Rechtlich: Logos nur zur Kennzeichnung der Firma zeigen, kein Anschein einer Partnerschaft → zu „vor dem Livegang klären“.
 
 ## Marketing und Website (Planungs-App #9), Stand 30.10.2026
@@ -567,7 +570,11 @@ Plan (Tobias 31.10.2026: „so machen“), nur lokal, in abbrechbaren Blöcken:
       (±1 Pp. bzw. ±0,1×): ROCE 36 → 96 %, Verschuldung 15 → 50 % (Rest: Leasing/Finanzsparten, Mercedes, VW, Siemens
       Energy), EBIT-Wachstum 10 J. 96 %, EK-Rendite 96 %, Umsatzwachstum 89 %, größter EBIT-Rückgang 87 % (gleiche Formel;
       Rest junge Firmen). Renditeerwartung nur 11 % gleich: eigene Formel mit Deckel, bewusst nicht angeglichen.
-      **Nebenwirkung, Entscheidung Tobias:** Mit echtem EBIT statt EBITDA (schwankt stärker) gibt es **29 statt 13 Zykliker**
+      **Zykliker-Regel verschärft (Tobias 31.10.2026):** jetzt **zweimal ≥ 40 %** Einbruch in 10 Jahren (vorher 2× ≥ 25 %)
+      → 15 Zykliker (u. a. Deutz, Krones, Lufthansa, Mercedes, Airbus, MTU, Nordex, Kion, Siemens Energy); DHL, Zalando,
+      Fresenius, Infineon nicht mehr. VW, BMW, Traton jetzt Substanzwert (KBV < 0,8). Verworfen: 3× ≥ 25 % (nur 9, ohne
+      Deutz/Traton). Text in `seiten.KATEGORIE_TEXT` angepasst.
+      Vorher (2× ≥ 25 %): Mit echtem EBIT statt EBITDA (schwankt stärker) gab es **29 statt 13 Zykliker**
       (neu u. a. VW, Mercedes, Lufthansa, Infineon, Kion, aber auch DHL, Zalando, FMC, Fresenius); Substanzwerte 6 → 1, weil
       Zykliker Vorrang hat. Qualitätscheck bei 37 Firmen geändert. 10/10: Atoss, Nemetschek, Alphabet, Microsoft (SAP jetzt
       nicht mehr). Geprüft per Bildschirmfoto (Deutz: 10 J. EBIT, Schätzsäulen 26e–28e), `docs/` zurückgesetzt.
@@ -779,3 +786,5 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   `git status` prüfen, ob committete Dateien von lokal geänderten abhängen. Noch lokal offen: `fundamental.py`,
   `stimmrechte.py`, `DATENQUELLEN.md`, `ARCHITEKTUR.md`, `logo/`, `newsletter/2026-11-01.md`.
 - **31.10.2026 (Logos 2):** Logos auf Firmenseiten und in der Firmenliste eingebaut, lokal geprüft, nicht gepusht.
+- **31.10.2026 (Logos 3):** Logo groß rechts im Firmenkopf (Wunsch Tobias), lokal geprüft; Ursache „live keine Logos“: Bot baut nur bei neuen Meldungen neu.
+- **31.10.2026 (8):** Zykliker-Regel auf 2× ≥ 40 % verschärft (15 statt 29). Git geprüft: lokal = GitHub (51225c6), Eulerpool-Einbau vollständig gepusht, Action seit #66 grün, Live-Seiten 200. Parallel offen aus anderer Sitzung: `seiten.py`/`style.css` (Logo groß, Aktionärsstruktur), `logo/`, `newsletter/2026-11-01.md`.

@@ -112,12 +112,12 @@ def logo_datei(isins: list) -> str | None:
     return None
 
 
-def firmenlogo(isins: list, name: str, wurzel: str) -> str:
+def firmenlogo(isins: list, name: str, wurzel: str, groesse: str = "") -> str:
     """Logo auf heller Kachel; ohne Logo der Anfangsbuchstabe als Platzhalter."""
     datei = logo_datei(isins)
     if datei:
-        return f'<span class="firmenlogo"><img src="{wurzel}logos/{e(datei)}" alt="Logo {e(name)}"></span>'
-    return f'<span class="firmenlogo leer" aria-hidden="true">{e(name[:1].upper())}</span>'
+        return f'<span class="firmenlogo {groesse}"><img src="{wurzel}logos/{e(datei)}" alt="Logo {e(name)}"></span>'
+    return f'<span class="firmenlogo {groesse} leer" aria-hidden="true">{e(name[:1].upper())}</span>'
 
 
 def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, ranking: pd.DataFrame,
@@ -175,19 +175,10 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
               'Die Prozente beziehen sich auf die Stammaktien. Sie werden den Familien Porsche und Piëch über '
               'Beteiligungsgesellschaften und Stimmbindungen vollständig zugerechnet (bei der Porsche AG über '
               'Porsche SE und Volkswagen), deshalb meldet jedes Mitglied die vollen 100 %. Hier stehen sie in einer Zeile.</p>' if f["ticker"] in NUR_VORZUG else "")
-    ring_html = aktionaersring(**ring) if ring else ""
-    if aktionaere.empty:
-        ga_html = ring_html + ('<p class="leer">Keine Halter über den Meldeschwellen laut den Stimmrechtsmitteilungen '
-                               'im EQS-Archiv seit 2018. Das heißt nicht, dass es keine Großaktionäre gibt.</p>')
-    else:
-        ga_html = ring_html + _tabelle(
-            [("Halter", ""), ("Aktien", "zahl"), ("Instrumente", "zahl"), ("Zusammen", "zahl"), ("Stand", "")],
-            [[(e(r.halter) + (f'<div class="klein">dieselben Aktien auch bei: {e(r.weitere)}</div>' if r.weitere else ""), ""),
-              (f"{zahl(r.aktien, 2)} %", "zahl"), (f"{zahl(r.instrumente, 2)} %", "zahl"),
-              (f"<b>{zahl(r.summe, 2)} %</b>", "zahl"),
-              (f'<a href="{e(r.url)}" rel="nofollow">{datum(r.schwellendatum)}</a>'
-               + (f'<div class="klein">geprüft {datum(r.geprueft)}</div>' if not _leer(r.geprueft) else ""), "datum")]
-             for r in aktionaere.itertuples()])
+    ga_html = aktionaersstruktur(**ring) if ring else ""
+    if not ga_html:
+        ga_html = ('<p class="leer">Keine Halter über den Meldeschwellen laut den Stimmrechtsmitteilungen '
+                   'im EQS-Archiv seit 2018. Das heißt nicht, dass es keine Großaktionäre gibt.</p>')
 
     if rueckkaeufe is None:
         rueck_abschnitt = ""
@@ -252,10 +243,13 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
 <body>
   <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quellen: BaFin-Datenbank der Eigengeschäfte von Führungskräften, EQS-Archiv.</div>
 
-  <header class="kopf">
-    <div class="marke"><a href="../../">← Insider-Monitor</a></div>
-    <div class="titelzeile">{firmenlogo(f['isins'], f['name'], '../../')}<h1>{e(f['name'])}</h1></div>
-    <p class="unterzeile">{e(f['ticker'])} · {e(f['index'])} · ISIN {e(', '.join(f['isins']))}</p>
+  <header class="kopf firmenkopf">
+    <div>
+      <div class="marke"><a href="../../">← Insider-Monitor</a></div>
+      <h1>{e(f['name'])}</h1>
+      <p class="unterzeile">{e(f['ticker'])} · {e(f['index'])} · ISIN {e(', '.join(f['isins']))}</p>
+    </div>
+    {firmenlogo(f['isins'], f['name'], '../../', 'gross')}
   </header>
 
   <main>
@@ -300,17 +294,14 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
     </section>
 
     <section class="karte">
-      <h2>Großaktionäre</h2>
-      <p class="erklaerung">Stimmrechtsanteile laut der letzten Stimmrechtsmitteilung je Halter (§§ 33 ff. WpHG),
-        gezählt ab 3 % in Aktien oder 5 % zusammen mit Instrumenten. Stand ist das Datum der Schwellenberührung,
-        der Link führt zur Mitteilung. <b>Was jemand besitzt, steht in der Spalte Aktien.</b> Instrumente sind
-        keine Aktien, sondern Rechte darauf (Optionen, Wertpapierleihe, Derivate): Hinter derselben Aktie stehen oft
-        mehrere Instrumente, etwa bei Käufer und Verkäufer einer Option. Die Spalten Instrumente und Zusammen
-        lassen sich deshalb nicht addieren und können über 100 % ergeben. Melden Mutter, Tochter oder Familienmitglieder
-        dieselben Aktien, steht das in einer Zeile.
-        <b>Ausgewertet sind Mitteilungen seit 2018 aus dem EQS-Archiv:</b> Wer seinen Anteil seitdem nicht verändert hat
-        (oft Gründerfamilien oder Mutterkonzerne), fehlt hier. Nach Umfirmierungen kann ein Halter doppelt erscheinen.
-        Einträge mit „geprüft“ haben wir von Hand mit veröffentlichten Angaben abgeglichen (Firma oder Wirtschaftspresse, Link zur Quelle).</p>
+      <h2>Aktionäre</h2>
+      <p class="erklaerung">Wem die Aktien gehören, soweit es öffentlich ist. Großaktionäre laut ihrer letzten
+        Stimmrechtsmitteilung (§§ 33 ff. WpHG, Meldepflicht ab 3 %, ausgewertet seit 2018 aus dem EQS-Archiv), dazu
+        eigene Aktien der Firma, der Norwegische Staatsfonds und US-Fonds (Pflichtmeldungen an die SEC). <b>Gezählt werden
+        nur Aktien.</b> Instrumente wie Optionen, Wertpapierleihe oder Derivate sind Rechte auf Aktien, keine Aktien;
+        sie stehen klein beim Halter und zählen nicht mit. Einträge mit „geprüft“ haben wir von Hand mit
+        veröffentlichten Angaben abgeglichen. Der Rest ist Streubesitz: Anleger unter der Meldeschwelle, deren Namen
+        nicht veröffentlicht werden.</p>
       {vorzug}{ga_html}
     </section>
 {rueck_abschnitt}
@@ -334,64 +325,95 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
 """
 
 
-def aktionaersring(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: dict | None = None,
-                   norwegen: dict | None = None, gattung: str | None = None) -> str:
-    """Ring über 100 % der Aktien. Blau: gemeldete Großaktionäre (nur Spalte Aktien, Instrumente sind keine Aktien;
-    unter 1 % zusammengefasst). Mittelgrau: eigene Aktien der Firma (ab 3 % gemeldet). Linkblau: Norwegischer
-    Staatsfonds (norwegen.csv). Dunkleres Blau: US-Fonds laut SEC (fonds_us.je_firma, ohne Konzerne, die schon als
-    Großaktionär gemeldet sind). Hellgrau: der Rest. gattung: None (eine Gattung), 'stamm' oder 'vorzug'."""
-    halter = aktionaere[aktionaere["aktien"] > 0].sort_values("aktien", ascending=False)
-    gross = [(r.halter, r.aktien) for r in halter.itertuples() if r.aktien >= 1][:7]
-    klein = halter["aktien"].sum() - sum(w for _, w in gross)
-    if klein > 0.05:
-        gross.append(("Weitere gemeldete Halter", klein))
-    segmente = [(n, w, f"color-mix(in srgb, var(--kauf) {max(100 - i * 11, 25)}%, var(--flaeche))", "")
-                for i, (n, w) in enumerate(gross)]
+def _prozent_text(x) -> str:
+    return f"{zahl(x, 2)} %" if x < 10 else f"{zahl(x, 1)} %"
+
+
+def aktionaersstruktur(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: dict | None = None,
+                       norwegen: dict | None = None, gattung: str | None = None,
+                       stamm_aktionaere: pd.DataFrame | None = None) -> str:
+    """Ring und eine Tabelle, die zugleich Legende ist: jede Zeile ein Ringsegment, gleiche Zahl, gleiche Farbe.
+    Gezählt wird nur der Aktienanteil; Instrumente stehen klein beim Halter. Reihenfolge und Farben (feste Palette,
+    --serie-1 … 8): bis zu 4 Großaktionäre ab 1 %, „weitere gemeldete Halter“, eigene Aktien, Norwegischer
+    Staatsfonds, US-Fonds (eine Zeile, Aufteilung klein), Rest grau. gattung 'vorzug': Ring über die Vorzugsaktien,
+    die Stimmrechte (stamm_aktionaere) stehen als Satz darunter. Nichts bekannt → leerer Text."""
+    halter = aktionaere.sort_values("aktien", ascending=False)
+    gross = halter[halter["aktien"] >= 1].head(4)
+    klein = halter.drop(gross.index)
+    segmente = []  # (Name-HTML, Anteil, Stand-HTML)
+
+    def instrumente(r) -> str:
+        return (f'<div class="klein">zusätzlich {_prozent_text(r.instrumente)} über Instrumente, zählen nicht mit</div>'
+                if r.instrumente and r.instrumente > 0.005 else "")
+
+    for r in gross.itertuples():
+        segmente.append((e(r.halter)
+                         + (f'<div class="klein">dieselben Aktien auch bei: {e(r.weitere)}</div>' if r.weitere else "")
+                         + instrumente(r), r.aktien,
+                         f'<a href="{e(r.url)}" rel="nofollow">{datum(r.schwellendatum)}</a>'
+                         + (f'<div class="klein">geprüft {datum(r.geprueft)}</div>' if not _leer(r.geprueft) else "")))
+    if not klein.empty:
+        liste = "; ".join(f'<a href="{e(r.url)}" rel="nofollow">{e(r.halter)}</a> {_prozent_text(r.aktien)}'
+                          + (f" (+ {_prozent_text(r.instrumente)} Instrumente)" if r.instrumente > 0.005 else "")
+                          for r in klein.itertuples())
+        segmente.append((f'Weitere gemeldete Halter<div class="klein">{liste}</div>', klein["aktien"].sum(), ""))
     if eigene:
-        segmente.append(("Eigene Aktien der Firma", eigene["anteil"], "var(--sonstiges)",
-                         (f'laut <a href="{e(eigene["url"])}" rel="nofollow">Mitteilung</a> vom {datum(eigene["schwellendatum"])}'
-                          if str(eigene["url"]).startswith("https://www.eqs-news.com") else
-                          f'laut <a href="{e(eigene["url"])}" rel="nofollow">Firmenangabe</a>, Stand {datum(eigene["schwellendatum"])}')))
+        quelle = ("Mitteilung" if str(eigene["url"]).startswith("https://www.eqs-news.com") else "Firmenangabe")
+        segmente.append(("Eigene Aktien der Firma", eigene["anteil"],
+                         f'<a href="{e(eigene["url"])}" rel="nofollow">{datum(eigene["schwellendatum"])}</a>'
+                         f'<div class="klein">{quelle}</div>'))
     if norwegen:
-        segmente.append(("Norwegischer Staatsfonds", norwegen["anteil"], "var(--link)",
-                         f"laut Norges Bank Investment Management, Stand {datum(norwegen['stichtag'])}"))
+        segmente.append(("Norwegischer Staatsfonds", norwegen["anteil"],
+                         f'<a href="https://www.nbim.no/en/investments/all-investments/" rel="nofollow">'
+                         f'{datum(norwegen["stichtag"])}</a>'))
     if fonds:
-        us = fonds["teile"][:4] + ([("Weitere US-Fonds", fonds["weitere"] + sum(w for _, w in fonds["teile"][4:]))]
-                                   if fonds["weitere"] > 0.05 or len(fonds["teile"]) > 4 else [])
-        for i, (n, w) in enumerate(us):
-            zusatz = (f"US-Fonds laut SEC (N-PORT), Stand {datum(fonds['stichtag'])}"
-                      + ("; ohne Konzerne, die oben schon gemeldet sind" if gross else "") if i == 0 else "")
-            segmente.append((n if n == "Weitere US-Fonds" else f"{n} (US-Fonds)", w,
-                             f"color-mix(in srgb, var(--kauf) {max(85 - i * 12, 30)}%, var(--text))", zusatz))
-    bekannt, stufen, legende, teile = 0.0, [], [], []
-    for name, wert, farbe, zusatz in segmente:
+        summe = sum(w for _, w in fonds["teile"]) + fonds["weitere"]
+        teile = ", ".join(f"{e(n)} {_prozent_text(w)}" for n, w in fonds["teile"][:4])
+        rest = summe - sum(w for _, w in fonds["teile"][:4])
+        segmente.append(("US-Fonds<div class=\"klein\">" + teile + (f", weitere {_prozent_text(rest)}" if rest > 0.05 else "")
+                         + ("; ohne Konzerne, die oben schon gemeldet sind" if len(gross) or len(klein) else "")
+                         + "</div>", summe,
+                         f'{datum(fonds["stichtag"])}<div class="klein">Meldungen an die SEC</div>'))
+    bekannt, gesehen = 0.0, []
+    for name, wert, stand in segmente:
         wert = min(wert, 100 - bekannt)  # Schutz, falls alles zusammen über 100 % ergibt
-        if wert <= 0.05:
-            continue
-        stufen.append(f"{farbe} {bekannt:.2f}% {bekannt + wert:.2f}%")
-        legende.append(f'<li><span class="ring-farbe" style="background:{farbe}"></span>{e(name)}'
-                       + (f'<div class="klein">{zusatz}</div>' if zusatz else "")
-                       + f'<span class="zahl">{zahl(wert, 1)} %</span></li>')
-        teile.append(f"{name} {zahl(wert, 1)} %")
-        bekannt += wert
-    if not teile:
-        return ""  # nichts bekannt: lieber kein Ring als 100 % „übrige Aktien“
+        if wert > 0.05:
+            gesehen.append((name, wert, stand))
+            bekannt += wert
+    if not gesehen:
+        return ""
     rest = 100 - bekannt
+    stufen, zeilen, start, luecke = [], [], 0.0, 0.4 if len(gesehen) > 1 or rest > 0.05 else 0
+    for i, (name, wert, stand) in enumerate(gesehen):
+        farbe = f"var(--serie-{i + 1})"
+        stufen.append(f"{farbe} {start:.2f}% {start + max(wert - luecke, 0.2):.2f}%, "
+                      f"var(--flaeche) {start + max(wert - luecke, 0.2):.2f}% {start + wert:.2f}%")
+        zeilen.append([(f'<span class="ring-farbe" style="background:{farbe}"></span><div>{name}</div>', "ring-name"),
+                       (_prozent_text(wert), "zahl"), (stand, "datum")])
+        start += wert
     if rest > 0.05:
-        stufen.append(f"var(--ring-rest) {bekannt:.2f}% 100%")
+        stufen.append(f"var(--ring-rest) {start:.2f}% 100%")
         erklaerung = ("Streubesitz und alle übrigen Anleger (für Vorzugsaktien gibt es keine Stimmrechtsmitteilungen)"
-                      if gattung == "vorzug" else "Streubesitz, Halter unter 3 % (nicht meldepflichtig)"
+                      if gattung == "vorzug" else "Streubesitz: Anleger unter 3 % (nicht meldepflichtig)"
                       + ("" if eigene else ", eigene Aktien unter 3 %") + (", Fonds außerhalb der USA" if fonds else ""))
-        legende.append('<li><span class="ring-farbe" style="background:var(--ring-rest)"></span>Übrige Aktien'
-                       f'<div class="klein">{erklaerung}</div><span class="zahl">{zahl(rest, 1)} %</span></li>')
-        teile.append(f"übrige Aktien {zahl(rest, 1)} %")
-    titel = {"stamm": "Der Ring zeigt die Stammaktien (mit Stimmrecht).",
-             "vorzug": "Der Ring zeigt die Vorzugsaktien (ohne Stimmrecht). Die Tabelle darunter betrifft die Stammaktien."}
-    return ((f'<p class="erklaerung">{titel[gattung]}</p>' if gattung else "")
-            + f'<div class="ring-block"><div class="ring" role="img" aria-label="Aktionärsstruktur: {e("; ".join(teile))}" '
+        zeilen.append([(f'<span class="ring-farbe" style="background:var(--ring-rest)"></span>'
+                        f'<div>Übrige Aktien<div class="klein">{erklaerung}</div></div>', "ring-name"),
+                       (_prozent_text(rest), "zahl"), ("", "datum")])
+    titel = {"stamm": "Stammaktien (mit Stimmrecht)", "vorzug": "Vorzugsaktien (ohne Stimmrecht)"}.get(gattung, "Aktien")
+    beschreibung = "; ".join(f"{re.sub('<[^>]+>', '', n.split('<div')[0])} {zahl(w, 1)} %" for n, w, _ in gesehen)
+    stimmrechte_satz = ""
+    if gattung == "vorzug" and stamm_aktionaere is not None and not stamm_aktionaere.empty:
+        stimmrechte_satz = ('<p class="erklaerung">Die Stimmrechte liegen bei den Stammaktien: '
+                            + ", ".join(f"{e(r.halter)} {_prozent_text(r.aktien)}"
+                                        for r in stamm_aktionaere.sort_values("aktien", ascending=False).head(4).itertuples())
+                            + ".</p>")
+    return (f'<div class="ring-block"><div class="ring" role="img" '
+            f'aria-label="{e(titel)}: {e(beschreibung)}; übrige {zahl(rest, 1)} %" '
             f'style="background:conic-gradient({", ".join(stufen)})"><div class="ring-mitte">'
             f'<b>{zahl(bekannt, 0)} %</b><span>mit Namen bekannt</span></div></div>'
-            f'<ul class="ring-legende">{"".join(legende)}</ul></div>')
+            f'<div class="ring-tabelle">'
+            + _tabelle([("Halter", ""), (f"Anteil an den {titel}" if gattung else "Anteil", "zahl"), ("Stand", "")], zeilen)
+            + f'</div></div>{stimmrechte_satz}')
 
 
 # --- Finanzkennzahlen (Planung #6, nur lokal: kennzahlen.csv liegt nicht im Repository) --------------
@@ -431,7 +453,7 @@ KATEGORIE_TEXT = {  # Einteilung nach Peter Lynch, Regeln in kennzahlen.kategori
     "Schnell wachsend": "Umsatz wächst seit 10 Jahren um mindestens 12 % pro Jahr (Lynch: Fast Grower).",
     "Solide wachsend": "Umsatz wächst um 5 bis 12 % pro Jahr (Lynch: Stalwart).",
     "Langsam wachsend": "Umsatz wächst um weniger als 5 % pro Jahr (Lynch: Slow Grower).",
-    "Zykliker": "Operatives Ergebnis ist in 10 Jahren mindestens zweimal um ein Viertel eingebrochen (Lynch: Cyclical).",
+    "Zykliker": "Operatives Ergebnis ist in 10 Jahren mindestens zweimal um mindestens 40 % eingebrochen (Lynch: Cyclical).",
     "Turnaround": "Verlust im letzten Geschäftsjahr oder in zwei der letzten drei (Lynch: Turnaround).",
     "Substanzwert": "Börsenwert unter 80 % des Buchwerts (Lynch: Asset Play).",
 }
