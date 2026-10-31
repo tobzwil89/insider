@@ -98,9 +98,37 @@ Ergebnis (2026q2, Stichtage meist 31.03.2026):
       Aktien), Allianz 8 → 18 %, Siemens 10 → 22 %, Hugo Boss 70 → 77 %, Brenntag 70 %. Bildschirmfoto hell/dunkel geprüft.
       Offen: Fresenius/Qiagen ohne Treffer (andere ISIN), Vorzugsaktien-Firmen ohne Fonds (bräuchten Gesamtzahl je
       Gattung), „Weitere US-Fonds“ oft 4–6 % (Zuordnungstabelle bei Bedarf erweitern).
-- [ ] 4. Optional: Norwegischer Staatsfonds (Norges Bank veröffentlicht alle Bestände, gratis; grob 1–2 % je Firma).
-- [ ] 5. Optional: Aufteilung des grauen Rests nach Anlegertyp aus Geschäftsbericht/IR (institutionell/privat), nur
-      von Hand und mit Quelle.
+- [x] 4. **Norwegischer Staatsfonds (31.10.2026, nicht gepusht).** `pipeline/norwegen.py`: NBIM-JSON-Schnittstelle der Seite
+      nbim.no/en/investments/all-investments/ (`/api/investments/v2/init.json` → neueste Datei, z. B. `2026-06-30.json`;
+      Felder n = Name, cc = Land, at = 0 Aktien, o = Eigentumsanteil %). Halbjährlich, lädt nur bei neuem Stand →
+      `daten/norwegen.csv` (firma, name_nbim, anteil, stichtag). Zuordnung über bereinigten Namen + `NAMEN` (9 Abweichungen,
+      z. B. DHL = „Deutsche Post AG“). 88 von 90 Firmen; Airbus fehlt bei NBIM absichtlich (ethischer Ausschluss), Deutz
+      nicht gehalten. Segment „Norwegischer Staatsfonds“ in `--link`; entfällt, wenn Norwegen schon Großaktionär ist
+      (Vonovia: Ministry of Finance 10,1 %) und bei Firmen mit zwei Gattungen (NBIM nennt nur einen Anteil je Firma).
+      Workflow „Stimmrechte laden“: Schritt „Norwegischen Staatsfonds laden“ nachts, committet `daten/norwegen.csv`.
+- [x] 5. **Vorzugsaktien und Firmen ohne EQS-Stimmrechte (31.10.2026, nicht gepusht).** `daten/aktiengattungen.csv`
+      (firma, isin, gattung stamm/vorzug/einzig, stueck, eigene, stand, quelle; alle Zahlen mit Quelle, Fuchs nach HV 05/2026
+      65,5 Mio. je Gattung). `export.ring_daten` (Hilfsfunktion in `exportiere`): Stammseite = Großaktionäre + US-Fonds der
+      Stamm-ISIN / Stammaktien; Vorzugsseite = nur US-Fonds der Vorzugs-ISIN / Vorzugsaktien (+ eigene Aktien), Satz über dem
+      Ring „Der Ring zeigt die Vorzugsaktien …“; `einzig` = eine Gattung, Gesamtzahl aus der Tabelle (Wacker, DWS haben keine
+      EQS-Stimmrechte). Fresenius/TUI (alte + neue ISIN) zählen jetzt alle ISINs der Firma. Kein Ring, wenn nichts bekannt ist.
+      `firmenseite(ring=…)` statt einzelner Argumente. **Geprüfte Großaktionäre ergänzt** (`grossaktionaere_geprueft.csv`):
+      VW (Porsche SE 53,3, Niedersachsen 20,0, Katar 17,0; VW-Seite Aktionärsstruktur 31.12.2025), Sartorius (Testaments-
+      vollstrecker 50,3, Bio-Rad 34,8, eigene Aktien 8,6 % der Stämme; H1-Factsheet, auf ausgegebene Aktien umgerechnet),
+      Wacker (Familie 66,9 = 100 − Streubesitz 33,09 laut IR), DWS (Deutsche Bank 79,5), Airbus (SOGEPA 10,83, GZBV 10,82,
+      SEPI 4,08; Zweitquelle uamr.de, Stand 31.12.2025), RTL (Bertelsmann 75,1; Quelle Wikipedia, Angaben schwanken 75,1–76,3).
+      **Namen bereinigt:** `stimmrechte.anzeigename` kürzt „Name, Ort, Land“ nur, wenn der letzte Teil ein Land ist
+      (Salzgitter-Fall); 11 Kandidaten geprüft, „Günter, Prof. Dr. Zimmer“ und „ACS, ACTIVIDADES …“ bleiben ganz.
+      **Ergebnis:** 94 Seiten mit Ring, Median „mit Namen bekannt“ ohne Vorzugsseiten **50,5 %** (Start: 36 %); VW-Stämme 91 %,
+      Sartorius 94 %, DWS 81 %, RTL 76 %, Wacker 73 %, Airbus 26 %. Vorzugsseiten 2–9 % (dort gibt es keine Meldepflicht).
+      Bildschirmfotos hell/dunkel geprüft.
+- **Offen / Pflege (Thema sonst abgeschlossen):**
+      - BMW: aktuelle Zahl der Stamm-/Vorzugsaktien fehlt (letzte Stimmrechtsmitteilung 2020) → US-Fonds bei BMW aus.
+      - Qiagen, RTL, Airbus: keine Gesamtzahl der Aktien → keine US-Fonds. Qiagen meldet Stimmrechte über **pressetext**
+        statt EQS (auch für andere Auslandsfirmen prüfen: zweite Quelle für Stimmrechtsmitteilungen).
+      - Bio-Rad hält ~28 % der Sartorius-Vorzüge (Factsheet), Vorzugsseiten kennen bisher keine Großaktionäre.
+      - Jährlich prüfen: `aktiengattungen.csv` (Kapitalmaßnahmen, Einziehungen) und neue Einträge in `grossaktionaere_geprueft.csv`.
+      - Airbus und RTL mit besseren Primärquellen belegen (Airbus-IR-Seite gab 404, RTL-Seite nicht abrufbar).
 - USA-Aktien später: 13F + 13D/13G + Form 4 decken dort meist 70–90 % mit Namen ab.
 
 ## Laufendes Vorhaben: Firmenlogos, Stand 31.10.2026
@@ -744,7 +772,7 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **31.10.2026 (Logo 2):** Tobias verwirft die Tech-Entwürfe: Logo soll elitär, „old money“, seriös wirken, Schriftzug in Serifenschrift. Name jetzt Rhodus. Drei neue Konzepte in `logo/` (Übersicht `logo/rhodus-konzepte-v3.png`): A Inschrift (Cinzel), B Privatbank (Bodoni Moda, Empfehlung), C Münze (Rose von Rhodos, Ring, Cormorant Garamond). Schriften frei lizenziert (OFL, Google Fonts) in `logo/schriften/`, Umwandlung in Pfade mit `logo/bauen.py`. Wartet auf Tobias' Wahl.
 - **31.10.2026 (Logo 3):** Tobias wählt A „Inschrift“. Logo-Paket fertig in `logo/kit/` (Richtlinien `logo/kit/RICHTLINIEN.md`): Schriftzug, Monogramm + kräftige Kleinversion, Farben Rhodus-Grün #1E3B2F / Creme #F3EEE2, Favicon-Satz auf grüner Kachel (dunkle Tabs), Profilbild, Newsletter-Kopf 1200×300, Präsentationstafeln. Neu bauen mit `python3 logo/paket.py` (im Ordner `logo/`). Noch nicht auf Website/Newsletter eingesetzt.
 - **31.10.2026 (Logo 4):** Aufgeräumt: alle verworfenen Entwürfe, Konzeptübersichten, Testbilder, `bauen.py` und die Schriften Bodoni Moda/Cormorant gelöscht. In `logo/` bleiben nur `kit/`, `paket.py`, `text2path.py`, `praesentation.json` und `schriften/Cinzel.ttf` + `OFL.txt`. Rechtscheck: Schrift (OFL) erlaubt Logo-Nutzung; Urheberrecht am R gibt es nicht (keine Schöpfungshöhe), Schutz nur über eine Marke (Empfehlung: zuerst Wortmarke RHODUS beim DPMA, 290 € für Klassen 36, 41, 42; Bildzeichen vorher in TMview als Bildmarke suchen).
-- **31.10.2026 (Aktionärsring):** Bachelorarbeits-Bezug aus Notiz und Gedächtnis entfernt (Tobias: längst durch, Startup). Ring für die Aktionärsstruktur beschlossen; N-PORT-Test: US-Fonds bringen netto Median +8,7 Pp. mit Namen (36 → 48 %). Plan unter „Geplantes Vorhaben: Aktionärsring“, Planungs-App #65. Danach Schritt 1 gebaut: Ring auf den Firmenseiten (lokal geprüft, nicht gepusht). Schritt 2: eigene Aktien aus § 40-Mitteilungen als Segment (11 Firmen ≥ 3 %). Schritt 3: US-Fonds (N-PORT) als Segmente, nächtlich automatisch; Median mit Namen 36 → 49 %.
+- **31.10.2026 (Aktionärsring):** Bachelorarbeits-Bezug aus Notiz und Gedächtnis entfernt (Tobias: längst durch, Startup). Ring für die Aktionärsstruktur beschlossen; N-PORT-Test: US-Fonds bringen netto Median +8,7 Pp. mit Namen (36 → 48 %). Plan unter „Geplantes Vorhaben: Aktionärsring“, Planungs-App #65. Danach Schritt 1 gebaut: Ring auf den Firmenseiten (lokal geprüft, nicht gepusht). Schritt 2: eigene Aktien aus § 40-Mitteilungen als Segment (11 Firmen ≥ 3 %). Schritt 3: US-Fonds (N-PORT) als Segmente, nächtlich automatisch; Median mit Namen 36 → 49 %. Danach Namen bereinigt, Norwegischer Staatsfonds, Vorzugsaktien und Firmen ohne EQS-Stimmrechte (VW, Sartorius, Wacker, DWS, Airbus, RTL); Median 50,5 %, Thema bis auf Pflegepunkte abgeschlossen.
 - **31.10.2026 (Logos):** `logos_laden.py` gebaut: Firmenlogos von Wikidata/Commons nach `docs/logos/`, 97 von 97 (Hochtief von hochtief.com), Übersicht `logos_uebersicht.html`. Wartet auf Durchsicht durch Tobias, noch nicht auf der Website.
 - **31.10.2026 abends:** Action #65 brach ab (`ImportError: DECKEL`): `seiten.py` war committet, das dazugehörige
   `kennzahlen.py` nur lokal. `kennzahlen.py` nachcommittet (4d86a3e), Lauf danach grün. Lehre: vor dem Push

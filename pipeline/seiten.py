@@ -349,7 +349,9 @@ def aktionaersring(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: 
                 for i, (n, w) in enumerate(gross)]
     if eigene:
         segmente.append(("Eigene Aktien der Firma", eigene["anteil"], "var(--sonstiges)",
-                         f'laut <a href="{e(eigene["url"])}" rel="nofollow">Mitteilung</a> vom {datum(eigene["schwellendatum"])}'))
+                         (f'laut <a href="{e(eigene["url"])}" rel="nofollow">Mitteilung</a> vom {datum(eigene["schwellendatum"])}'
+                          if str(eigene["url"]).startswith("https://www.eqs-news.com") else
+                          f'laut <a href="{e(eigene["url"])}" rel="nofollow">Firmenangabe</a>, Stand {datum(eigene["schwellendatum"])}')))
     if norwegen:
         segmente.append(("Norwegischer Staatsfonds", norwegen["anteil"], "var(--link)",
                          f"laut Norges Bank Investment Management, Stand {datum(norwegen['stichtag'])}"))
@@ -357,8 +359,8 @@ def aktionaersring(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: 
         us = fonds["teile"][:4] + ([("Weitere US-Fonds", fonds["weitere"] + sum(w for _, w in fonds["teile"][4:]))]
                                    if fonds["weitere"] > 0.05 or len(fonds["teile"]) > 4 else [])
         for i, (n, w) in enumerate(us):
-            zusatz = (f"US-Fonds laut SEC (N-PORT), Stand {datum(fonds['stichtag'])}; ohne Konzerne, die oben schon "
-                      "gemeldet sind" if i == 0 else "")
+            zusatz = (f"US-Fonds laut SEC (N-PORT), Stand {datum(fonds['stichtag'])}"
+                      + ("; ohne Konzerne, die oben schon gemeldet sind" if gross else "") if i == 0 else "")
             segmente.append((n if n == "Weitere US-Fonds" else f"{n} (US-Fonds)", w,
                              f"color-mix(in srgb, var(--kauf) {max(85 - i * 12, 30)}%, var(--text))", zusatz))
     bekannt, stufen, legende, teile = 0.0, [], [], []
@@ -372,6 +374,8 @@ def aktionaersring(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: 
                        + f'<span class="zahl">{zahl(wert, 1)} %</span></li>')
         teile.append(f"{name} {zahl(wert, 1)} %")
         bekannt += wert
+    if not teile:
+        return ""  # nichts bekannt: lieber kein Ring als 100 % „übrige Aktien“
     rest = 100 - bekannt
     if rest > 0.05:
         stufen.append(f"var(--ring-rest) {bekannt:.2f}% 100%")

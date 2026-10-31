@@ -130,18 +130,21 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
         ga = aktionaere[aktionaere["firma"] == name]
         halter = list(ga["halter"]) + list(ga["weitere"].dropna())
         g = gattungen.get(isin)
-        if g is None:  # eine Gattung (Fresenius/TUI haben zusätzlich eine alte ISIN)
+        if g is None or g["gattung"] == "einzig":  # eine Gattung (Fresenius/TUI haben zusätzlich eine alte ISIN)
             nb = norwegen.get(name)
             if nb and any(re.search(r"norw|norges", h, re.I) for h in halter):
                 nb = None  # schon als Großaktionär gemeldet
+            anzahl = g["stueck"] if g is not None else gesamt.get(name)
             return {"aktionaere": ga, "eigene": eigene_aktien.get(name), "norwegen": nb, "gattung": None,
-                    "fonds": fonds_us.je_firma(fonds[fonds["isin"].isin(isins_je_firma[name])], halter, gesamt.get(name))}
+                    "fonds": fonds_us.je_firma(fonds[fonds["isin"].isin(isins_je_firma[name])], halter, anzahl)}
         anzahl = g["stueck"] if pd.notna(g["stueck"]) else None
+        eigene = ({"anteil": 100 * g["eigene"] / anzahl, "schwellendatum": g["stand"], "url": g["quelle"]}
+                  if anzahl and pd.notna(g.get("eigene")) else None)
         f_gattung = fonds[fonds["isin"] == isin]
         if g["gattung"] == "vorzug":
-            return {"aktionaere": ga.iloc[0:0], "eigene": None, "norwegen": None, "gattung": "vorzug",
+            return {"aktionaere": ga.iloc[0:0], "eigene": eigene, "norwegen": None, "gattung": "vorzug",
                     "fonds": fonds_us.je_firma(f_gattung, [], anzahl)}
-        return {"aktionaere": ga, "eigene": eigene_aktien.get(name), "norwegen": None, "gattung": "stamm",
+        return {"aktionaere": ga, "eigene": eigene or eigene_aktien.get(name), "norwegen": None, "gattung": "stamm",
                 "fonds": fonds_us.je_firma(f_gattung, halter, anzahl)}
     # Rückkäufe nur für Firmen, deren Historie fertig geladen ist (sonst hieße „keine“ nur „noch nicht geladen“)
     rk_datei, rk_fertig = DATEN / "rueckkaeufe.csv", DATEN / "rueckkaeufe_fortschritt.csv"
