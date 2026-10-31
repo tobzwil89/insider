@@ -2,7 +2,8 @@
 # Speichert nach jeder Firma; ein erneuter Start macht dort weiter, wo der letzte aufgehört hat.
 # Abbrechen ist jederzeit möglich ("Cancel workflow"): Das bis dahin Geladene wird trotzdem gespeichert.
 # Täglich nachts: nur neue Mitteilungen der letzten 14 Tage (dauert ~15 Minuten, deshalb nicht in "Daten aktualisieren").
-# Dazu nachts: US-Fondsbestände (SEC N-PORT), lädt nur, wenn die SEC ein neues Quartal veröffentlicht hat (~2 Min.).
+# Dazu nachts: US-Fondsbestände (SEC N-PORT), lädt nur, wenn die SEC ein neues Quartal veröffentlicht hat (~2 Min.),
+# und Bestände des Norwegischen Staatsfonds (halbjährlich, nur bei neuem Stand).
 name: Stimmrechte laden
 
 on:
@@ -52,6 +53,11 @@ jobs:
         continue-on-error: true
         run: python -m pipeline.fonds_us
 
+      - name: Norwegischen Staatsfonds laden (nur bei neuem Stand)
+        if: github.event_name == 'schedule'
+        continue-on-error: true
+        run: python -m pipeline.norwegen
+
       # Auch nach Fehler oder Abbruch speichern, was bis dahin geladen wurde
       - name: Ergebnis speichern
         if: always()
@@ -60,6 +66,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add daten/stimmrechte*.csv 2>/dev/null || true
           git add daten/fonds_us.csv 2>/dev/null || true
+          git add daten/norwegen.csv 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "Nichts Neues"
           else

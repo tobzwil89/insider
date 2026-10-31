@@ -130,6 +130,24 @@ def _schluessel(name: str) -> str:
     return re.sub(r"[^a-z0-9]", "", re.sub(r"\bthe\b", "", ",".join(behalten).lower()))
 
 
+LAND = re.compile(r"deutschland|germany|vereinigte staaten|united states|u\.?s\.?a\.?|amerika|finnland|finland|norwegen|"
+                  r"norway|schweiz|switzerland|großbritannien|united kingdom|vereinigtes königreich|frankreich|france|"
+                  r"luxemburg|luxembourg|niederlande|netherlands|kanada|canada|japan|irland|ireland|spanien|spain|italien|"
+                  r"italy|österreich|austria|schweden|sweden|dänemark|denmark|belgien|belgium|singapur|singapore|"
+                  r"hongkong|hong kong|australien|australia|china|katar|qatar|kuwait|saudi", re.I)
+
+
+def anzeigename(name: str) -> str:
+    """'Salzgitter Aktiengesellschaft, Salzgitter,, Deutschland' → 'Salzgitter Aktiengesellschaft'.
+    Gekürzt wird nur, wenn der Name auf ein Land endet (Ort und Land angehängt); sonst bleibt er unverändert,
+    damit 'Günter, Prof. Dr. Zimmer' oder 'ACS, ACTIVIDADES DE CONSTRUCCIÓN Y SERVICIOS, S.A.' ganz bleiben."""
+    teile = [t.strip() for t in name.split(",")]
+    if len(teile) < 3 or not LAND.search(teile[-1]):
+        return name
+    behalten = [teile[0]] + [t for t in teile[1:2] if RECHTSFORM.match(t)]
+    return ", ".join(behalten)
+
+
 def grossaktionaere(df: pd.DataFrame, geprueft: pd.DataFrame | None = None) -> pd.DataFrame:
     """Letzter Stand je Firma und Halter.
     Nur wer mindestens 3 % in Aktien oder 5 % insgesamt hält: Das sind die niedrigsten Schwellen (Aktien 3 %,
@@ -147,7 +165,7 @@ def grossaktionaere(df: pd.DataFrame, geprueft: pd.DataFrame | None = None) -> p
     # Anzeigename: kürzeste Schreibweise des Halters (meist die ohne Ort und Land)
     namen = df.assign(laenge=df["meldepflichtiger"].str.len()).sort_values("laenge") \
         .groupby("schluessel")["meldepflichtiger"].first()
-    letzte["halter"] = letzte["schluessel"].map(namen)
+    letzte["halter"] = letzte["schluessel"].map(namen).map(anzeigename)
     # Konzernkette: Wer je am selben Tag denselben Bestand gemeldet hat wie ein anderer (Mutter, Tochter,
     # Familie), gehört zur selben Kette. Je Kette zählt der neueste Stand; ältere Meldungen mit anderem Wert sind
     # überholt (vor dem Schwellenfilter: Parsifal 3,05 % ist überholt, weil David Zorub für dieselbe Kette 2,92 %

@@ -1,0 +1,15 @@
+firma,isin,gattung,stueck,eigene,stand,quelle
+Volkswagen AG,DE0007664005,stamm,295089818.0,,2025-12-31,https://www.volkswagen-group.com/de/basisdaten-16024
+Volkswagen AG,DE0007664039,vorzug,206205445.0,,2025-12-31,https://www.volkswagen-group.com/de/basisdaten-16024
+Henkel (Unternehmen),DE0006048408,stamm,259795875.0,,2026-04-27,https://www.henkel.de/resource/blob/2172472/0d50c12a46206c87c2a068be375c4b01/data/2026-04-27-satzung-henkel-de.pdf
+Henkel (Unternehmen),DE0006048432,vorzug,178162875.0,,2026-04-27,https://www.henkel.de/resource/blob/2172472/0d50c12a46206c87c2a068be375c4b01/data/2026-04-27-satzung-henkel-de.pdf
+Sartorius AG,DE0007165607,stamm,37440000.0,3201331,2026-06-30,https://www.sartorius.com/en/company-de/sartorius-ag-investor-relations-de/shares-de
+Sartorius AG,DE0007165631,vorzug,37440000.0,2626379,2026-06-30,https://www.sartorius.com/en/company-de/sartorius-ag-investor-relations-de/shares-de
+Fuchs Petrolub SE,DE000A3E5D56,stamm,65500000.0,,2026-05-06,https://www.fuchs.com/group/investor-relations/service-contact/frequently-asked-questions/
+Fuchs Petrolub SE,DE000A3E5D64,vorzug,65500000.0,,2026-05-06,https://www.fuchs.com/group/investor-relations/service-contact/frequently-asked-questions/
+BMW,DE0005190003,stamm,,,,offen: aktuelle Zahl fehlt (letzte Stimmrechtsmitteilung 2020)
+BMW,DE0005190037,vorzug,,,,offen
+Porsche Automobil Holding SE,DE000PAH0038,vorzug,153125000.0,,2025-04-07,https://www.porsche-se.com/fileadmin/user_upload/Satzung_PSE.pdf
+Porsche,DE000PAG9113,vorzug,455500000.0,,2025-04-04,https://investorrelations.porsche.com/~/media/Files/P/porsche-ir/corporate-governance/agm/2025-germany/gemeinsamer-bericht-100-uber-den-beherrschungsvertrag.pdf
+Wacker Chemie AG,DE000WCH8881,einzig,52152600.0,,2026-10-31,https://www.wacker.com/cms/en-de/investor-relations/share/detail.html
+DWS Group,DE000DWS1007,einzig,200000000.0,,2026-10-31,"abgeleitet: Deutsche Bank 158.980.000 Aktien = 79,49 % (simplywall.st)"
