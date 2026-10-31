@@ -8,6 +8,7 @@
 Läuft als GitHub Action „Stimmrechte laden“ (kann jederzeit abgebrochen werden). Ergebnis:
 daten/stimmrechte.csv (eine Zeile je Mitteilung) und daten/stimmrechte_fortschritt.csv (welche
 Firmen fertig sind). Beides wird nach jeder Firma gespeichert, ein Abbruch kostet höchstens eine Firma.
+Am Ende jedes Aufrufs: Mitteilungen über eigene Aktien (ab 2018) nach daten/stimmrechte_eigene_aktien.csv (nur fehlende).
 """
 
 import argparse
@@ -22,6 +23,7 @@ ERGEBNIS = DATEN / "stimmrechte.csv"
 FORTSCHRITT = DATEN / "stimmrechte_fortschritt.csv"
 FORTSCHRITT_ALT = DATEN / "stimmrechte_alt_fortschritt.csv"
 TEXTE = DATEN / "stimmrechte_texte.csv"
+EIGENE = DATEN / "stimmrechte_eigene_aktien.csv"
 SPALTEN = ["firma", "isin", "veroeffentlicht", "schwellendatum", "meldepflichtiger", "sitz",
            "aktien", "instrumente", "summe", "aktien_vorher", "instrumente_vorher", "summe_vorher",
            "gesamtstimmrechte", "korrektur", "formular", "url"]
@@ -105,5 +107,25 @@ def main() -> int:
     return 0
 
 
+def eigene_aktien_nachladen() -> None:
+    """Mitteilungen über eigene Aktien (ab 2018) aus stimmrechte.csv lesen, die noch nicht in EIGENE stehen."""
+    st = pd.read_csv(ERGEBNIS, usecols=["firma", "veroeffentlicht", "formular", "url"])
+    kandidaten = st[st["formular"].eq("anderes") & st["veroeffentlicht"].ge("2018")
+                    & st["url"].str.contains(stimmrechte.EIGENE_URL, case=False, na=False)]
+    gelesen = set(pd.read_csv(EIGENE, usecols=["url"])["url"]) if EIGENE.exists() else set()
+    zeilen = []
+    for r in kandidaten[~kandidaten["url"].isin(gelesen)].itertuples():
+        try:
+            zeilen.append(dict(stimmrechte.eigene_aktien_lesen(r.url), firma=r.firma, veroeffentlicht=r.veroeffentlicht))
+        except Exception as fehler:  # beim nächsten Lauf erneut
+            print(f"  eigene Aktien fehlgeschlagen: {r.url} ({fehler})")
+    if zeilen:
+        pd.DataFrame(zeilen)[["firma", "veroeffentlicht", "schwellendatum", "anteil", "anteil_vorher", "gesamt", "url"]] \
+            .to_csv(EIGENE, mode="a", header=not EIGENE.exists(), index=False)
+    print(f"Eigene Aktien: {len(zeilen)} Mitteilungen neu gelesen")
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    ergebnis = main()
+    eigene_aktien_nachladen()
+    sys.exit(ergebnis)

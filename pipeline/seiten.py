@@ -106,9 +106,12 @@ def versionen_eintragen(v: dict) -> None:
 
 def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, ranking: pd.DataFrame,
                 letzter_kurs: tuple, v: dict, aktionaere: pd.DataFrame, rueckkaeufe: pd.DataFrame | None = None,
-                kennzahlen: dict | None = None, rueck_ohne_meldungen: bool = False) -> str:
+                kennzahlen: dict | None = None, rueck_ohne_meldungen: bool = False, eigene: dict | None = None,
+                fonds: dict | None = None) -> str:
     """f: ticker, name, index, benchmark, isins. ranking: Zeilen dieser Firma mit Spalte 'rang'.
     aktionaere: Zeilen dieser Firma aus stimmrechte.grossaktionaere.
+    eigene: eigene Aktien der Firma (anteil, schwellendatum, url) aus stimmrechte.eigene_aktien; None = unter 3 % oder unbekannt.
+    fonds: US-Fondsbestände aus fonds_us.je_firma; None = keine Daten oder Firma mit mehreren Gattungen.
     rueckkaeufe: Zeilen dieser Firma aus rueckkaeufe.jahre; None = Historie noch nicht geladen, Abschnitt fehlt.
     kennzahlen: Zeile aus kennzahlen.csv; None = Abschnitt fehlt.
     rueck_ohne_meldungen: EQS führt für die Firma keine Rückkaufmeldungen → „keine Daten“ statt „keine Rückkäufe“."""
@@ -161,7 +164,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
         ga_html = ('<p class="leer">Keine Halter über den Meldeschwellen laut den Stimmrechtsmitteilungen '
                    'im EQS-Archiv seit 2018. Das heißt nicht, dass es keine Großaktionäre gibt.</p>')
     else:
-        ga_html = aktionaersring(aktionaere) + _tabelle(
+        ga_html = aktionaersring(aktionaere, eigene, fonds) + _tabelle(
             [("Halter", ""), ("Aktien", "zahl"), ("Instrumente", "zahl"), ("Zusammen", "zahl"), ("Stand", "")],
             [[(e(r.halter) + (f'<div class="klein">dieselben Aktien auch bei: {e(r.weitere)}</div>' if r.weitere else ""), ""),
               (f"{zahl(r.aktien, 2)} %", "zahl"), (f"{zahl(r.instrumente, 2)} %", "zahl"),
@@ -315,39 +318,55 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
 """
 
 
-# --- Finanzkennzahlen (Planung #6, nur lokal: kennzahlen.csv liegt nicht im Repository) --------------
-
-def aktionaersring(aktionaere: pd.DataFrame) -> str:
-    """Ring über 100 % der Aktien: gemeldete Halter (nur Spalte Aktien, Instrumente sind keine Aktien) in Blau,
-    der Rest in Grau. Halter unter 1 % werden zu „weitere gemeldete Halter“ zusammengefasst."""
+def aktionaersring(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: dict | None = None) -> str:
+    """Ring über 100 % der Aktien. Blau: gemeldete Großaktionäre (nur Spalte Aktien, Instrumente sind keine Aktien;
+    unter 1 % zusammengefasst). Mittelgrau: eigene Aktien der Firma (ab 3 % gemeldet). Dunkleres Blau: US-Fonds laut
+    SEC (fonds_us.je_firma, ohne Konzerne, die schon als Großaktionär gemeldet sind). Hellgrau: der Rest."""
     halter = aktionaere[aktionaere["aktien"] > 0].sort_values("aktien", ascending=False)
-    teile = [(r.halter, r.aktien) for r in halter.itertuples() if r.aktien >= 1][:7]
-    klein = halter["aktien"].sum() - sum(w for _, w in teile)
+    gross = [(r.halter, r.aktien) for r in halter.itertuples() if r.aktien >= 1][:7]
+    klein = halter["aktien"].sum() - sum(w for _, w in gross)
     if klein > 0.05:
-        teile.append(("Weitere gemeldete Halter", klein))
-    bekannt, start, stufen, legende = 0.0, 0.0, [], []
-    for i, (name, wert) in enumerate(teile):
-        wert = min(wert, 100 - bekannt)  # Schutz, falls Meldungen zusammen über 100 % ergeben
-        if wert <= 0:
-            break
-        farbe = f"color-mix(in srgb, var(--kauf) {max(100 - i * 11, 25)}%, var(--flaeche))"
-        stufen.append(f"{farbe} {start:.2f}% {start + wert:.2f}%")
+        gross.append(("Weitere gemeldete Halter", klein))
+    segmente = [(n, w, f"color-mix(in srgb, var(--kauf) {max(100 - i * 11, 25)}%, var(--flaeche))", "")
+                for i, (n, w) in enumerate(gross)]
+    if eigene:
+        segmente.append(("Eigene Aktien der Firma", eigene["anteil"], "var(--sonstiges)",
+                         f'laut <a href="{e(eigene["url"])}" rel="nofollow">Mitteilung</a> vom {datum(eigene["schwellendatum"])}'))
+    if fonds:
+        us = fonds["teile"][:4] + ([("Weitere US-Fonds", fonds["weitere"] + sum(w for _, w in fonds["teile"][4:]))]
+                                   if fonds["weitere"] > 0.05 or len(fonds["teile"]) > 4 else [])
+        for i, (n, w) in enumerate(us):
+            zusatz = (f"US-Fonds laut SEC (N-PORT), Stand {datum(fonds['stichtag'])}; ohne Konzerne, die oben schon "
+                      "gemeldet sind" if i == 0 else "")
+            segmente.append((n if n == "Weitere US-Fonds" else f"{n} (US-Fonds)", w,
+                             f"color-mix(in srgb, var(--kauf) {max(85 - i * 12, 30)}%, var(--text))", zusatz))
+    bekannt, stufen, legende, teile = 0.0, [], [], []
+    for name, wert, farbe, zusatz in segmente:
+        wert = min(wert, 100 - bekannt)  # Schutz, falls alles zusammen über 100 % ergibt
+        if wert <= 0.05:
+            continue
+        stufen.append(f"{farbe} {bekannt:.2f}% {bekannt + wert:.2f}%")
         legende.append(f'<li><span class="ring-farbe" style="background:{farbe}"></span>{e(name)}'
-                       f'<span class="zahl">{zahl(wert, 1)} %</span></li>')
+                       + (f'<div class="klein">{zusatz}</div>' if zusatz else "")
+                       + f'<span class="zahl">{zahl(wert, 1)} %</span></li>')
+        teile.append(f"{name} {zahl(wert, 1)} %")
         bekannt += wert
-        start += wert
     rest = 100 - bekannt
     if rest > 0.05:
-        stufen.append(f"var(--ring-rest) {start:.2f}% 100%")
+        stufen.append(f"var(--ring-rest) {bekannt:.2f}% 100%")
         legende.append('<li><span class="ring-farbe" style="background:var(--ring-rest)"></span>Übrige Aktien'
-                       '<div class="klein">Streubesitz, Halter unter 3 % (nicht meldepflichtig), eigene Aktien</div>'
+                       '<div class="klein">Streubesitz, Halter unter 3 % (nicht meldepflichtig)'
+                       + ("" if eigene else ", eigene Aktien unter 3 %")
+                       + (", Fonds außerhalb der USA" if fonds else "") + '</div>'
                        f'<span class="zahl">{zahl(rest, 1)} %</span></li>')
-    beschreibung = "; ".join(f"{n} {zahl(w, 1)} %" for n, w in teile) + f"; übrige Aktien {zahl(rest, 1)} %"
-    return (f'<div class="ring-block"><div class="ring" role="img" aria-label="Aktionärsstruktur: {e(beschreibung)}" '
+        teile.append(f"übrige Aktien {zahl(rest, 1)} %")
+    return (f'<div class="ring-block"><div class="ring" role="img" aria-label="Aktionärsstruktur: {e("; ".join(teile))}" '
             f'style="background:conic-gradient({", ".join(stufen)})"><div class="ring-mitte">'
             f'<b>{zahl(bekannt, 0)} %</b><span>mit Namen bekannt</span></div></div>'
             f'<ul class="ring-legende">{"".join(legende)}</ul></div>')
 
+
+# --- Finanzkennzahlen (Planung #6, nur lokal: kennzahlen.csv liegt nicht im Repository) --------------
 
 def _betrag(x, waehrung) -> str:
     if _leer(x):

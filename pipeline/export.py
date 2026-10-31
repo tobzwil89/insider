@@ -21,7 +21,7 @@ import shutil
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, gurus, ranking as rk, rueckkaeufe, seiten, stimmrechte
+from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, ranking as rk, rueckkaeufe, seiten, stimmrechte
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
 KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
@@ -110,6 +110,14 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     kurs_start = kurse.index.max() - pd.DateOffset(years=KURS_JAHRE)
     aktionaere = stimmrechte.grossaktionaere(pd.read_csv(DATEN / "stimmrechte.csv"),
                                              pd.read_csv(DATEN / "grossaktionaere_geprueft.csv"))
+    ea_datei = DATEN / "stimmrechte_eigene_aktien.csv"
+    eigene_aktien = stimmrechte.eigene_aktien(pd.read_csv(ea_datei)).set_index("firma").to_dict("index") if ea_datei.exists() else {}
+    # US-Fonds (SEC N-PORT) in Prozent der Gesamtstimmrechte laut letzter Stimmrechtsmitteilung. Nur bei Firmen mit
+    # einer Gattung: Bei Stamm- und Vorzugsaktien zählen die Stimmrechte nur die Stammaktien, der Anteil wäre falsch.
+    fu_datei = DATEN / "fonds_us.csv"
+    fonds = pd.read_csv(fu_datei) if fu_datei.exists() else pd.DataFrame(columns=["isin"])
+    st_roh = pd.read_csv(DATEN / "stimmrechte.csv", usecols=["firma", "veroeffentlicht", "gesamtstimmrechte"])
+    gesamt = st_roh.dropna(subset=["gesamtstimmrechte"]).sort_values("veroeffentlicht").groupby("firma")["gesamtstimmrechte"].last()
     # Rückkäufe nur für Firmen, deren Historie fertig geladen ist (sonst hieße „keine“ nur „noch nicht geladen“)
     rk_datei, rk_fertig = DATEN / "rueckkaeufe.csv", DATEN / "rueckkaeufe_fortschritt.csv"
     rueck = rueckkaeufe.jahre(pd.read_csv(rk_datei)) if rk_datei.exists() else pd.DataFrame(columns=["firma"])
@@ -134,7 +142,13 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
             stamm, eigene, ausgewertet[ausgewertet["ticker"] == ticker], rang[rang["ticker"] == ticker], letzter, v,
             aktionaere[aktionaere["firma"] == stamm["name"]],
             rueck[rueck["firma"] == stamm["name"]] if stamm["name"] in rk_geladen else None,
-            next((kz[i] for i in stamm["isins"] if i in kz), None), stamm["name"] in rk_ohne))
+            next((kz[i] for i in stamm["isins"] if i in kz), None), stamm["name"] in rk_ohne,
+            eigene_aktien.get(stamm["name"]),
+            fonds_us.je_firma(fonds[fonds["isin"] == stamm["isins"][0]],
+                              list(aktionaere.loc[aktionaere["firma"] == stamm["name"], "halter"])
+                              + list(aktionaere.loc[aktionaere["firma"] == stamm["name"], "weitere"].dropna()),
+                              gesamt.get(stamm["name"]))
+            if (firmen["name"] == stamm["name"]).sum() == 1 and ticker not in seiten.NUR_VORZUG else None))
         uebersicht.append({"ticker": ticker, "name": stamm["name"], "index": stamm["index"],
                            "meldungen": len(eigene),
                            "letzte_meldung": eigene["mitteilungsdatum"].max() if len(eigene) else None})

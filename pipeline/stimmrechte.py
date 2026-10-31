@@ -196,3 +196,39 @@ def grossaktionaere(df: pd.DataFrame, geprueft: pd.DataFrame | None = None) -> p
     return (letzte.sort_values(["firma", "aktien", "summe"], ascending=[True, False, False])
             [["firma", "halter", "weitere", "aktien", "instrumente", "summe", "schwellendatum", "url", "geprueft"]]
             .reset_index(drop=True))
+
+
+# Eigene Aktien (§ 40 Abs. 1 Satz 2 WpHG): Die Firma meldet, wenn ihr Bestand eigener Aktien 3, 5 oder 10 % berührt.
+# Diese Mitteilungen stehen in stimmrechte.csv als formular="anderes"; gelesen werden sie hier in eine eigene Datei.
+EIGENE_URL = r"eigene[nr]?-aktien|own-shares"
+
+
+def eigene_aktien_lesen(url: str, html: str | None = None) -> dict:
+    """Eine Mitteilung über eigene Aktien → schwellendatum, anteil, anteil_vorher, gesamt (Aktien insgesamt)."""
+    soup = BeautifulSoup(html or eqs._holen(url), "lxml")
+    for t in soup(["script", "style", "nav", "header", "footer"]):
+        t.decompose()
+    zeilen = [_reparieren(z) for z in soup.get_text("\n", strip=True).split("\n")]
+    anfang = next((i for i, z in enumerate(zeilen) if z.startswith(("Für den Inhalt der Mitteilung",
+                                                                    "The issuer is solely responsible"))), -1)
+    if anfang < 0:
+        raise eqs.Gedrosselt(f"Meldung ohne Inhalt: {url}")
+    zeilen = zeilen[anfang:]
+    datum = zeilen[_abschnitt(zeilen, "3. ") + 1]
+    neu = next(i for i, z in enumerate(zeilen) if z in ("Neu", "Resulting situation"))
+    vorher = next((i for i, z in enumerate(zeilen) if z in ("Letzte Veröffentlichung", "Previous publication")), -1)
+    return {"url": url,
+            "schwellendatum": pd.to_datetime(datum, dayfirst=True, errors="coerce"),
+            "anteil": _prozent(zeilen[neu + 1]),
+            "anteil_vorher": _prozent(zeilen[vorher + 1]) if vorher > 0 else None,
+            "gesamt": int(re.sub(r"\D", "", zeilen[neu + 2]) or 0) or None}
+
+
+def eigene_aktien(df: pd.DataFrame) -> pd.DataFrame:
+    """Letzter Stand eigener Aktien je Firma (nach Schwellendatum, nur Mitteilungen ab 2018).
+    Nur wer zuletzt mindestens 3 % gemeldet hat: Darunter muss die Firma Änderungen nicht mehr melden.
+    Spalten: firma, anteil, schwellendatum, url."""
+    df = df.assign(schwellendatum=pd.to_datetime(df["schwellendatum"], errors="coerce")).dropna(subset=["anteil"])
+    df = df[df["schwellendatum"] >= "2018-01-01"]
+    letzte = df.sort_values("schwellendatum").groupby("firma").tail(1)
+    return letzte[letzte["anteil"] >= 3][["firma", "anteil", "schwellendatum", "url"]]
