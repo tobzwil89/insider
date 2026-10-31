@@ -104,14 +104,29 @@ def versionen_eintragen(v: dict) -> None:
 
 # --- Firmenseite --------------------------------------------------------------------------------
 
+def logo_datei(isins: list) -> str | None:
+    """Dateiname des Firmenlogos in docs/logos/ (geladen von logos_laden.py) oder None."""
+    for isin in isins:
+        for datei in sorted((DOCS / "logos").glob(f"{isin}.*")):
+            return datei.name
+    return None
+
+
+def firmenlogo(isins: list, name: str, wurzel: str) -> str:
+    """Logo auf heller Kachel; ohne Logo der Anfangsbuchstabe als Platzhalter."""
+    datei = logo_datei(isins)
+    if datei:
+        return f'<span class="firmenlogo"><img src="{wurzel}logos/{e(datei)}" alt="Logo {e(name)}"></span>'
+    return f'<span class="firmenlogo leer" aria-hidden="true">{e(name[:1].upper())}</span>'
+
+
 def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, ranking: pd.DataFrame,
                 letzter_kurs: tuple, v: dict, aktionaere: pd.DataFrame, rueckkaeufe: pd.DataFrame | None = None,
-                kennzahlen: dict | None = None, rueck_ohne_meldungen: bool = False, eigene: dict | None = None,
-                fonds: dict | None = None) -> str:
+                kennzahlen: dict | None = None, rueck_ohne_meldungen: bool = False,
+                ring: dict | None = None) -> str:
     """f: ticker, name, index, benchmark, isins. ranking: Zeilen dieser Firma mit Spalte 'rang'.
     aktionaere: Zeilen dieser Firma aus stimmrechte.grossaktionaere.
-    eigene: eigene Aktien der Firma (anteil, schwellendatum, url) aus stimmrechte.eigene_aktien; None = unter 3 % oder unbekannt.
-    fonds: US-Fondsbestände aus fonds_us.je_firma; None = keine Daten oder Firma mit mehreren Gattungen.
+    ring: Argumente für aktionaersring (export.ring_daten); None = kein Ring.
     rueckkaeufe: Zeilen dieser Firma aus rueckkaeufe.jahre; None = Historie noch nicht geladen, Abschnitt fehlt.
     kennzahlen: Zeile aus kennzahlen.csv; None = Abschnitt fehlt.
     rueck_ohne_meldungen: EQS führt für die Firma keine Rückkaufmeldungen → „keine Daten“ statt „keine Rückkäufe“."""
@@ -160,11 +175,12 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
               'Die Prozente beziehen sich auf die Stammaktien. Sie werden den Familien Porsche und Piëch über '
               'Beteiligungsgesellschaften und Stimmbindungen vollständig zugerechnet (bei der Porsche AG über '
               'Porsche SE und Volkswagen), deshalb meldet jedes Mitglied die vollen 100 %. Hier stehen sie in einer Zeile.</p>' if f["ticker"] in NUR_VORZUG else "")
+    ring_html = aktionaersring(**ring) if ring else ""
     if aktionaere.empty:
-        ga_html = ('<p class="leer">Keine Halter über den Meldeschwellen laut den Stimmrechtsmitteilungen '
-                   'im EQS-Archiv seit 2018. Das heißt nicht, dass es keine Großaktionäre gibt.</p>')
+        ga_html = ring_html + ('<p class="leer">Keine Halter über den Meldeschwellen laut den Stimmrechtsmitteilungen '
+                               'im EQS-Archiv seit 2018. Das heißt nicht, dass es keine Großaktionäre gibt.</p>')
     else:
-        ga_html = aktionaersring(aktionaere, eigene, fonds) + _tabelle(
+        ga_html = ring_html + _tabelle(
             [("Halter", ""), ("Aktien", "zahl"), ("Instrumente", "zahl"), ("Zusammen", "zahl"), ("Stand", "")],
             [[(e(r.halter) + (f'<div class="klein">dieselben Aktien auch bei: {e(r.weitere)}</div>' if r.weitere else ""), ""),
               (f"{zahl(r.aktien, 2)} %", "zahl"), (f"{zahl(r.instrumente, 2)} %", "zahl"),
@@ -238,7 +254,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
 
   <header class="kopf">
     <div class="marke"><a href="../../">← Insider-Monitor</a></div>
-    <h1>{e(f['name'])}</h1>
+    <div class="titelzeile">{firmenlogo(f['isins'], f['name'], '../../')}<h1>{e(f['name'])}</h1></div>
     <p class="unterzeile">{e(f['ticker'])} · {e(f['index'])} · ISIN {e(', '.join(f['isins']))}</p>
   </header>
 
@@ -318,10 +334,12 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
 """
 
 
-def aktionaersring(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: dict | None = None) -> str:
+def aktionaersring(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: dict | None = None,
+                   norwegen: dict | None = None, gattung: str | None = None) -> str:
     """Ring über 100 % der Aktien. Blau: gemeldete Großaktionäre (nur Spalte Aktien, Instrumente sind keine Aktien;
-    unter 1 % zusammengefasst). Mittelgrau: eigene Aktien der Firma (ab 3 % gemeldet). Dunkleres Blau: US-Fonds laut
-    SEC (fonds_us.je_firma, ohne Konzerne, die schon als Großaktionär gemeldet sind). Hellgrau: der Rest."""
+    unter 1 % zusammengefasst). Mittelgrau: eigene Aktien der Firma (ab 3 % gemeldet). Linkblau: Norwegischer
+    Staatsfonds (norwegen.csv). Dunkleres Blau: US-Fonds laut SEC (fonds_us.je_firma, ohne Konzerne, die schon als
+    Großaktionär gemeldet sind). Hellgrau: der Rest. gattung: None (eine Gattung), 'stamm' oder 'vorzug'."""
     halter = aktionaere[aktionaere["aktien"] > 0].sort_values("aktien", ascending=False)
     gross = [(r.halter, r.aktien) for r in halter.itertuples() if r.aktien >= 1][:7]
     klein = halter["aktien"].sum() - sum(w for _, w in gross)
@@ -332,6 +350,9 @@ def aktionaersring(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: 
     if eigene:
         segmente.append(("Eigene Aktien der Firma", eigene["anteil"], "var(--sonstiges)",
                          f'laut <a href="{e(eigene["url"])}" rel="nofollow">Mitteilung</a> vom {datum(eigene["schwellendatum"])}'))
+    if norwegen:
+        segmente.append(("Norwegischer Staatsfonds", norwegen["anteil"], "var(--link)",
+                         f"laut Norges Bank Investment Management, Stand {datum(norwegen['stichtag'])}"))
     if fonds:
         us = fonds["teile"][:4] + ([("Weitere US-Fonds", fonds["weitere"] + sum(w for _, w in fonds["teile"][4:]))]
                                    if fonds["weitere"] > 0.05 or len(fonds["teile"]) > 4 else [])
@@ -354,13 +375,16 @@ def aktionaersring(aktionaere: pd.DataFrame, eigene: dict | None = None, fonds: 
     rest = 100 - bekannt
     if rest > 0.05:
         stufen.append(f"var(--ring-rest) {bekannt:.2f}% 100%")
+        erklaerung = ("Streubesitz und alle übrigen Anleger (für Vorzugsaktien gibt es keine Stimmrechtsmitteilungen)"
+                      if gattung == "vorzug" else "Streubesitz, Halter unter 3 % (nicht meldepflichtig)"
+                      + ("" if eigene else ", eigene Aktien unter 3 %") + (", Fonds außerhalb der USA" if fonds else ""))
         legende.append('<li><span class="ring-farbe" style="background:var(--ring-rest)"></span>Übrige Aktien'
-                       '<div class="klein">Streubesitz, Halter unter 3 % (nicht meldepflichtig)'
-                       + ("" if eigene else ", eigene Aktien unter 3 %")
-                       + (", Fonds außerhalb der USA" if fonds else "") + '</div>'
-                       f'<span class="zahl">{zahl(rest, 1)} %</span></li>')
+                       f'<div class="klein">{erklaerung}</div><span class="zahl">{zahl(rest, 1)} %</span></li>')
         teile.append(f"übrige Aktien {zahl(rest, 1)} %")
-    return (f'<div class="ring-block"><div class="ring" role="img" aria-label="Aktionärsstruktur: {e("; ".join(teile))}" '
+    titel = {"stamm": "Der Ring zeigt die Stammaktien (mit Stimmrecht).",
+             "vorzug": "Der Ring zeigt die Vorzugsaktien (ohne Stimmrecht). Die Tabelle darunter betrifft die Stammaktien."}
+    return ((f'<p class="erklaerung">{titel[gattung]}</p>' if gattung else "")
+            + f'<div class="ring-block"><div class="ring" role="img" aria-label="Aktionärsstruktur: {e("; ".join(teile))}" '
             f'style="background:conic-gradient({", ".join(stufen)})"><div class="ring-mitte">'
             f'<b>{zahl(bekannt, 0)} %</b><span>mit Namen bekannt</span></div></div>'
             f'<ul class="ring-legende">{"".join(legende)}</ul></div>')

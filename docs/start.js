@@ -135,7 +135,11 @@ function zeigeFirmen(firmen) {
     const text = suche.value.trim().toLowerCase();
     const treffer = firmen.filter((f) => !text || f.name.toLowerCase().includes(text) || f.ticker.toLowerCase().includes(text));
     ziel.replaceChildren(...treffer.map((f) => el("a", { href: `firma/${encodeURIComponent(f.ticker)}/` },
-      el("span", {}, f.name), el("span", { class: "klein" }, `${f.index} · ${f.meldungen}`))));
+      el("span", { class: "firmenname" },
+        f.logo ? el("span", { class: "firmenlogo mini" }, el("img", { src: `logos/${f.logo}`, alt: "", loading: "lazy" }))
+               : el("span", { class: "firmenlogo mini leer" }, f.name.slice(0, 1).toUpperCase()),
+        f.name),
+      el("span", { class: "klein" }, `${f.index} · ${f.meldungen}`))));
     if (!treffer.length) ziel.append(el("p", { class: "leer" }, "Keine Firma gefunden."));
   }
   suche.addEventListener("input", aktualisieren);

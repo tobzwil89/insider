@@ -116,7 +116,12 @@ Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): 
 - [ ] 2. **Tobias:** Übersicht durchsehen. Verdacht auf veraltete Logos (Claude, nicht geprüft): Nordex (mit „acciona“),
       TUI (mit „Aktiengesellschaft“), Jenoptik (blaues Kästchen), Hella (Forvia-Doppellogo), Porsche AG (Wappen statt Schriftzug),
       Fuchs (kleines PNG mit Werbespruch).
-- [ ] 3. Einbau auf Firmenseite und in Tabellen (Platzhalter mit Anfangsbuchstaben, wenn kein Logo), erst nach Freigabe.
+- [x] 2a. Tobias 31.10.2026: „Passt, alles einbauen“ (Verdachtsfälle bleiben vorerst).
+- [x] 3. **Eingebaut (31.10.2026, nicht gepusht):** `seiten.logo_datei`/`firmenlogo` (Logo neben dem Namen im Kopf der
+      Firmenseite, weiße Kachel auch im dunklen Modus, ohne Logo Anfangsbuchstabe), Feld `logo` in `firmen.json`
+      (`export.py`), kleines Logo in der Firmenliste der Startseite (`start.js`), Stile `.firmenlogo`/`.titelzeile` am Ende
+      von `style.css`. Lokal geprüft per Bildschirmfoto (SAP hell, Hochtief dunkel 420 px, Firmenliste): 94 von 94 Seiten mit Logo.
+      Die Firmenseiten baut der Bot beim nächsten Lauf neu. Noch nicht in Ticker, Cluster und Ranking (nur Firmenname).
 - Rechtlich: Logos nur zur Kennzeichnung der Firma zeigen, kein Anschein einer Partnerschaft → zu „vor dem Livegang klären“.
 
 ## Marketing und Website (Planungs-App #9), Stand 30.10.2026
@@ -234,6 +239,10 @@ ob die Regel „kein Fincept-Code“ bleibt (Urheberrecht AGPL, nicht nur Nutzun
   Lokale Testläufe von `lauf.py` verändern `docs/data` und `daten/meldungen.csv` → vor dem Commit mit
   `git checkout -- docs/data daten/meldungen.csv` zurücksetzen, sonst Konflikte mit dem Bot.
 - Tobias pusht selbst (kein `gh`, Token mit Rechten Contents + Workflows). Ich committe/pushe nicht.
+- **Schutz vor Push (31.10.2026):** `.git/hooks/pre-push` packt den hochzuladenden Stand in einen leeren Ordner und
+  importiert dort `lauf`, `rueckkaeufe_laden`, `stimmrechte_laden`, `historie` und alle `pipeline`-Module. Fehlt etwas
+  (Datei nur lokal geändert), wird der Push gestoppt. Umgehen nur im Notfall: `git push --no-verify`. Liegt nicht im
+  Repository, gilt nur für diesen Ordner auf Tobias' Mac. Neue Skripte, die eine Action startet, dort in die Liste eintragen.
 - Recherche und Screenshots in `.recherche/` (in `.gitignore`).
 
 ## Aktueller Stand (22.10.2026 abends)
@@ -737,3 +746,8 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **31.10.2026 (Logo 4):** Aufgeräumt: alle verworfenen Entwürfe, Konzeptübersichten, Testbilder, `bauen.py` und die Schriften Bodoni Moda/Cormorant gelöscht. In `logo/` bleiben nur `kit/`, `paket.py`, `text2path.py`, `praesentation.json` und `schriften/Cinzel.ttf` + `OFL.txt`. Rechtscheck: Schrift (OFL) erlaubt Logo-Nutzung; Urheberrecht am R gibt es nicht (keine Schöpfungshöhe), Schutz nur über eine Marke (Empfehlung: zuerst Wortmarke RHODUS beim DPMA, 290 € für Klassen 36, 41, 42; Bildzeichen vorher in TMview als Bildmarke suchen).
 - **31.10.2026 (Aktionärsring):** Bachelorarbeits-Bezug aus Notiz und Gedächtnis entfernt (Tobias: längst durch, Startup). Ring für die Aktionärsstruktur beschlossen; N-PORT-Test: US-Fonds bringen netto Median +8,7 Pp. mit Namen (36 → 48 %). Plan unter „Geplantes Vorhaben: Aktionärsring“, Planungs-App #65. Danach Schritt 1 gebaut: Ring auf den Firmenseiten (lokal geprüft, nicht gepusht). Schritt 2: eigene Aktien aus § 40-Mitteilungen als Segment (11 Firmen ≥ 3 %). Schritt 3: US-Fonds (N-PORT) als Segmente, nächtlich automatisch; Median mit Namen 36 → 49 %.
 - **31.10.2026 (Logos):** `logos_laden.py` gebaut: Firmenlogos von Wikidata/Commons nach `docs/logos/`, 97 von 97 (Hochtief von hochtief.com), Übersicht `logos_uebersicht.html`. Wartet auf Durchsicht durch Tobias, noch nicht auf der Website.
+- **31.10.2026 abends:** Action #65 brach ab (`ImportError: DECKEL`): `seiten.py` war committet, das dazugehörige
+  `kennzahlen.py` nur lokal. `kennzahlen.py` nachcommittet (4d86a3e), Lauf danach grün. Lehre: vor dem Push
+  `git status` prüfen, ob committete Dateien von lokal geänderten abhängen. Noch lokal offen: `fundamental.py`,
+  `stimmrechte.py`, `DATENQUELLEN.md`, `ARCHITEKTUR.md`, `logo/`, `newsletter/2026-11-01.md`.
+- **31.10.2026 (Logos 2):** Logos auf Firmenseiten und in der Firmenliste eingebaut, lokal geprüft, nicht gepusht.

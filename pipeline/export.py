@@ -16,6 +16,7 @@ docs/sitemap.xml und Versionsnummern (?v=) für CSS/JS.
 
 import json
 import math
+import re
 import shutil
 
 import numpy as np
@@ -112,12 +113,36 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
                                              pd.read_csv(DATEN / "grossaktionaere_geprueft.csv"))
     ea_datei = DATEN / "stimmrechte_eigene_aktien.csv"
     eigene_aktien = stimmrechte.eigene_aktien(pd.read_csv(ea_datei)).set_index("firma").to_dict("index") if ea_datei.exists() else {}
-    # US-Fonds (SEC N-PORT) in Prozent der Gesamtstimmrechte laut letzter Stimmrechtsmitteilung. Nur bei Firmen mit
-    # einer Gattung: Bei Stamm- und Vorzugsaktien zählen die Stimmrechte nur die Stammaktien, der Anteil wäre falsch.
-    fu_datei = DATEN / "fonds_us.csv"
-    fonds = pd.read_csv(fu_datei) if fu_datei.exists() else pd.DataFrame(columns=["isin"])
+    # Daten für den Aktionärsring: US-Fonds (SEC N-PORT), Norwegischer Staatsfonds, Aktien je Gattung
+    fu_datei, nb_datei = DATEN / "fonds_us.csv", DATEN / "norwegen.csv"
+    fonds = pd.read_csv(fu_datei) if fu_datei.exists() else pd.DataFrame(columns=["isin", "gesellschaft", "stueck", "stichtag"])
+    norwegen = pd.read_csv(nb_datei).set_index("firma").to_dict("index") if nb_datei.exists() else {}
+    gattungen = pd.read_csv(DATEN / "aktiengattungen.csv").set_index("isin").to_dict("index")
     st_roh = pd.read_csv(DATEN / "stimmrechte.csv", usecols=["firma", "veroeffentlicht", "gesamtstimmrechte"])
     gesamt = st_roh.dropna(subset=["gesamtstimmrechte"]).sort_values("veroeffentlicht").groupby("firma")["gesamtstimmrechte"].last()
+    isins_je_firma = firmen.groupby("name")["isin"].apply(list)
+
+    def ring_daten(name: str, isin: str) -> dict:
+        """Alles, was seiten.aktionaersring für eine Seite braucht. Bei Firmen mit Stamm- und Vorzugsaktien
+        (daten/aktiengattungen.csv) zeigt der Ring die Gattung der Seite: Stammaktien mit Großaktionären,
+        Vorzugsaktien ohne (Stimmrechtsmitteilungen gibt es nur für Stimmrechte). Der Norwegische Staatsfonds nennt
+        nur einen Anteil je Firma, nicht je Gattung → dort weggelassen."""
+        ga = aktionaere[aktionaere["firma"] == name]
+        halter = list(ga["halter"]) + list(ga["weitere"].dropna())
+        g = gattungen.get(isin)
+        if g is None:  # eine Gattung (Fresenius/TUI haben zusätzlich eine alte ISIN)
+            nb = norwegen.get(name)
+            if nb and any(re.search(r"norw|norges", h, re.I) for h in halter):
+                nb = None  # schon als Großaktionär gemeldet
+            return {"aktionaere": ga, "eigene": eigene_aktien.get(name), "norwegen": nb, "gattung": None,
+                    "fonds": fonds_us.je_firma(fonds[fonds["isin"].isin(isins_je_firma[name])], halter, gesamt.get(name))}
+        anzahl = g["stueck"] if pd.notna(g["stueck"]) else None
+        f_gattung = fonds[fonds["isin"] == isin]
+        if g["gattung"] == "vorzug":
+            return {"aktionaere": ga.iloc[0:0], "eigene": None, "norwegen": None, "gattung": "vorzug",
+                    "fonds": fonds_us.je_firma(f_gattung, [], anzahl)}
+        return {"aktionaere": ga, "eigene": eigene_aktien.get(name), "norwegen": None, "gattung": "stamm",
+                "fonds": fonds_us.je_firma(f_gattung, halter, anzahl)}
     # Rückkäufe nur für Firmen, deren Historie fertig geladen ist (sonst hieße „keine“ nur „noch nicht geladen“)
     rk_datei, rk_fertig = DATEN / "rueckkaeufe.csv", DATEN / "rueckkaeufe_fortschritt.csv"
     rueck = rueckkaeufe.jahre(pd.read_csv(rk_datei)) if rk_datei.exists() else pd.DataFrame(columns=["firma"])
@@ -143,13 +168,9 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
             aktionaere[aktionaere["firma"] == stamm["name"]],
             rueck[rueck["firma"] == stamm["name"]] if stamm["name"] in rk_geladen else None,
             next((kz[i] for i in stamm["isins"] if i in kz), None), stamm["name"] in rk_ohne,
-            eigene_aktien.get(stamm["name"]),
-            fonds_us.je_firma(fonds[fonds["isin"] == stamm["isins"][0]],
-                              list(aktionaere.loc[aktionaere["firma"] == stamm["name"], "halter"])
-                              + list(aktionaere.loc[aktionaere["firma"] == stamm["name"], "weitere"].dropna()),
-                              gesamt.get(stamm["name"]))
-            if (firmen["name"] == stamm["name"]).sum() == 1 and ticker not in seiten.NUR_VORZUG else None))
+            ring_daten(stamm["name"], stamm["isins"][0])))
         uebersicht.append({"ticker": ticker, "name": stamm["name"], "index": stamm["index"],
+                           "logo": seiten.logo_datei(stamm["isins"]),
                            "meldungen": len(eigene),
                            "letzte_meldung": eigene["mitteilungsdatum"].max() if len(eigene) else None})
     _schreibe("firmen.json", sorted(uebersicht, key=lambda x: x["name"].lower()))
