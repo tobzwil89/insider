@@ -1,7 +1,7 @@
 # Insider-Monitor – Stand der Dinge
 
-Directors' Dealings (Art. 19 MAR) von DAX- und MDAX-Firmen seit 2018, live ausgewertet mit der Event Study aus
-Tobias' Bachelorarbeit (Uni Bayreuth). Langfristiges Ziel: ein Startup, eine Finanzdaten-Plattform wie GuruFocus, global (Einstieg unten).
+Directors' Dealings (Art. 19 MAR) von DAX- und MDAX-Firmen seit 2018, live ausgewertet mit einer Event Study.
+Das ist Tobias' **Startup** (Produktname Rhodus), kein Uni-Projekt mehr. Ziel: ein Startup, eine Finanzdaten-Plattform wie GuruFocus, global (Einstieg unten).
 
 - Website: https://insider.tobiaszwilling.me (GitHub Pages aus `/docs`, Branch `main`)
 - Repository: github.com/tobzwil89/insider (öffentlich); DNS bei Namecheap, CNAME `insider` → `tobzwil89.github.io`
@@ -81,18 +81,18 @@ CTA: Newsletter, Formular mit **EmailOctopus** (läuft schon in `roleplay-landin
           (Facta, Signa, Proba …) sind auf .com/.io/.ai alle vergeben. Reserve: Examen (lat. Bienenschwarm + Prüfung).
 - [ ] 2. Newsletter starten: schlichtes EmailOctopus-Formular, verlinkt von der jetzigen Seite; Skript, das samstags
       einen Entwurf des Sonntags-Reports aus den eigenen Daten vorbereitet.
-      **Skript fertig (31.10.2026, nicht gepusht):** `python3 sonntags_report.py [JJJJ-MM-TT]` → `newsletter/<Datum>.md`
+      **Skript fertig (31.10.2026, gepusht):** `python3 sonntags_report.py [JJJJ-MM-TT]` → `newsletter/<Datum>.md`
       (Stichtag = Sonntag, betrachtet die 7 Tage davor nach Mitteilungsdatum): 5 größte Käufe, neue Cluster, Käufer mit
       guter Bilanz (aus `ranking.json`, nur Ø und Median > 0), 3 größte Verkäufe. Liest nur `docs/data`, also vorher
       `git pull`. Getestet an den Wochen bis 04.10. und 01.11.2026. Nur Deutsch (Englisch fehlt noch). 
-      **Anmeldung (31.10.2026, nicht gepusht): Kit statt EmailOctopus.** EmailOctopus hat nach einem Update keine Listen
+      **Anmeldung (31.10.2026, gepusht ca2db4c, live geprüft): Kit statt EmailOctopus.** EmailOctopus hat nach einem Update keine Listen
       mehr, nur Tags, und im Gratistarif nur 1 Formular (das hat Roleplay) → bleibt nur für `roleplay-landing`. Kit
       (kit.com, Gratistarif laut Drittquellen 10.000 Abonnenten, Formulare unbegrenzt), Formular-ID `10125562`.
-      Karte „Sonntags-Report“ auf der Startseite unter den Kacheln (`docs/index.html`, eigenes HTML-Formular, sendet per
+      Karte „Sonntags-Report“ auf der Startseite an vorletzter Stelle (vor „Firmen im DAX und MDAX“, Tobias 31.10.2026) (`docs/index.html`, eigenes HTML-Formular, sendet per
       `fetch` an `app.kit.com/forms/10125562/subscriptions`, Feld `email_address`; Kits Skript wird nicht geladen),
       Stile `.report-formular` in `style.css`, Datenschutzabsatz `#newsletter` in `impressum.html`. Geprüft: Kit erlaubt
       Anfragen von fremden Seiten (CORS `*`), ungültige Adresse im Browser abgelehnt; echte Anmeldung noch nicht getestet.
-      **Offen:** Tobias prüft im Kit-Formular, dass die Bestätigungsmail (Double-Opt-in, bei Kit „Incentive email“) an ist;
+      Bestätigungsmail („Incentive email“) laut Tobias eingeschaltet und deutsch. **Offen:** echte Anmeldung auf der Live-Seite testen;
       Grundlage USA-Übermittlung (Text nennt Standardvertragsklauseln; DPF-Zertifizierung nur über Drittseite gesehen) auf
       kit.com/privacy prüfen. Versand samstags automatisch erst, wenn der Report von Hand ein paar Wochen gut war.
 - [ ] 3. Mit 5–10 Anlegern sprechen. Leitfaden, Anschreiben, Auswertungstabelle: `newsletter/GESPRAECHE.md` (31.10.2026).
@@ -121,7 +121,7 @@ Guru-Depots, später Sentiment). Reihenfolge laut Empfehlung Claude:
 
 ## Einstieg für einen neuen Chat (Stand 28.10.2026)
 
-**Was das ist:** Tobias (Bachelorarbeit Uni Bayreuth, Event Study zu Directors' Dealings) baut aus dem Insider-Monitor
+**Was das ist:** Tobias baut aus dem Insider-Monitor
 ein **Startup**: eine Finanzdaten-Plattform nach Vorbild GuruFocus/AlleAktien, **global** (Deutschland, USA, weitere
 Märkte), mit eigener Datenbank. Der heutige Stand (statische Website auf GitHub Pages, Python-Pipeline in GitHub Actions)
 ist nur der Anfang; **Tech-Stack ist offen**, Umzug auf eine richtige Datenbank ist geplant.
@@ -645,6 +645,7 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **31.10.2026 (6):** Eulerpool mit Gratis-Schlüssel getestet (`DATENQUELLEN.md` Abschnitt 9): GuV mit EBIT über 25–43 Jahre weltweit, Schätzungen bis 2030, teils verschlüsselt (SAP, nicht umgehen); Eulerpool ist Datenlieferant von AlleAktien (AAQS-Adresse liefert die Kartenwerte). Einbau wartet auf Freigabe.
 - **31.10.2026 (7):** Sonntags-Report: `sonntags_report.py` (Entwurf aus eigenen Daten) und `newsletter/GESPRAECHE.md` (Leitfaden Anlegergespräche). Formular wartet auf EmailOctopus-Liste von Tobias.
 - **31.10.2026 (8):** EmailOctopus für den Newsletter verworfen (1 Formular im Gratistarif), Kit eingerichtet: Anmeldekarte auf der Startseite, Datenschutzabsatz, Verbindung geprüft.
+- **31.10.2026 (9):** Testanmeldungen (gmx, proton) kommen bei Kit an („Unconfirmed“, 2 Mails verschickt), Bestätigungsmails erreichen Tobias aber nicht → Absenderadresse prüfen. Kit-MCP (`app.kit.com/mcp`, in `~/.claude.json`) verbunden, braucht aber Bezahltarif → unbrauchbar. Formular nach unten verschoben (nicht gepusht).
 - **31.10.2026 (7):** Eulerpool in Sammler und Kennzahlen eingebaut (EBIT 10 J. bei 91 statt 7 Firmen, Schätzungen bis 3 Jahre), alle Firmen gegen AAQS abgeglichen, ROCE/Verschuldung auf Geschäftsjahr umgestellt (ROCE 96 % gleich mit AlleAktien). Offen: Zykliker-Schwelle (29 statt 13).
 - **31.10.2026 (Logo):** MVP-Logo begonnen, nur Bildzeichen (Name noch offen), Graustufen, Wirkung „seriös, belegt“ + „modern, Tech“, Einsatz Sonntags-Report, Website + Favicon, Social Media. Drei Konzepte in `logo/` (v1 verworfen: QR-Code-, Uhrzeiger-, Audio-Wirkung). Übersicht `logo/konzepte-v2.png`, Empfehlung A „Innenblick“. Wartet auf Tobias' Wahl; danach Logo-Paket (Farbe, Favicon, Icons).
 - **31.10.2026 (Logo 2):** Tobias verwirft die Tech-Entwürfe: Logo soll elitär, „old money“, seriös wirken, Schriftzug in Serifenschrift. Name jetzt Rhodus. Drei neue Konzepte in `logo/` (Übersicht `logo/rhodus-konzepte-v3.png`): A Inschrift (Cinzel), B Privatbank (Bodoni Moda, Empfehlung), C Münze (Rose von Rhodos, Ring, Cormorant Garamond). Schriften frei lizenziert (OFL, Google Fonts) in `logo/schriften/`, Umwandlung in Pfade mit `logo/bauen.py`. Wartet auf Tobias' Wahl.
