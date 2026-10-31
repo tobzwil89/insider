@@ -26,6 +26,16 @@
   <main>
     <div class="kacheln" id="kacheln"></div>
 
+    <section class="karte" id="newsletter">
+      <h2>Sonntags-Report</h2>
+      <p class="erklaerung">Jeden Sonntag per E-Mail: die größten Insiderkäufe der Woche, Cluster-Käufe und Käufer mit guter Bilanz. Kostenlos, jederzeit abbestellbar.</p>
+      <form id="report-formular" class="report-formular">
+        <input type="email" name="email_address" required placeholder="E-Mail-Adresse" aria-label="E-Mail-Adresse">
+        <button type="submit">Eintragen</button>
+      </form>
+      <p class="erklaerung" id="report-meldung">Du bekommst erst eine Mail mit Bestätigungslink. Details unter <a href="impressum.html#newsletter">Datenschutz</a>.</p>
+    </section>
+
     <section class="karte">
       <h2>Kursreaktion um Insider-Geschäfte</h2>
       <p class="erklaerung">Kumulierte durchschnittliche abnormale Rendite (CAAR) von 5 Handelstagen vor bis 5 nach der
@@ -90,5 +100,23 @@
 
   <script src="gemeinsam.js?v=d7826b92"></script>
   <script src="start.js?v=13c92b76"></script>
+  <script>
+  // Anmeldung zum Sonntags-Report: sendet direkt an das Kit-Formular, ohne Kits Skript zu laden
+  document.getElementById('report-formular').addEventListener('submit', async e => {
+    e.preventDefault()
+    const meldung = document.getElementById('report-meldung')
+    try {
+      const antwort = await (await fetch('https://app.kit.com/forms/10125562/subscriptions', {
+        method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(e.target)
+      })).json()
+      meldung.textContent = antwort.status === 'success'
+        ? 'Fast geschafft: Bitte bestätige deine Anmeldung über den Link in der Mail.'
+        : 'Das hat nicht geklappt. Ist die Adresse richtig?'
+      if (antwort.status === 'success') e.target.reset()
+    } catch {
+      meldung.textContent = 'Keine Verbindung. Bitte später noch einmal versuchen.'
+    }
+  })
+  </script>
 </body>
 </html>

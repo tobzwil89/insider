@@ -156,3 +156,30 @@ footer p { margin: 4px 0; }
 .text-seite h2 { margin-top: 22px; }
 .text-seite p, .text-seite li { color: var(--text-2); max-width: 760px; }
 .platzhalter { background: var(--hinweis); border-radius: 4px; padding: 0 4px; }
+
+/* Finanzkennzahlen (Planung #6) */
+.fk-gruppen { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 24px; }
+.fk-gruppe h3, .fk-diagramm h3 { font-size: 14px; margin: 0 0 6px; }
+.fk-gruppe dl { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; margin: 0; font-size: 14px; }
+.fk-gruppe dt { color: var(--text-2); }
+.fk-gruppe dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.fk-diagramme { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 20px; }
+.fk-saeulen { display: flex; align-items: flex-end; gap: 4px; height: 140px; border-bottom: 1px solid var(--achse); }
+.fk-saeule { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
+.fk-balken { background: var(--kauf); border-radius: 3px 3px 0 0; min-height: 1px; }
+.fk-saeule.schaetzung .fk-balken { opacity: 0.4; }
+.fk-saeule.minus .fk-balken { background: var(--verkauf); }
+.fk-jahr { position: absolute; bottom: -18px; width: 100%; text-align: center; font-size: 11px; color: var(--text-3); }
+.fk-diagramm { padding-bottom: 20px; }
+.fk-kategorie { font-size: 14px; margin: 0 0 14px; }
+.fk-check { margin-top: 8px; }
+.fk-check ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4px 24px; font-size: 14px; }
+.fk-check li span { display: inline-block; width: 20px; font-weight: 700; }
+.fk-check li.ja span { color: var(--kauf); }
+.fk-check li.nein span { color: var(--verkauf); }
+.fk-check li.offen { color: var(--text-3); }
+
+/* Anmeldung Sonntags-Report */
+.report-formular { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 4px; }
+.report-formular input { flex: 1 1 220px; padding: 8px 10px; font: inherit; border: 1px solid var(--achse); border-radius: 6px; background: var(--flaeche); color: var(--text); }
+.report-formular button { padding: 8px 16px; font: inherit; border: 0; border-radius: 6px; background: var(--kauf); color: #fff; cursor: pointer; }

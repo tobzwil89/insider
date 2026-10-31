@@ -64,16 +64,37 @@ CTA: Newsletter, Formular mit **EmailOctopus** (läuft schon in `roleplay-landin
       - **Preis:** kostenlos (Sonntags-Report, Daten mit Verzögerung); Pro 9 €/Monat bzw. 89 €/Jahr; Gründerpreis 59 €/Jahr
         dauerhaft für die ersten 100. Vergleich: AlleAktien ≈ 290 €/Jahr, GuruFocus ≈ 450–550 $/Region. Eulerpool Builder
         (99 $/Monat) ist ab etwa 15 Zahlenden gedeckt.
-      - **Name:** offen, eigene kurze Runde. Geprüft 31.10.2026 (whois): profispur.de/.com, followtheinsiders.com,
-        aktienspur.de frei; insiderblick.de, kapitalspur.de vergeben. Vor dem Kauf Marke bei DPMA/EUIPO prüfen.
+      - **Name: Rhodus (festgelegt von Tobias, 31.10.2026).** Herkunft: Äsop „Hic Rhodus, hic salta!“ („Hier ist Rhodos,
+        hier spring!“ = zeig es hier, statt nur zu erzählen); zitiert von Hegel (Vorrede Rechtsphilosophie) und Marx.
+        Lesart: Rhodus ist der Ort, an dem geprüft wird, was stimmt – Insiderkäufe UND Schwarmstimmung. Die Masse ist
+        nicht der Gegner (Sentiment/Schwarmintelligenz ist Kernpunkt, Korrektur Tobias).
+        - **Untertitel offen.** „Taten statt Worte“ / „Facta, non verba“ verworfen (wertet Sentiment ab).
+        - Domains frei (31.10.): rhodus.io, rhodus.ai, hicrhodus.io. Tobias kauft vorerst kein .com/.de; Umbenennung
+          später möglich. Websuche: keine Finanzfirma „Rhodus“ (nächste: Rho, Rhodon). **TMview: frei** (geprüft von Tobias
+          mit Claude im Browser, 31.10.2026).
+          Markenprüfung 31.10.2026 (indirekt, TMview blockt Skripte): in USPTO (Justia), Web und Firmensuche kein
+          „RHODUS“; ähnlich nur RHODOS (USA, Rosen, gelöscht), Rhodium/Rhodes in fremden Branchen. Offiziell noch nicht
+          geprüft → Tobias hat danach selbst in TMview gesucht: frei.
+        - Verworfen in der Namensrunde: deutsche Namen (Profispur, Aktienspur … nicht global), englische Kunstnamen
+          (Noctmoor, Ardeamont: albern), Glaux, Pythia, Delphi (Delphi Digital = Research für Anleger, „OK Delphi“
+          ändert nichts), Babylon (Babylon Health pleite), Geminus (zu nah an Gemini). Echte lat./griech. Einzelwörter
+          (Facta, Signa, Proba …) sind auf .com/.io/.ai alle vergeben. Reserve: Examen (lat. Bienenschwarm + Prüfung).
 - [ ] 2. Newsletter starten: schlichtes EmailOctopus-Formular, verlinkt von der jetzigen Seite; Skript, das samstags
       einen Entwurf des Sonntags-Reports aus den eigenen Daten vorbereitet.
       **Skript fertig (31.10.2026, nicht gepusht):** `python3 sonntags_report.py [JJJJ-MM-TT]` → `newsletter/<Datum>.md`
       (Stichtag = Sonntag, betrachtet die 7 Tage davor nach Mitteilungsdatum): 5 größte Käufe, neue Cluster, Käufer mit
       guter Bilanz (aus `ranking.json`, nur Ø und Median > 0), 3 größte Verkäufe. Liest nur `docs/data`, also vorher
-      `git pull`. Getestet an den Wochen bis 04.10. und 01.11.2026. Nur Deutsch (Englisch fehlt noch). Offen: EmailOctopus-
-      Liste + Formularcode von Tobias, Link auf der Seite, Datenschutztext (Vorlage `roleplay-landing`); Versand samstags
-      automatisch erst, wenn der Report von Hand ein paar Wochen gut war.
+      `git pull`. Getestet an den Wochen bis 04.10. und 01.11.2026. Nur Deutsch (Englisch fehlt noch). 
+      **Anmeldung (31.10.2026, nicht gepusht): Kit statt EmailOctopus.** EmailOctopus hat nach einem Update keine Listen
+      mehr, nur Tags, und im Gratistarif nur 1 Formular (das hat Roleplay) → bleibt nur für `roleplay-landing`. Kit
+      (kit.com, Gratistarif laut Drittquellen 10.000 Abonnenten, Formulare unbegrenzt), Formular-ID `10125562`.
+      Karte „Sonntags-Report“ auf der Startseite unter den Kacheln (`docs/index.html`, eigenes HTML-Formular, sendet per
+      `fetch` an `app.kit.com/forms/10125562/subscriptions`, Feld `email_address`; Kits Skript wird nicht geladen),
+      Stile `.report-formular` in `style.css`, Datenschutzabsatz `#newsletter` in `impressum.html`. Geprüft: Kit erlaubt
+      Anfragen von fremden Seiten (CORS `*`), ungültige Adresse im Browser abgelehnt; echte Anmeldung noch nicht getestet.
+      **Offen:** Tobias prüft im Kit-Formular, dass die Bestätigungsmail (Double-Opt-in, bei Kit „Incentive email“) an ist;
+      Grundlage USA-Übermittlung (Text nennt Standardvertragsklauseln; DPF-Zertifizierung nur über Drittseite gesehen) auf
+      kit.com/privacy prüfen. Versand samstags automatisch erst, wenn der Report von Hand ein paar Wochen gut war.
 - [ ] 3. Mit 5–10 Anlegern sprechen. Leitfaden, Anschreiben, Auswertungstabelle: `newsletter/GESPRAECHE.md` (31.10.2026).
       Die Gespräche prüfen jetzt Zielgruppe und Preisidee aus der Positionierung (31.10.2026).
 - [ ] 4. Weiter am Produkt (Datenbank, Sentiment); Website danach.
@@ -83,14 +104,14 @@ CTA: Newsletter, Formular mit **EmailOctopus** (läuft schon in `roleplay-landin
 Ziel bleibt: Startup, Finanzdaten-Plattform „GuruFocus für Europa, günstiger“ + „Folge den Profis“ + Sentiment.
 Fundamentaldaten sind dafür Pflicht, aber nicht das Alleinstellungsmerkmal (das sind Insider, Großaktionäre, Rückkäufe,
 Guru-Depots, später Sentiment). Reihenfolge laut Empfehlung Claude:
-1. **Neuer Chat: Eulerpool einbauen** (`DATENQUELLEN.md` Abschnitt 9): Leser in `pipeline/fundamental.py`
+1. ✅ **Eulerpool eingebaut (31.10.2026, Details unter Fundamentaldaten, Block „Eulerpool“).** Ursprünglicher Auftrag: Leser in `pipeline/fundamental.py`
    (GuV, Bilanz, Cashflow, Schätzungen; Ist-Jahre von Schätzjahren trennen; Werte in Mio. → ×1e6; verschlüsselte
    Antworten überspringen, nie entschlüsseln), in `kennzahlen.PRIORITAET` vor onvista/TradingView für EBIT und
    Schätzungen; dann alle Firmen automatisch gegen `/api/1/aaqs/by-isin` abgleichen (nur Prüfung, nicht anzeigen) und
    Formeln nachschärfen (ROCE, Verschuldung). Danach Fundamentaldaten als fertig betrachten, **nicht weiter ausbauen**.
 2. **Kleine Fehler auf der Live-Seite zuerst beheben:** Rückkäufe „keine Daten“ ✅ (31.10., gepusht);
    Taktung: cron-job.org einrichten (Tobias, Abschnitt Offen).
-3. **Positionierung: erledigt 31.10.2026** (siehe Marketing Schritt 1), nur der Name ist noch offen.
+3. **Positionierung: erledigt 31.10.2026** (siehe Marketing Schritt 1). Name: **Rhodus** (31.10.2026, TMview frei), Untertitel offen.
 4. **Newsletter „Sonntags-Report“ + 5–10 Gespräche mit Anlegern** (Marketing Schritt 2–3): erste echte Rückmeldung.
 5. **Architektur entschieden (31.10.2026, `ARCHITEKTUR.md` unten):** Supabase (Postgres, kostenlos), Sammler bleiben
    in GitHub Actions, kein Hetzner bis MVP, 0 € bis MVP. Umsetzung (Block 1–2) nach der Positionierung (erledigt) und
@@ -411,8 +432,30 @@ Plan (Tobias 31.10.2026: „so machen“), nur lokal, in abbrechbaren Blöcken:
       (USA, China, HK, Taiwan, Korea, Japan, Indien, ganz Europa, Kanada, Australien, Brasilien …), Schätzungen bei
       Nebenwerten dünner. onvista auch große Auslandswerte (nicht China-A, nicht Indien). **SEC hat offizielle Daten
       für ausländische Firmen mit US-Notierung (20-F, teils IFRS)**: Vorschlag, `sec()` um `ifrs-full` zu erweitern.
-- [ ] Danach offen: Handyansicht auf echtem Gerät; Schätzungen über 1 Jahr für Umsatz/EBIT (keine Gratisquelle
-      gefunden); SEC um IFRS erweitern (Freigabe Tobias); Universum über DAX/MDAX hinaus (Freigabe Tobias);
+- [x] **Eulerpool (31.10.2026, nur lokal):** `fundamental.eulerpool` holt je Firma GuV, Bilanz, Cashflow (Präfix
+      `guv.`/`bilanz.`/`cf.`, Millionen ×1e6, Gewinn je Aktie nicht), Schätzungen (`schaetzung.*`, Periode „JJJJe“, schon
+      in ganzen Einheiten) und AAQS (Quelle `aaqs`, nur Prüfung, nie anzeigen). Schlüssel `EULERPOOL_API_KEY` aus `.env`,
+      ohne Schlüssel übersprungen. Verschlüsselte Antworten (SAP-Schätzungen) werden übersprungen. `EP_KENNUNG`: Fresenius,
+      Henkel, Fuchs, Sartorius kennt Eulerpool nur unter der anderen ISIN. Lauf jetzt **~6 Min.**, `fundamental.csv` 21 MB,
+      ~530 Abrufe (Kontingent 100.000/Monat).
+      `kennzahlen`: Eulerpool zuerst für EBIT (`PRIORITAET`), Schätzungen nächstes Jahr (`EP_SCHAETZUNG`), Gewinn je Aktie
+      in 3 Jahren; Balken zeigen bis zu 3 Schätzjahre. **Währungsschutz** `ep_passt`: Eulerpool rechnet in Berichtswährung,
+      TradingView in Handelswährung → Eulerpool nur, wenn der Umsatz im letzten Geschäftsjahr auf 10 % gleich ist. Greift
+      nicht bei Qiagen, RTL, NVIDIA (Währung/Geschäftsjahr) und Deutsche Börse, Hannover Rück, Commerzbank (Umsatzbegriff);
+      die fallen auf die alten Quellen zurück. Ergebnis: 99 von 105 Firmen mit Eulerpool, **echtes EBIT über 10 Jahre bei
+      91 statt 7 Firmen.** Eulerpools Ist-Gewinn je Aktie = onvista bereinigt bei 87 % (±5 %).
+      **Formeln nachgeschärft** (Abgleich aller Firmen gegen AAQS, `.recherche/eulerpool_abgleich.py`): ROCE und
+      Verschuldung jetzt mit EBIT des Geschäftsjahrs statt der letzten 12 Monate (zur Bilanz am selben Jahresende),
+      Nettoschulden = Schulden − Bargeld ohne kurzfristige Anlagen (TradingView `cash_n_equivalents_fy`). Gleich mit AAQS
+      (±1 Pp. bzw. ±0,1×): ROCE 36 → 96 %, Verschuldung 15 → 50 % (Rest: Leasing/Finanzsparten, Mercedes, VW, Siemens
+      Energy), EBIT-Wachstum 10 J. 96 %, EK-Rendite 96 %, Umsatzwachstum 89 %, größter EBIT-Rückgang 87 % (gleiche Formel;
+      Rest junge Firmen). Renditeerwartung nur 11 % gleich: eigene Formel mit Deckel, bewusst nicht angeglichen.
+      **Nebenwirkung, Entscheidung Tobias:** Mit echtem EBIT statt EBITDA (schwankt stärker) gibt es **29 statt 13 Zykliker**
+      (neu u. a. VW, Mercedes, Lufthansa, Infineon, Kion, aber auch DHL, Zalando, FMC, Fresenius); Substanzwerte 6 → 1, weil
+      Zykliker Vorrang hat. Qualitätscheck bei 37 Firmen geändert. 10/10: Atoss, Nemetschek, Alphabet, Microsoft (SAP jetzt
+      nicht mehr). Geprüft per Bildschirmfoto (Deutz: 10 J. EBIT, Schätzsäulen 26e–28e), `docs/` zurückgesetzt.
+      Sicherung des Stands davor: `.recherche/sicherung_eulerpool/`. **Fundamentaldaten damit fertig, nicht weiter ausbauen.**
+- [ ] Danach offen: Handyansicht auf echtem Gerät; SEC um IFRS erweitern (Freigabe Tobias); Universum über DAX/MDAX hinaus (Freigabe Tobias);
       vor dem Livegang Rechtslage TradingView/onvista/Nasdaq.
 
 ## Laufendes Vorhaben: Guru-Depots (13F der SEC)
@@ -601,3 +644,9 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **31.10.2026 (5):** Eulerpool-API geprüft (nur Webseiten, `DATENQUELLEN.md` Abschnitt 9): Gratis 100.000 Abrufe für Prototypen, Schätzungen nur eingeschränkt; Builder 99 $/Monat mit Anzeigerecht. Probe wartet auf Gratis-Schlüssel von Tobias.
 - **31.10.2026 (6):** Eulerpool mit Gratis-Schlüssel getestet (`DATENQUELLEN.md` Abschnitt 9): GuV mit EBIT über 25–43 Jahre weltweit, Schätzungen bis 2030, teils verschlüsselt (SAP, nicht umgehen); Eulerpool ist Datenlieferant von AlleAktien (AAQS-Adresse liefert die Kartenwerte). Einbau wartet auf Freigabe.
 - **31.10.2026 (7):** Sonntags-Report: `sonntags_report.py` (Entwurf aus eigenen Daten) und `newsletter/GESPRAECHE.md` (Leitfaden Anlegergespräche). Formular wartet auf EmailOctopus-Liste von Tobias.
+- **31.10.2026 (8):** EmailOctopus für den Newsletter verworfen (1 Formular im Gratistarif), Kit eingerichtet: Anmeldekarte auf der Startseite, Datenschutzabsatz, Verbindung geprüft.
+- **31.10.2026 (7):** Eulerpool in Sammler und Kennzahlen eingebaut (EBIT 10 J. bei 91 statt 7 Firmen, Schätzungen bis 3 Jahre), alle Firmen gegen AAQS abgeglichen, ROCE/Verschuldung auf Geschäftsjahr umgestellt (ROCE 96 % gleich mit AlleAktien). Offen: Zykliker-Schwelle (29 statt 13).
+- **31.10.2026 (Logo):** MVP-Logo begonnen, nur Bildzeichen (Name noch offen), Graustufen, Wirkung „seriös, belegt“ + „modern, Tech“, Einsatz Sonntags-Report, Website + Favicon, Social Media. Drei Konzepte in `logo/` (v1 verworfen: QR-Code-, Uhrzeiger-, Audio-Wirkung). Übersicht `logo/konzepte-v2.png`, Empfehlung A „Innenblick“. Wartet auf Tobias' Wahl; danach Logo-Paket (Farbe, Favicon, Icons).
+- **31.10.2026 (Logo 2):** Tobias verwirft die Tech-Entwürfe: Logo soll elitär, „old money“, seriös wirken, Schriftzug in Serifenschrift. Name jetzt Rhodus. Drei neue Konzepte in `logo/` (Übersicht `logo/rhodus-konzepte-v3.png`): A Inschrift (Cinzel), B Privatbank (Bodoni Moda, Empfehlung), C Münze (Rose von Rhodos, Ring, Cormorant Garamond). Schriften frei lizenziert (OFL, Google Fonts) in `logo/schriften/`, Umwandlung in Pfade mit `logo/bauen.py`. Wartet auf Tobias' Wahl.
+- **31.10.2026 (Logo 3):** Tobias wählt A „Inschrift“. Logo-Paket fertig in `logo/kit/` (Richtlinien `logo/kit/RICHTLINIEN.md`): Schriftzug, Monogramm + kräftige Kleinversion, Farben Rhodus-Grün #1E3B2F / Creme #F3EEE2, Favicon-Satz auf grüner Kachel (dunkle Tabs), Profilbild, Newsletter-Kopf 1200×300, Präsentationstafeln. Neu bauen mit `python3 logo/paket.py` (im Ordner `logo/`). Noch nicht auf Website/Newsletter eingesetzt.
+- **31.10.2026 (Logo 4):** Aufgeräumt: alle verworfenen Entwürfe, Konzeptübersichten, Testbilder, `bauen.py` und die Schriften Bodoni Moda/Cormorant gelöscht. In `logo/` bleiben nur `kit/`, `paket.py`, `text2path.py`, `praesentation.json` und `schriften/Cinzel.ttf` + `OFL.txt`. Rechtscheck: Schrift (OFL) erlaubt Logo-Nutzung; Urheberrecht am R gibt es nicht (keine Schöpfungshöhe), Schutz nur über eine Marke (Empfehlung: zuerst Wortmarke RHODUS beim DPMA, 290 € für Klassen 36, 41, 42; Bildzeichen vorher in TMview als Bildmarke suchen).
