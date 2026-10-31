@@ -52,11 +52,51 @@ CTA: Newsletter, Formular mit **EmailOctopus** (läuft schon in `roleplay-landin
 
 **Empfehlung Claude (Tobias hat zugestimmt, mit Schritt 1 zu beginnen):** Aufwendige Website erst, wenn das Produkt steht
 (dann echter Designer oder hochwertige Vorlage, nicht generiert). Jetzt:
-- [ ] 1. Positionierung in einer Sitzung: Zielgruppe, Versprechen, Angebot, Preisidee, Name (Arbeitsname offen).
+- [x] 1. Positionierung in einer Sitzung (31.10.2026), Entscheidungen Tobias:
+      - **Zielgruppe:** Privatanleger, die selbst Einzelaktien auswählen. Reihenfolge: DACH → Europa und USA → Rest der Welt.
+        Seite Deutsch und Englisch von Anfang an.
+      - **Versprechen:** „GuruFocus für Europa, günstiger“ + Insider + Sentiment. Begründung Tobias: Der Markt läuft heute
+        stark über X/Twitter und Reddit (Hype, Pennystocks, Krypto), dort gelten die alten Regeln nicht; Vorbild Nancy Pelosi (USA).
+        Vorschlag Claude für die Überschrift (offen): „Was die Profis tun, was die Masse redet und was davon stimmt“
+        (Profis gegen Hype, belegt durch die eigene Event Study). „Günstiger“ als Nebenbotschaft, nicht als Überschrift
+        (AlleAktien nutzt ebenfalls Eulerpool-Daten). Grenzen: Politikerdepots gibt es nur in den USA (STOCK Act), in der EU
+        keine vergleichbaren Daten → kommt mit der USA-Phase; Krypto hat keine Insidermeldungen; Pennystock-Hype rechtlich heikel.
+      - **Preis:** kostenlos (Sonntags-Report, Daten mit Verzögerung); Pro 9 €/Monat bzw. 89 €/Jahr; Gründerpreis 59 €/Jahr
+        dauerhaft für die ersten 100. Vergleich: AlleAktien ≈ 290 €/Jahr, GuruFocus ≈ 450–550 $/Region. Eulerpool Builder
+        (99 $/Monat) ist ab etwa 15 Zahlenden gedeckt.
+      - **Name:** offen, eigene kurze Runde. Geprüft 31.10.2026 (whois): profispur.de/.com, followtheinsiders.com,
+        aktienspur.de frei; insiderblick.de, kapitalspur.de vergeben. Vor dem Kauf Marke bei DPMA/EUIPO prüfen.
 - [ ] 2. Newsletter starten: schlichtes EmailOctopus-Formular, verlinkt von der jetzigen Seite; Skript, das samstags
       einen Entwurf des Sonntags-Reports aus den eigenen Daten vorbereitet.
-- [ ] 3. Mit 5–10 Anlegern sprechen.
+      **Skript fertig (31.10.2026, nicht gepusht):** `python3 sonntags_report.py [JJJJ-MM-TT]` → `newsletter/<Datum>.md`
+      (Stichtag = Sonntag, betrachtet die 7 Tage davor nach Mitteilungsdatum): 5 größte Käufe, neue Cluster, Käufer mit
+      guter Bilanz (aus `ranking.json`, nur Ø und Median > 0), 3 größte Verkäufe. Liest nur `docs/data`, also vorher
+      `git pull`. Getestet an den Wochen bis 04.10. und 01.11.2026. Nur Deutsch (Englisch fehlt noch). Offen: EmailOctopus-
+      Liste + Formularcode von Tobias, Link auf der Seite, Datenschutztext (Vorlage `roleplay-landing`); Versand samstags
+      automatisch erst, wenn der Report von Hand ein paar Wochen gut war.
+- [ ] 3. Mit 5–10 Anlegern sprechen. Leitfaden, Anschreiben, Auswertungstabelle: `newsletter/GESPRAECHE.md` (31.10.2026).
+      Die Gespräche prüfen jetzt Zielgruppe und Preisidee aus der Positionierung (31.10.2026).
 - [ ] 4. Weiter am Produkt (Datenbank, Sentiment); Website danach.
+
+## Nächste Schritte (Stand 31.10.2026, nach Rauszoomen mit Tobias)
+
+Ziel bleibt: Startup, Finanzdaten-Plattform „GuruFocus für Europa, günstiger“ + „Folge den Profis“ + Sentiment.
+Fundamentaldaten sind dafür Pflicht, aber nicht das Alleinstellungsmerkmal (das sind Insider, Großaktionäre, Rückkäufe,
+Guru-Depots, später Sentiment). Reihenfolge laut Empfehlung Claude:
+1. **Neuer Chat: Eulerpool einbauen** (`DATENQUELLEN.md` Abschnitt 9): Leser in `pipeline/fundamental.py`
+   (GuV, Bilanz, Cashflow, Schätzungen; Ist-Jahre von Schätzjahren trennen; Werte in Mio. → ×1e6; verschlüsselte
+   Antworten überspringen, nie entschlüsseln), in `kennzahlen.PRIORITAET` vor onvista/TradingView für EBIT und
+   Schätzungen; dann alle Firmen automatisch gegen `/api/1/aaqs/by-isin` abgleichen (nur Prüfung, nicht anzeigen) und
+   Formeln nachschärfen (ROCE, Verschuldung). Danach Fundamentaldaten als fertig betrachten, **nicht weiter ausbauen**.
+2. **Kleine Fehler auf der Live-Seite zuerst beheben:** Rückkäufe „keine Daten“ ✅ (31.10., gepusht);
+   Taktung: cron-job.org einrichten (Tobias, Abschnitt Offen).
+3. **Positionierung: erledigt 31.10.2026** (siehe Marketing Schritt 1), nur der Name ist noch offen.
+4. **Newsletter „Sonntags-Report“ + 5–10 Gespräche mit Anlegern** (Marketing Schritt 2–3): erste echte Rückmeldung.
+5. **Architektur entschieden (31.10.2026, `ARCHITEKTUR.md` unten):** Supabase (Postgres, kostenlos), Sammler bleiben
+   in GitHub Actions, kein Hetzner bis MVP, 0 € bis MVP. Umsetzung (Block 1–2) nach der Positionierung (erledigt) und
+   bevor das Universum über DAX/MDAX hinaus wächst, **kann also jetzt starten**; braucht ein Supabase-Konto von Tobias.
+   Website-Technik ist noch festzulegen.
+6. **Vor dem Livegang:** Rechtslage der Quellen; legaler Weg mit Anzeigerecht wäre Eulerpool Builder (99 $/Monat).
 
 ## Einstieg für einen neuen Chat (Stand 28.10.2026)
 
@@ -276,7 +316,11 @@ Auftrag Tobias 30.10.2026 (nach Abschluss Stimmrechte). Quelle: EQS-Kategorie `s
       90 Firmen, 16.144 Zeilen (15.321 Rückkauftage, 823 `anderes`). Kontrollzahl: 2.939 Meldungen stimmen, 192 ohne,
       150 „Abweichungen“ sind nur die kumulierte Programmsumme (BASF, Brenntag, Puma: Differenz zur Vormeldung passt),
       83 echte Abweichungen, davon 48 Scout24 (2019–2024), Rest einzeln (Allianz, Telekom, Commerzbank, Talanx …).
-- [ ] **Fehler auf der Live-Seite:** 34 Firmen haben bei EQS **0 Meldungen** in der Kategorie (u. a. BMW, K+S, Rheinmetall,
+- [x] **Fehler auf der Live-Seite (behoben und gepusht 31.10.2026, per Patch `.recherche/rueckkauf-keine-daten.patch`):**
+      Firmen mit `meldungen=0` in `rueckkaeufe_fortschritt.csv` und ohne Zeile in `rueckkaeufe.csv` bekommen jetzt
+      „Keine Daten: Das EQS-Archiv enthält … keine Rückkaufmeldungen“ (`export.rk_ohne`, `firmenseite(rueck_ohne_meldungen=)`).
+      Lokal getestet mit den Bot-Daten: 36 Seiten „Keine Daten“ (34 Firmen, VW/Sartorius je 2 Gattungen), 14 behalten
+      „Keine Aktienrückkäufe“, SAP Tabelle. Ursprünglicher Befund: 34 Firmen haben bei EQS **0 Meldungen** in der Kategorie (u. a. BMW, K+S, Rheinmetall,
       Volkswagen) und bekommen trotzdem „Keine Aktienrückkäufe seit 2018 laut EQS-Archiv.“ BMW (Verteiler gewechselt)
       und K+S (Programm 2023) haben aber zurückgekauft → bei 0 Meldungen besser „keine Daten“ statt „keine Rückkäufe“.
 - [ ] Offen aus der Prüfung: Scout24-Abweichungen ansehen; `art=anderes` mit „Rückkauf“ im Text (braucht die Meldungstexte).
@@ -329,9 +373,47 @@ Plan (Tobias 31.10.2026: „so machen“), nur lokal, in abbrechbaren Blöcken:
       Bekannte Schwächen: Renditeerwartung = Gewinnwachstum je Aktie 3 J. (onvista) + Dividendenrendite → bei
       niedriger Ausgangsbasis unplausibel hoch (Deutz 60 %, Rheinmetall 67 %); fehlt für US-Firmen (keine onvista-Daten,
       Nasdaq hätte Gewinnschätzungen); Siemens-Verschuldung enthält die Finanzsparte (3,0 × EBITDA); EBIT 10 J. nur USA.
-- [ ] 3. Lokale Anzeige auf der Firmenseite (nicht pushen): Kennzahlen, Rentabilität, Risiko, Balken Umsatz/EBIT, Wachstum.
-- [ ] 4. Eigener Qualitätscheck (10 Kriterien, eigene Schwellen) und Kategorie nach Peter Lynch per Regel.
-      Burggraben-Text nicht automatisch.
+- [x] **3. Lokale Anzeige (31.10.2026):** Abschnitt „Finanzkennzahlen“ nach dem Kursdiagramm (`seiten.fundamental_abschnitt`):
+      Bewertung, Rentabilität, Risiko, Wachstum, Balken Umsatz und EBIT (10 Jahre + Schätzung, reines HTML/CSS, Stile
+      `.fk-*` in `style.css`). `export.py` liest `daten/kennzahlen.csv` nur, wenn sie existiert; sie steht in `.gitignore`,
+      also **zeigt die Action den Abschnitt nie → Code kann gefahrlos gepusht werden.** Banken/Versicherer ohne
+      EBIT-Diagramm und ohne Umsatzschätzung (Allianz zeigte +31 %). Geprüft per Bildschirmfoto (SAP, Allianz), alle 94
+      Seiten mit Abschnitt, `docs/` danach zurückgesetzt. **Lokal ansehen:** `python3 -m pipeline.fundamental`,
+      `python3 -m pipeline.kennzahlen`, `PYTHONPATH=. python3 .recherche/seiten_lokal.py` (wie `lauf.py` ohne BaFin,
+      Gurus, Telegram), `python3 -m http.server 8765 --directory docs` → http://localhost:8765/firma/SAP.DE/,
+      danach `git checkout -- docs/data docs/firma docs/sitemap.xml docs/*.html docs/gurus`.
+      **Architektur (Tobias' Frage, 31.10.2026):** nicht nach Markt trennen, sondern ein Datenmodell (langes Format)
+      mit Quellen als austauschbaren Lesern; welche Quelle je Posten gilt, steht in `kennzahlen.PRIORITAET`.
+      Getrennt nach Schwierigkeit wird nur beim Livegang: US-Abschlüsse über die SEC sind offiziell und sofort
+      zeigbar, Schätzungen und Kurse sind auch in den USA grau; deutsche Abschlüsse sind nur grau verfügbar
+      (bis ESAP 2027 oder Lizenz).
+- [x] **4. Qualitätscheck, Kategorie, Renditeerwartung (31.10.2026):** in `kennzahlen.py` (`KRITERIEN`, `kategorie`,
+      `renditeerwartung`), Anzeige in `seiten.fundamental_abschnitt` (Häkchenliste, Kategorie mit Erklärung).
+      Qualitätscheck: 10 eigene Kriterien (Umsatz 10 J./3 J. ≥ 5 %, EBIT bzw. EBITDA 10 J. ≥ 5 %, Gewinnschätzung ≥ 5 %,
+      Nettoverschuldung ≤ 2 × EBIT (bei Verlust nur ohne Schulden), Gewinn in ≥ 9 von 10 Jahren, Einbruch ≤ 25 %,
+      EK-Rendite ≥ 15 %, ROCE ≥ 15 %, Marge ≥ 10 %); fehlende Daten zählen nicht, Ergebnis „x von y bewertbaren“.
+      10/10: SAP, Nemetschek, Atoss, Alphabet; 0/9: Bayer, Wacker, Lanxess, Salzgitter.
+      Kategorie nach Peter Lynch (Vorrang in dieser Reihenfolge): Turnaround (Verlust letztes Jahr oder 2 von 3),
+      Zykliker (operatives Ergebnis in 10 J. mindestens **zweimal** ≥ 25 % zum Vorjahr eingebrochen; erste Fassung mit
+      „einmal ≥ 40 %“ ergab 29 Zykliker inkl. Rational/Amazon wegen Corona → verworfen), Substanzwert (KBV < 0,8, keine
+      Finanzwerte), sonst nach Umsatzwachstum ≥ 12 % / 5–12 % / < 5 %. Verteilung: 29 langsam, 28 solide, 16 schnell,
+      13 Zykliker, 13 Turnaround, 6 Substanzwerte. Grenzfälle: Siemens als Zykliker (Konzernumbau), Aroundtown
+      „schnell wachsend“ (Zukäufe).
+      Renditeerwartung: Gewinnwachstum je Aktie (3 J. onvista, sonst 1 J. TradingView, damit auch USA) **gedeckelt auf
+      20 % p. a.** + Dividendenrendite, Hinweis auf der Seite, wenn gedeckelt (vorher Deutz 60 %, Rheinmetall 67 %).
+      Burggraben-Text nicht automatisch. Geprüft per Bildschirmfoto (SAP, Deutz), `docs/` zurückgesetzt.
+- [x] **Nasdaq und Märkte (31.10.2026):** `fundamental.nasdaq` holt US-Gewinnschätzungen (4 Jahre, Posten
+      `eps_schaetzung`, `analysten`); `kennzahlen` nimmt sie, wenn onvista fehlt (Ist-Gewinn je Aktie TradingView →
+      Schätzung in 3 Jahren; Vorsicht: Nasdaq bereinigt, Ist nach US-GAAP). Alle 10 US-Testfirmen haben jetzt
+      Renditeerwartung aus 3 Jahren (Apple 14 %, NVIDIA gedeckelt). Bekannt: Firmen mit Geschäftsjahr bis Januar
+      (NVIDIA) können um ein Jahr verrutschen (TradingView-Jahr vs. Nasdaq „Jan 2027“), nicht geprüft.
+      Marktabdeckung geprüft → `DATENQUELLEN.md` Abschnitt 8: TradingView hat alle großen Börsen mit 20 Jahren
+      (USA, China, HK, Taiwan, Korea, Japan, Indien, ganz Europa, Kanada, Australien, Brasilien …), Schätzungen bei
+      Nebenwerten dünner. onvista auch große Auslandswerte (nicht China-A, nicht Indien). **SEC hat offizielle Daten
+      für ausländische Firmen mit US-Notierung (20-F, teils IFRS)**: Vorschlag, `sec()` um `ifrs-full` zu erweitern.
+- [ ] Danach offen: Handyansicht auf echtem Gerät; Schätzungen über 1 Jahr für Umsatz/EBIT (keine Gratisquelle
+      gefunden); SEC um IFRS erweitern (Freigabe Tobias); Universum über DAX/MDAX hinaus (Freigabe Tobias);
+      vor dem Livegang Rechtslage TradingView/onvista/Nasdaq.
 
 ## Laufendes Vorhaben: Guru-Depots (13F der SEC)
 
@@ -423,7 +505,10 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 
 ## Offen
 
-- [ ] **Taktung reicht nicht:** gepusht, aber geprüft am 24.10.2026: nur 12 geplante Läufe in ~1,5 Tagen (23.10.: 6 statt
+- [ ] **Taktung reicht nicht** (31.10.2026 erneut gezählt: 24.–30.10. je 5–7 geplante Läufe statt 48, Lücken bis 6,5 h,
+      0 Fehler). Lösung vorbereitet: Kommentar im Workflow, Anleitung cron-job.org an Tobias gegeben (Token fein
+      abgestuft, nur Repo insider, Actions: Read and write; POST auf `…/workflows/aktualisieren.yml/dispatches` mit
+      `{"ref":"main","inputs":{"immer":"false"}}`, sonst rechnet jeder Lauf neu und committet). **Eingerichtet 31.10.2026**, Testlauf 204, Lauf 17:34 UTC erfolgreich. Nach 1–2 Tagen Läufe zählen (Soll ~48/Tag), dann Punkt abhaken (Planungs-App #62). Workflow-Kommentar gepusht 31.10.2026. Alt: gepusht, aber geprüft am 24.10.2026: nur 12 geplante Läufe in ~1,5 Tagen (23.10.: 6 statt
       ~48), alle erfolgreich. Neue Meldungen kommen also mit Stunden Verspätung. Abhilfe: externer Auslöser (cron-job.org
       ruft `workflow_dispatch` über die GitHub-API auf; braucht ein Token mit Actions-Recht). Entscheidung Tobias.
 - [ ] Diagramm auf der Firmenseite einmal auf dem echten Handy ansehen.
@@ -510,3 +595,9 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **30.10.2026 (7):** `ARCHITEKTUR.md` geschrieben (Planung #7): heutige Grenzen, empfohlenes Ziel, Weg in 5 Blöcken, offene Entscheidungen. Nichts gebaut.
 - **30.10.2026 (8):** Fundamentaldaten (#6): erster Plan (Bezahlanbieter) von Tobias verworfen (kein Geld, global, nur lokal). Gratis-Quellen getestet, TradingView-Screener liefert 20 Jahre für alle Märkte; neuer Plan unter „Geplantes Vorhaben: Fundamentaldaten“, nichts gebaut.
 - **31.10.2026:** Fundamentaldaten (#6) Block 1 (Sammler TradingView/onvista/SEC) und Block 2 (Kennzahlen) gebaut und gegen AlleAktien-Karte Atoss geprüft; Daten nur lokal (`.gitignore`), nicht gepusht.
+- **31.10.2026 (2):** Fundamentaldaten Block 3: Abschnitt „Finanzkennzahlen“ auf den Firmenseiten (nur lokal, weil Daten in `.gitignore`), Quellen-Prioritätstabelle, Fehler „11 von 10“ und Allianz-Umsatzschätzung behoben.
+- **31.10.2026 (3):** Fundamentaldaten Block 4: Qualitätscheck (10 Kriterien), Kategorie nach Peter Lynch, gedeckelte Renditeerwartung; Vorhaben #6 (lokal) abgeschlossen.
+- **31.10.2026 (4):** Nasdaq-Gewinnschätzungen für US-Firmen eingebaut; Abdeckung von 32 Märkten geprüft (`DATENQUELLEN.md` Abschnitt 8), SEC hat auch ausländische Firmen mit US-Notierung.
+- **31.10.2026 (5):** Eulerpool-API geprüft (nur Webseiten, `DATENQUELLEN.md` Abschnitt 9): Gratis 100.000 Abrufe für Prototypen, Schätzungen nur eingeschränkt; Builder 99 $/Monat mit Anzeigerecht. Probe wartet auf Gratis-Schlüssel von Tobias.
+- **31.10.2026 (6):** Eulerpool mit Gratis-Schlüssel getestet (`DATENQUELLEN.md` Abschnitt 9): GuV mit EBIT über 25–43 Jahre weltweit, Schätzungen bis 2030, teils verschlüsselt (SAP, nicht umgehen); Eulerpool ist Datenlieferant von AlleAktien (AAQS-Adresse liefert die Kartenwerte). Einbau wartet auf Freigabe.
+- **31.10.2026 (7):** Sonntags-Report: `sonntags_report.py` (Entwurf aus eigenen Daten) und `newsletter/GESPRAECHE.md` (Leitfaden Anlegergespräche). Formular wartet auf EmailOctopus-Liste von Tobias.
