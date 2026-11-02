@@ -1,4 +1,5 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+DEUTZ Aktiengesellschaft,40001150,DE0006305006,"Freytag, Melanie",Aufsichtsrat,Aktie,Kauf,"9,64 EUR","48.175,64 EUR",2026-11-02,2026-10-30,XETRA,2026-11-02 12:01:20,9.64,EUR,48175.64,2026-11-02 12:13:41
 UmweltBank Aktiengesellschaft,10108663,DE0005570808,"von Blücher, Dietmar",Vorstand,Aktie,Kauf,"3,66 EUR","12.468,76 EUR",2026-11-02,2026-10-29,Xetra,2026-11-02 10:47:09,3.66,EUR,12468.76,2026-11-02 11:13:38
 Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"65,00 EUR","49.205,00 EUR",2026-11-02,2026-10-29,Tradegate,2026-11-02 10:33:53,65.0,EUR,49205.0,2026-11-02 10:43:39
 Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"64,80 EUR","3.240,00 EUR",2026-11-02,2026-10-29,Quotrix,2026-11-02 10:33:53,64.8,EUR,3240.0,2026-11-02 10:43:39
