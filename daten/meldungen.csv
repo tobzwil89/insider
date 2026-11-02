@@ -1,4 +1,11 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"65,00 EUR","49.205,00 EUR",2026-11-02,2026-10-29,Tradegate,2026-11-02 10:33:53,65.0,EUR,49205.0,2026-11-02 10:43:39
+Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"64,80 EUR","3.240,00 EUR",2026-11-02,2026-10-29,Quotrix,2026-11-02 10:33:53,64.8,EUR,3240.0,2026-11-02 10:43:39
+tk accelis Group AG & Co. KGaA,40036903,DE000TKCC1S8,"López Borrego, Miguel Ángel",Aufsichtsrat,Aktie,Sonstiges,"27,80 EUR","448.664,20 EUR",2026-10-30,2026-10-27,,2026-11-02 10:27:57,27.8,EUR,448664.2,2026-11-02 10:43:39
+Symrise AG,40005903,DE000SYM9999,"Ribeiro, Walter",Vorstand,Aktie,Kauf,"92,76 EUR","46.380,00 EUR",2026-10-30,2026-10-29,Xetra,2026-11-02 10:27:57,92.76,EUR,46380.0,2026-11-02 10:43:39
+"ADTRAN Holdings, Inc.",50087419,,"Terlinde, Christian H.",Sonstige Führungsperson,Aktie,Sonstiges,,,2026-10-30,2026-10-27,,2026-11-02 10:27:57,,,,2026-11-02 10:43:39
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,38 EUR","3.800,00 EUR",2026-10-30,2026-10-28,Xetra,2026-11-02 10:22:52,0.38,EUR,3800.0,2026-11-02 10:43:39
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,38 EUR","3.800,00 EUR",2026-10-30,2026-10-28,Tradegate,2026-11-02 10:22:52,0.38,EUR,3800.0,2026-11-02 10:43:39
 FCR Immobilien Aktiengesellschaft,40022612,DE000A1YC913,MAMBO Vermögensverwaltung GmbH,in enger Beziehung,Aktie,Kauf,"9,50 EUR","204.383,00 EUR",2026-10-30,2026-10-28,,2026-10-30 17:34:17,9.5,EUR,204383.0,2026-10-30 19:53:34
 tk accelis Group AG & Co. KGaA,40036903,DE000TKCC1S8,"Wodera, Daniel",Vorstand,Aktie,Kauf,"27,18 EUR","81.531,78 EUR",2026-10-30,2026-10-29,Xetra,2026-10-30 17:28:01,27.18,EUR,81531.78,2026-10-30 19:53:34
 Knorr-Bremse Aktiengesellschaft,40002863,DE000KBX1006,"Llistosella, Marc",Vorstand,Aktie,Kauf,"88,10 EUR","52.860,00 EUR",2026-10-30,2026-10-30,Tradegate,2026-10-30 17:28:01,88.1,EUR,52860.0,2026-10-30 19:53:34
