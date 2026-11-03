@@ -1,4 +1,5 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+EnviTec Biogas AG,40006808,DE000A0MVLS8,2. vLB GmbH & Co. KG,in enger Beziehung,Aktie,Kauf,"17,14 EUR","26.116,40 EUR",2026-11-02,2026-10-22,Tradegate,2026-11-03 14:15:08,17.14,EUR,26116.4,2026-11-03 14:43:36
 AMADEUS FIRE AG,40001855,DE0005093108,"Weixler, Otto Kajetan",Aufsichtsrat,Aktie,Kauf,"17,37 EUR","17.372,30 EUR",2026-11-03,2026-11-03,XETRA,2026-11-03 12:35:43,17.37,EUR,17372.3,2026-11-03 12:43:37
 UmweltBank Aktiengesellschaft,10108663,DE0005570808,"von Blücher, Dietmar",Vorstand,Aktie,Kauf,"3,55 EUR","21.286,41 EUR",2026-11-03,2026-10-30,XETRA,2026-11-03 09:47:07,3.55,EUR,21286.41,2026-11-03 10:13:34
 Symrise AG,40005903,DE000SYM9999,"Coßmann, Dr. Stephanie",Vorstand,Aktie,Kauf,"91,32 EUR","25.569,60 EUR",2026-11-02,2026-10-29,Tradegate,2026-11-03 09:41:17,91.32,EUR,25569.6,2026-11-03 10:13:34
