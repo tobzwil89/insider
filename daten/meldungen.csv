@@ -1,4 +1,11 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+EnviTec Biogas AG,40006808,DE000A0MVLS8,2. vLB GmbH & Co. KG,in enger Beziehung,Aktie,Kauf,"17,12 EUR","57.802,16 EUR",2026-11-02,2026-10-30,Tradegate,2026-11-03 09:04:32,17.12,EUR,57802.16,2026-11-03 09:13:30
+WeGrow AG,40034080,DE000A2LQUV1,Gasparian GmbH,in enger Beziehung,Aktie,Verkauf,"1,10 EUR","275.000,00 EUR",2026-11-02,2026-10-29,,2026-11-03 08:53:04,1.1,EUR,275000.0,2026-11-03 09:13:30
+WeGrow AG,40034080,DE000A2LQUV1,"Dießenbacher, Peter",Vorstand,Aktie,Verkauf,"1,10 EUR","275.000,00 EUR",2026-11-02,2026-10-29,,2026-11-03 08:47:02,1.1,EUR,275000.0,2026-11-03 09:13:30
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,39 EUR","3.900,00 EUR",2026-11-02,2026-10-29,Tradegate,2026-11-03 08:47:02,0.39,EUR,3900.0,2026-11-03 09:13:30
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,42 EUR","4.200,00 EUR",2026-11-02,2026-10-30,Xetra,2026-11-03 08:40:03,0.42,EUR,4200.0,2026-11-03 09:13:30
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr Max",Vorstand,Aktie,Verkauf,"0,39 EUR","3.900,00 EUR",2026-11-02,2026-10-29,Xetra,2026-11-03 08:40:03,0.39,EUR,3900.0,2026-11-03 09:13:30
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,40 EUR","2.400,00 EUR",2026-11-02,2026-10-29,Xetra,2026-11-03 08:40:03,0.4,EUR,2400.0,2026-11-03 09:13:30
 RATIONAL Aktiengesellschaft,40002239,DE0007010803,HONUA Natur & Mensch Stiftung,in enger Beziehung,Aktie,Sonstiges,"0,00 EUR","0,00 EUR",2026-11-02,2026-10-27,,2026-11-03 08:33:16,0.0,EUR,0.0,2026-11-03 08:43:39
 Rigsave S.p.A.,40035602,IT0005526295,Pareto Capital Partners SA - SPF,in enger Beziehung,Aktie,Kauf,"3,56 EUR","7.839,53 EUR",2026-11-02,2026-10-28,xetra,2026-11-02 13:51:51,3.56,EUR,7839.53,2026-11-02 14:13:43
 DEUTZ Aktiengesellschaft,40001150,DE0006305006,"Freytag, Melanie",Aufsichtsrat,Aktie,Kauf,"9,64 EUR","48.175,64 EUR",2026-11-02,2026-10-30,XETRA,2026-11-02 12:01:20,9.64,EUR,48175.64,2026-11-02 12:13:41
