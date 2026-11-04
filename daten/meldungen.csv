@@ -1,4 +1,6 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+init innovation in traffic systems SE,40002545,DE0005759807,"Ferber, Dr. Marco",Vorstand,Aktie,Kauf,"31,60 EUR","47.400,00 EUR",2026-11-04,2026-11-03,Xetra,2026-11-04 10:39:08,31.6,EUR,47400.0,2026-11-04 11:43:42
+init innovation in traffic systems SE,40002545,DE0005759807,"Munz, Jörg",Vorstand,Aktie,Kauf,"32,79 EUR","65.578,00 EUR",2026-11-04,2026-11-02,,2026-11-04 10:39:08,32.79,EUR,65578.0,2026-11-04 11:43:42
 Delivery Hero SE,40026088,DE000A41YH12,"Bruder, Dr. Johannes",Vorstand,Aktie,Verkauf,"37,20 EUR","2.099.456,40 EUR",2026-11-04,2026-10-29,Xetra,2026-11-04 09:38:50,37.2,EUR,2099456.4,2026-11-04 10:13:49
 Delivery Hero SE,40026088,DE000A41YH12,"Vandepitte, Pieter-Jan",Vorstand,Aktie,Verkauf,"37,20 EUR","1.621.585,20 EUR",2026-11-04,2026-10-29,,2026-11-04 09:38:50,37.2,EUR,1621585.2,2026-11-04 10:13:49
 Delivery Hero SE,40026088,DE000A41YH12,"Östberg, Niklas",Vorstand,Aktie,Verkauf,"36,80 EUR","43.225.280,00 EUR",2026-11-04,2026-10-28,,2026-11-04 09:38:50,36.8,EUR,43225280.0,2026-11-04 10:13:49
