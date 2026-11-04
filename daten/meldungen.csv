@@ -1,4 +1,9 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+Mensch und Maschine Software SE,40001190,DE0006580806,"Drotleff, Adi",Vorstand,Aktie,Sonstiges,"24,48 EUR","7.975,60 EUR",2026-11-04,2026-11-02,,2026-11-04 15:47:30,24.48,EUR,7975.6,2026-11-04 16:43:41
+init innovation in traffic systems SE,40002545,DE0005759807,"Timmann, Martin",Vorstand,Aktie,Kauf,"31,00 EUR","6.200,00 EUR",2026-11-04,2026-11-03,Tradegate,2026-11-04 15:42:04,31.0,EUR,6200.0,2026-11-04 16:43:41
+init innovation in traffic systems SE,40002545,DE0005759807,"Maklak-Timmann, Elena",in enger Beziehung,Aktie,Kauf,"30,58 EUR","27.521,37 EUR",2026-11-04,2026-11-03,Xetra,2026-11-04 15:42:04,30.58,EUR,27521.37,2026-11-04 16:43:41
+init innovation in traffic systems SE,40002545,DE0005759807,"Haupt, Dr. Johannes",Aufsichtsrat,Aktie,Kauf,"32,00 EUR","176.000,00 EUR",2026-11-04,2026-11-03,Stuttgart,2026-11-04 15:42:04,32.0,EUR,176000.0,2026-11-04 16:43:41
+UmweltBank Aktiengesellschaft,10108663,DE0005570808,"von Blücher, Dietmar",Vorstand,Aktie,Kauf,"3,64 EUR","9.758,84 EUR",2026-11-04,2026-11-03,XETRA,2026-11-04 15:42:04,3.64,EUR,9758.84,2026-11-04 16:43:41
 UmweltBank Aktiengesellschaft,10108663,DE0005570808,"von Blücher, Dietmar",Vorstand,Aktie,Kauf,"3,65 EUR","930,75 EUR",2026-11-04,2026-11-02,XETRA,2026-11-04 13:41:41,3.65,EUR,930.75,2026-11-04 14:13:35
 init innovation in traffic systems SE,40002545,DE0005759807,"Kühn, Matthias",Vorstand,Aktie,Kauf,"33,20 EUR","66.400,00 EUR",2026-11-04,2026-11-03,Xetra,2026-11-04 13:31:16,33.2,EUR,66400.0,2026-11-04 13:43:38
 init innovation in traffic systems SE,40002545,DE0005759807,"Timmann, Martin",Vorstand,Aktie,Kauf,"33,10 EUR","13.240,00 EUR",2026-11-04,2026-11-02,Tradegate,2026-11-04 13:31:16,33.1,EUR,13240.0,2026-11-04 13:43:38
