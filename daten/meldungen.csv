@@ -1,4 +1,7 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+Delivery Hero SE,40026088,DE000A41YH12,"Bruder, Dr. Johannes",Vorstand,Aktie,Verkauf,"37,20 EUR","2.099.456,40 EUR",2026-11-04,2026-10-29,Xetra,2026-11-04 09:38:50,37.2,EUR,2099456.4,2026-11-04 10:13:49
+Delivery Hero SE,40026088,DE000A41YH12,"Vandepitte, Pieter-Jan",Vorstand,Aktie,Verkauf,"37,20 EUR","1.621.585,20 EUR",2026-11-04,2026-10-29,,2026-11-04 09:38:50,37.2,EUR,1621585.2,2026-11-04 10:13:49
+Delivery Hero SE,40026088,DE000A41YH12,"Östberg, Niklas",Vorstand,Aktie,Verkauf,"36,80 EUR","43.225.280,00 EUR",2026-11-04,2026-10-28,,2026-11-04 09:38:50,36.8,EUR,43225280.0,2026-11-04 10:13:49
 Alzchem Group AG,40001802,DE000A41YHG1,"Sans, Dr. Jürgen",Vorstand,Aktie,Kauf,"141,00 EUR","14.100,00 EUR",2026-11-03,2026-11-02,,2026-11-04 09:28:34,141.0,EUR,14100.0,2026-11-04 09:43:38
 Alzchem Group AG,40001802,DE000A41YHG1,"Sans, Dr. Jürgen",Vorstand,Aktie,Kauf,"151,02 EUR","45.304,80 EUR",2026-11-03,2026-10-30,,2026-11-04 09:28:34,151.02,EUR,45304.8,2026-11-04 09:43:38
 Alzchem Group AG,40001802,DE000A41YHG1,"Niedermaier, Herr Andreas",Vorstand,Aktie,Kauf,"149,70 EUR","50.498,50 EUR",2026-11-03,2026-10-30,,2026-11-04 09:28:34,149.7,EUR,50498.5,2026-11-04 09:43:38
