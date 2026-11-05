@@ -1,4 +1,7 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,40 EUR","4.000,00 EUR",2026-10-27,2026-10-21,Tradegate,2026-11-05 10:35:17,0.4,EUR,4000.0,2026-11-05 10:43:38
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,40 EUR","4.000,00 EUR",2026-10-27,2026-10-21,Xetra,2026-11-05 10:35:17,0.4,EUR,4000.0,2026-11-05 10:43:38
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,44 EUR","3.960,00 EUR",2026-10-27,2026-10-19,Tradegate,2026-11-05 10:35:17,0.44,EUR,3960.0,2026-11-05 10:43:38
 ATOSS Software SE,40002013,DE0005104400,"Obereder, Nicola-Sophie",in enger Beziehung,Aktie,Kauf,"90,50 EUR","8.688.000,00 EUR",2026-11-05,2026-11-04,,2026-11-05 09:06:59,90.5,EUR,8688000.0,2026-11-05 09:13:45
 ATOSS Software SE,40002013,DE0005104400,AOB Portfolio One GmbH & Co. KG,in enger Beziehung,Aktie,Verkauf,"90,50 EUR","27.487.927,00 EUR",2026-11-05,2026-11-04,,2026-11-05 09:06:59,90.5,EUR,27487927.0,2026-11-05 09:13:45
 ATOSS Software SE,40002013,DE0005104400,"Obereder, Valerie",in enger Beziehung,Aktie,Kauf,"90,50 EUR","1.499.947,00 EUR",2026-11-05,2026-11-04,,2026-11-05 09:06:59,90.5,EUR,1499947.0,2026-11-05 09:13:45
