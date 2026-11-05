@@ -1,4 +1,6 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+"Haier Smart Home Co., Ltd.",40027093,CNE1000048K8,"Huang, Xiaowu",Sonstige Führungsperson,Aktie,Verkauf,"21,14 HKD","422.800,00 HKD",2026-11-05,2026-11-05,Hong Kong Stock Exchange,2026-11-05 15:17:49,21.14,HKD,422800.0,2026-11-05 15:43:48
+"Haier Smart Home Co., Ltd.",40027093,CNE1000048K8,"Huang, Xiaowu",Sonstige Führungsperson,Aktie,Verkauf,"20,80 HKD","416.000,00 HKD",2026-11-05,2026-11-04,Hong Kong Stock Exchange,2026-11-05 15:17:49,20.8,HKD,416000.0,2026-11-05 15:43:48
 German Tech Holding GmbH & Co. KGaA,10142363,DE000A1MMEV4,Sachs Assets GmbH,in enger Beziehung,Aktie,Kauf,"0,07 EUR","101.522,19 EUR",2026-11-05,2026-11-03,,2026-11-05 13:39:27,0.07,EUR,101522.19,2026-11-05 14:13:42
 Heidelberg Materials AG,40001085,DE0006047004,"Gurdal, Hakan",Vorstand,Aktie,Kauf,"176,35 EUR","43.205,75 EUR",2026-11-05,2026-11-05,Börse Frankfurt,2026-11-05 13:34:11,176.35,EUR,43205.75,2026-11-05 13:43:32
 DEUTZ Aktiengesellschaft,40001150,DE000SU1C207,"Schulte, Dr. Sebastian C.",Vorstand,Derivat,Kauf,"0,19 EUR","3.800,00 EUR",2026-11-05,2026-11-03,,2026-11-05 13:34:11,0.19,EUR,3800.0,2026-11-05 13:43:32
