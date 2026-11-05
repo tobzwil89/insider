@@ -1,4 +1,13 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+ATOSS Software SE,40002013,DE0005104400,"Obereder, Nicola-Sophie",in enger Beziehung,Aktie,Kauf,"90,50 EUR","8.688.000,00 EUR",2026-11-05,2026-11-04,,2026-11-05 09:06:59,90.5,EUR,8688000.0,2026-11-05 09:13:45
+ATOSS Software SE,40002013,DE0005104400,AOB Portfolio One GmbH & Co. KG,in enger Beziehung,Aktie,Verkauf,"90,50 EUR","27.487.927,00 EUR",2026-11-05,2026-11-04,,2026-11-05 09:06:59,90.5,EUR,27487927.0,2026-11-05 09:13:45
+ATOSS Software SE,40002013,DE0005104400,"Obereder, Valerie",in enger Beziehung,Aktie,Kauf,"90,50 EUR","1.499.947,00 EUR",2026-11-05,2026-11-04,,2026-11-05 09:06:59,90.5,EUR,1499947.0,2026-11-05 09:13:45
+ATOSS Software SE,40002013,DE0005104400,"Obereder, Christopher",in enger Beziehung,Aktie,Kauf,"90,50 EUR","17.299.980,00 EUR",2026-11-05,2026-11-04,,2026-11-05 09:06:59,90.5,EUR,17299980.0,2026-11-05 09:13:45
+ATOSS Software SE,40002013,DE0005104400,AOI Invest GmbH,in enger Beziehung,Aktie,Kauf,"93,70 EUR","12.419.372,80 EUR",2026-11-04,2026-11-03,,2026-11-05 09:01:15,93.7,EUR,12419372.8,2026-11-05 09:13:45
+ATOSS Software SE,40002013,DE0005104400,"Obereder, Nicola-Sophie",in enger Beziehung,Aktie,Verkauf,"93,70 EUR","5.185.732,80 EUR",2026-11-04,2026-11-03,,2026-11-05 09:01:15,93.7,EUR,5185732.8,2026-11-05 09:13:45
+ATOSS Software SE,40002013,DE0005104400,"Obereder, Christopher",in enger Beziehung,Aktie,Verkauf,"93,70 EUR","7.233.640,00 EUR",2026-11-04,2026-11-03,,2026-11-05 09:01:15,93.7,EUR,7233640.0,2026-11-05 09:13:45
+Mensch und Maschine Software SE,40001190,DE0006580806,"Pech, Markus",Vorstand,Aktie,Sonstiges,"24,48 EUR","7.975,60 EUR",2026-11-04,2026-11-02,,2026-11-05 08:55:59,24.48,EUR,7975.6,2026-11-05 09:13:45
+German Tech Holding GmbH & Co. KGaA,10142363,DE000A1MMEV4,"Gerlinger, Christoph",Vorstand,Aktie,Kauf,"0,07 EUR","11.964,96 EUR",2026-11-04,2026-11-03,,2026-11-05 08:55:59,0.07,EUR,11964.96,2026-11-05 09:13:45
 Mensch und Maschine Software SE,40001190,DE0006580806,"Drotleff, Adi",Vorstand,Aktie,Sonstiges,"24,48 EUR","7.975,60 EUR",2026-11-04,2026-11-02,,2026-11-04 15:47:30,24.48,EUR,7975.6,2026-11-04 16:43:41
 init innovation in traffic systems SE,40002545,DE0005759807,"Timmann, Martin",Vorstand,Aktie,Kauf,"31,00 EUR","6.200,00 EUR",2026-11-04,2026-11-03,Tradegate,2026-11-04 15:42:04,31.0,EUR,6200.0,2026-11-04 16:43:41
 init innovation in traffic systems SE,40002545,DE0005759807,"Maklak-Timmann, Elena",in enger Beziehung,Aktie,Kauf,"30,58 EUR","27.521,37 EUR",2026-11-04,2026-11-03,Xetra,2026-11-04 15:42:04,30.58,EUR,27521.37,2026-11-04 16:43:41
