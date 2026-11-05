@@ -1,4 +1,9 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+Heidelberg Materials AG,40001085,DE0006047004,"Gurdal, Hakan",Vorstand,Aktie,Kauf,"176,35 EUR","43.205,75 EUR",2026-11-05,2026-11-05,Börse Frankfurt,2026-11-05 13:34:11,176.35,EUR,43205.75,2026-11-05 13:43:32
+DEUTZ Aktiengesellschaft,40001150,DE000SU1C207,"Schulte, Dr. Sebastian C.",Vorstand,Derivat,Kauf,"0,19 EUR","3.800,00 EUR",2026-11-05,2026-11-03,,2026-11-05 13:34:11,0.19,EUR,3800.0,2026-11-05 13:43:32
+Rubean AG,40025108,DE0005120802,M2 Venture GmbH,in enger Beziehung,Aktie,Kauf,"4,50 EUR","999.999,00 EUR",2026-11-05,2026-11-03,,2026-11-05 13:29:19,4.5,EUR,999999.0,2026-11-05 13:43:32
+RENK Group AG,50085580,DE000RENK730,"Sagel, Dr. Alexander",Vorstand,Aktie,Kauf,"35,17 EUR","238.802,94 EUR",2026-11-05,2026-11-05,XETRA,2026-11-05 13:29:19,35.17,EUR,238802.94,2026-11-05 13:43:32
+German Tech Holding GmbH & Co. KGaA,10142363,DE000A1MMEV4,Gerlinger & Partner GmbH,in enger Beziehung,Aktie,Kauf,"0,07 EUR","74.918,27 EUR",2026-11-05,2026-11-03,,2026-11-05 13:24:02,0.07,EUR,74918.27,2026-11-05 13:43:32
 Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,40 EUR","4.000,00 EUR",2026-10-27,2026-10-21,Tradegate,2026-11-05 10:35:17,0.4,EUR,4000.0,2026-11-05 10:43:38
 Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,40 EUR","4.000,00 EUR",2026-10-27,2026-10-21,Xetra,2026-11-05 10:35:17,0.4,EUR,4000.0,2026-11-05 10:43:38
 Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,44 EUR","3.960,00 EUR",2026-10-27,2026-10-19,Tradegate,2026-11-05 10:35:17,0.44,EUR,3960.0,2026-11-05 10:43:38
