@@ -220,6 +220,9 @@ Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): 
   `nav.kapitel`, `id` je Karte; „Sonntags-Report“ behält `#newsletter`). Markier-Skript von `firma.js` nach `gemeinsam.js`
   verschoben (läuft nur, wenn eine Leiste da ist). Geprüft 1400/520 px, Sprünge zu Timing/Firmen/Report, RHM weiter ok.
   Sicherung: `.recherche/sicherung_kapitel_start/`. Neue Karte auf der Startseite → Link in der Leiste von Hand ergänzen.
+  **Fehler und Reparatur 07.11.2026:** Die Sprungmarken `#cluster` und `#firmen` gab es schon als Ids der Listen,
+  `start.js` füllte deshalb die ganze Karte (Firmenliste und Cluster zerschossen, live). Umbenannt in `#cluster-kaeufe`
+  und `#firmenliste`; keine doppelten Ids mehr auf Start- und Firmenseiten. Lehre: vor neuen Ids nach vorhandenen suchen.
 - **Kursreaktion je Ereignis (06.11.2026, Tobias):** Tabelle jetzt neueste zuerst (`sort_values(..., ascending=False)`). Gepusht 06.11.2026.
 - **Erklärtexte volle Breite (06.11.2026, Tobias):** `max-width: 760px` bei `.karte .erklaerung` entfernt, gilt für alle Karten. Geprüft RHM „Aktionäre“ 1400 px. Gepusht 06.11.2026.
 - Rechtlich: Logos nur zur Kennzeichnung der Firma zeigen, kein Anschein einer Partnerschaft → zu „vor dem Livegang klären“.
