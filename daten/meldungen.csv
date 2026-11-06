@@ -1,4 +1,12 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+German Tech Holding GmbH & Co. KGaA,10142363,DE000A1MMEV4,"Koning, Gerhard",Aufsichtsrat,Aktie,Kauf,"0,07 EUR","25.200,00 EUR",2026-11-06,2026-11-03,,2026-11-06 13:05:33,0.07,EUR,25200.0,2026-11-06 13:13:35
+Deutsche Lufthansa Aktiengesellschaft,40001478,DE0008232125,"Stange, Dr. Astrid",Aufsichtsrat,Aktie,Kauf,"8,33 EUR","153.759,00 EUR",2026-11-06,2026-11-05,Tradegate Berlin Stock Exchange,2026-11-06 13:05:33,8.33,EUR,153759.0,2026-11-06 13:13:35
+Rheinmetall Aktiengesellschaft,40002496,DE0007030009,"Papperger, Armin Theodor",Vorstand,Aktie,Kauf,"858,95 EUR","502.484,40 EUR",2026-11-06,2026-11-05,XETRA,2026-11-06 12:59:40,858.95,EUR,502484.4,2026-11-06 13:13:35
+Rubean AG,40025108,DE0005120802,"Van de Velden, Henrica",Aufsichtsrat,Aktie,Kauf,"4,50 EUR","499.999,50 EUR",2026-11-06,2026-11-03,,2026-11-06 12:54:39,4.5,EUR,499999.5,2026-11-06 13:13:35
+Viromed Medical AG,40034243,DE000A40ZVN7,"Perbandt, Heike",in enger Beziehung,Aktie,Verkauf,"4,84 EUR","968.000,00 EUR",2026-11-05,2026-11-03,,2026-11-06 12:49:32,4.84,EUR,968000.0,2026-11-06 13:13:35
+Rubean AG,40025108,DE0005120802,"Van de Velden, Henrica",Aufsichtsrat,Aktie,Kauf,"4,50 EUR","111.111,00 EUR",2026-11-05,2026-11-03,,2026-11-06 12:49:32,4.5,EUR,111111.0,2026-11-06 13:13:35
+AUMOVIO SE,40036346,DE000AUM0V10,"Dagli, Dr. Ismail",Vorstand,Aktie,Kauf,"32,25 EUR","47.596,05 EUR",2026-11-05,2026-11-05,Berlin Tradegate Exchange,2026-11-06 12:44:11,32.25,EUR,47596.05,2026-11-06 13:13:35
+ZEAL Network SE,40003601,DE000ZEAL241,Othello Vier Beteiligungs GmbH & Co. KG,in enger Beziehung,Aktie,Sonstiges,,,2026-11-06,2026-11-04,,2026-11-06 12:38:59,,,,2026-11-06 13:13:35
 Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,40 EUR","6.000,00 EUR",2026-11-05,2026-11-02,Tradegate,2026-11-06 12:33:44,0.4,EUR,6000.0,2026-11-06 12:43:34
 Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,40 EUR","6.000,00 EUR",2026-11-05,2026-11-02,Xetra,2026-11-06 12:28:22,0.4,EUR,6000.0,2026-11-06 12:43:34
 "Haier Smart Home Co., Ltd.",40027093,CNE1000048K8,"Huang, Xiaowu",Sonstige Führungsperson,Aktie,Verkauf,"21,14 HKD","422.800,00 HKD",2026-11-05,2026-11-05,Hong Kong Stock Exchange,2026-11-05 15:17:49,21.14,HKD,422800.0,2026-11-05 15:43:48
