@@ -58,6 +58,10 @@ function firmaLink(name, ticker) {
   return ticker ? el("a", { href: `firma/${encodeURIComponent(ticker)}/` }, name) : el("span", {}, name);
 }
 
+function personLink(name, seite) {
+  return seite ? el("a", { href: `person/${encodeURIComponent(seite)}/` }, name) : name;
+}
+
 function stand(s) {
   return `Berechnet ${fmt.datumZeit(s.berechnet)} · letzte BaFin-Meldung ${fmt.datumZeit(s.letzte_meldung)} · ` +
     `Kurse bis ${fmt.datum(s.letzter_kurstag)}`;
@@ -213,7 +217,7 @@ function rankingTabelle(liste, mitFirma = true) {
     ["Typisch (Median)", "zahl"], ["Durchschnitt", "zahl"], ["Besser als Index", "zahl"], ["Zeitraum"]].filter(Boolean),
   liste.map((r) => el("tr", {},
     el("td", { class: "zahl" }, r.rang),
-    el("td", {}, r.person, el("div", { class: "klein" }, fmt.position(r.position))),
+    el("td", {}, personLink(r.person, r.seite), el("div", { class: "klein" }, fmt.position(r.position))),
     mitFirma ? el("td", {}, firmaLink(r.name, r.ticker)) : null,
     el("td", { class: "zahl" }, r.kaeufe),
     el("td", { class: `zahl ${r.median > 0 ? "positiv" : "negativ"}` }, fmt.prozent(r.median)),

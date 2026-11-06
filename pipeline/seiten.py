@@ -18,6 +18,7 @@ import pandas as pd
 
 from pipeline import AUSGABE
 from pipeline.kennzahlen import DECKEL, KRITERIEN
+from pipeline.ranking import schluessel
 
 DOCS = AUSGABE.parent
 WEBSITE = "https://insider.tobiaszwilling.me"
@@ -87,6 +88,12 @@ def _kachel(label: str, wert: str, zusatz: str) -> str:
             f'<div class="zusatz">{e(zusatz)}</div></div>')
 
 
+def person_link(name: str, personen: dict | None, wurzel: str) -> str:
+    """Name als Link zur Personenseite, wenn es eine gibt (personen: Namensschlüssel → Adresse)."""
+    a = personen.get(schluessel(name)) if personen else None
+    return f'<a href="{wurzel}person/{a}/">{e(name)}</a>' if a else e(name)
+
+
 # --- Versionsnummern: Prüfsumme statt ?v=2 von Hand -------------------------------------------
 
 def versionen() -> dict:
@@ -123,13 +130,14 @@ def firmenlogo(isins: list, name: str, wurzel: str, groesse: str = "") -> str:
 def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, ranking: pd.DataFrame,
                 letzter_kurs: tuple, v: dict, aktionaere: pd.DataFrame, rueckkaeufe: pd.DataFrame | None = None,
                 kennzahlen: dict | None = None, rueck_ohne_meldungen: bool = False,
-                ring: dict | None = None) -> str:
+                ring: dict | None = None, personen: dict | None = None) -> str:
     """f: ticker, name, index, benchmark, isins. ranking: Zeilen dieser Firma mit Spalte 'rang'.
     aktionaere: Zeilen dieser Firma aus stimmrechte.grossaktionaere.
     ring: Argumente für aktionaersring (export.ring_daten); None = kein Ring.
     rueckkaeufe: Zeilen dieser Firma aus rueckkaeufe.jahre; None = Historie noch nicht geladen, Abschnitt fehlt.
     kennzahlen: Zeile aus kennzahlen.csv; None = Abschnitt fehlt.
-    rueck_ohne_meldungen: EQS führt für die Firma keine Rückkaufmeldungen → „keine Daten“ statt „keine Rückkäufe“."""
+    rueck_ohne_meldungen: EQS führt für die Firma keine Rückkaufmeldungen → „keine Daten“ statt „keine Rückkäufe“.
+    personen: Namensschlüssel → Adresse der Personenseite (Vorstand und Aufsichtsrat), für die Links."""
     index_name = INDEXNAME.get(f["benchmark"], f["benchmark"])
     aktien = meldungen[meldungen["instrument"].eq("Aktie")]
     kaeufe, verkaeufe = aktien[aktien["art"].eq("Kauf")], aktien[aktien["art"].eq("Verkauf")]
@@ -164,7 +172,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
             [("#", "zahl"), ("Person", ""), ("Käufe", "zahl"), ("Typisch (Median)", "zahl"),
              ("Durchschnitt", "zahl"), ("Besser als Index", "zahl"), ("Zeitraum", "")],
             [[(str(r.rang), "zahl"),
-              (f'{e(r.person)}<div class="klein">{e(POSITION.get(r.position, r.position))}</div>', ""),
+              (f'{person_link(r.person, personen, "../../")}<div class="klein">{e(POSITION.get(r.position, r.position))}</div>', ""),
               (str(r.kaeufe), "zahl"), (prozent(r.median), f"zahl {_vorzeichen_klasse(r.median)}"),
               (prozent(r.ueberrendite), "zahl"), (f"{zahl(r.trefferquote * 100)} %", "zahl"),
               (e(f"{r.erster_kauf:%Y}" if r.erster_kauf.year == r.letzter_kauf.year
@@ -213,7 +221,8 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
             [("Veröffentlicht", ""), ("Geschäft", ""), ("Person", ""), ("Art", ""), ("Instrument", ""),
              ("Volumen", "zahl"), ("Kurs", "zahl")],
             [[(datum(r.mitteilungsdatum), "datum"), (datum(r.geschaeftsdatum), "datum"),
-              (f'{e(r.person)}<div class="klein">{e(POSITION.get(r.position, r.position))}</div>', ""),
+              (f'{person_link(r.person, personen if r.position in ("Vorstand", "Aufsichtsrat") else None, "../../")}'
+               f'<div class="klein">{e(POSITION.get(r.position, r.position))}</div>', ""),
               (_art(r.art), ""), (e(r.instrument), ""), (euro(r.volumen, r.waehrung), "zahl"),
               (zahl(r.preis, 2), "zahl")]
              for r in meldungen.itertuples()])
@@ -559,8 +568,9 @@ def usd(x) -> str:
     return f"{zahl(x / 1e6, 1)} Mio. $"
 
 
-def _guru_rahmen(titel: str, beschreibung: str, adresse: str, wurzel: str, kopf: str, inhalt: str, v: dict) -> str:
-    """Gemeinsames Seitengerüst; wurzel = relativer Weg zur Startseite ('../' oder '../../')."""
+def _guru_rahmen(titel: str, beschreibung: str, adresse: str, wurzel: str, kopf: str, inhalt: str, v: dict,
+                 quelle: str = "Formular 13F der US-Börsenaufsicht SEC") -> str:
+    """Gemeinsames Seitengerüst (Gurus, Personen); wurzel = relativer Weg zur Startseite ('../' oder '../../')."""
     return f"""<!doctype html>
 <html lang="de">
 <head>
@@ -573,7 +583,7 @@ def _guru_rahmen(titel: str, beschreibung: str, adresse: str, wurzel: str, kopf:
   <link rel="stylesheet" href="{wurzel}style.css?v={v['style.css']}">
 </head>
 <body>
-  <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quelle: Formular 13F der US-Börsenaufsicht SEC.</div>
+  <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quelle: {e(quelle)}.</div>
   <header class="kopf">{kopf}</header>
   <main>{inhalt}</main>
   <footer>
@@ -642,6 +652,135 @@ def gurus_uebersicht(depots: list, v: dict) -> str:
                           ("Größte Position", ""), ("Stand", "")], zeilen) + "</section>")
     return _guru_rahmen("Depots bekannter Investoren (13F)", "Aktiendepots von Warren Buffett, Bill Ackman und "
                         "anderen bekannten Investoren laut SEC-Formular 13F.", "gurus/", "../", kopf, inhalt, v)
+
+
+# --- Personenseiten (Vorstand und Aufsichtsrat, pipeline/personen.py) ----------------------------------
+
+QUELLE_DD = "BaFin-Datenbank der Eigengeschäfte von Führungskräften, EQS-Archiv"
+NUR_EIGENE = ("Enthalten sind eigene Geschäfte und Geschäfte eigener Gesellschaften (Holding, Stiftung), wenn die "
+              "Meldung die Person nennt. Geschäfte von Angehörigen stehen nur auf der Firmenseite.")
+
+
+def _volumen_je_jahr(aktien: pd.DataFrame) -> str:
+    """Käufe und Verkäufe je Jahr (Geschäftsdatum) als Säulenpaare, nur Euro-Beträge."""
+    eur = aktien[aktien["waehrung"].fillna("EUR").eq("EUR") & aktien["geschaeftsdatum"].notna()]
+    if eur["volumen"].fillna(0).sum() <= 0:
+        return '<p class="leer">Keine Volumenangaben in Euro.</p>'
+    t = (eur.assign(jahr=eur["geschaeftsdatum"].dt.year).pivot_table(index="jahr", columns="art", values="volumen",
+                                                                       aggfunc="sum", fill_value=0))
+    jahre = range(int(t.index.min()), max(int(t.index.max()), pd.Timestamp.now().year) + 1)
+    t = t.reindex(jahre, fill_value=0)
+    hoch = max(t.get("Kauf", pd.Series([0])).max(), t.get("Verkauf", pd.Series([0])).max()) or 1
+    saeulen = ""
+    for jahr, r in t.iterrows():
+        balken = "".join(
+            f'<div class="jv-balken {art.lower()}" style="height:{r.get(art, 0) / hoch * 100:.1f}%" '
+            f'title="{jahr} {e(art)}: {e(euro(r.get(art, 0)))}"></div>'
+            for art in ("Kauf", "Verkauf") if r.get(art, 0) > 0)
+        saeulen += f'<div class="jv-jahr">{balken}<div class="fk-jahr">{jahr}</div></div>'
+    beschreibung = "; ".join(f"{j}: Käufe {euro(r.get('Kauf', 0))}, Verkäufe {euro(r.get('Verkauf', 0))}"
+                             for j, r in t.iterrows() if r.sum() > 0)
+    return (f'<div class="legende"><span><span class="punkt" style="background:var(--kauf)"></span>Käufe</span>'
+            f'<span><span class="punkt" style="background:var(--verkauf)"></span>Verkäufe</span>'
+            f'<span class="klein">höchster Wert {e(euro(hoch))}</span></div>'
+            f'<div class="jv-saeulen" role="img" aria-label="{e(beschreibung)}">{saeulen}</div>')
+
+
+def personenseite(p: dict, v: dict) -> str:
+    """p: Eintrag aus personen.personen (name, adresse, geschaefte, mandate, ranking, letztes)."""
+    g = p["geschaefte"]
+    aktien = g[g["instrument"].eq("Aktie")]
+    kaeufe, verkaeufe = aktien[aktien["art"].eq("Kauf")], aktien[aktien["art"].eq("Verkauf")]
+    eur = lambda x: x.loc[x["waehrung"].fillna("EUR").eq("EUR"), "volumen"].sum()
+    letzte = g.loc[g["geschaeftsdatum"].idxmax()] if g["geschaeftsdatum"].notna().any() else g.iloc[0]
+    rollen = list(dict.fromkeys(f"{r.position} bei {r.firma}" for r in p["mandate"].itertuples()))
+
+    kacheln = "".join([
+        _kachel("Handelsvolumen", euro(eur(kaeufe) + eur(verkaeufe)), "Aktien, Käufe und Verkäufe"),
+        _kachel("Käufe", zahl(len(kaeufe)), f"zusammen {euro(eur(kaeufe))}"),
+        _kachel("Verkäufe", zahl(len(verkaeufe)), f"zusammen {euro(eur(verkaeufe))}"),
+        _kachel("Letztes Geschäft", datum(p["letztes"]), letzte["firma"]),
+    ])
+    mandate = _tabelle(
+        [("Firma", ""), ("Position", ""), ("Meldungen", "zahl"), ("Geschäfte von – bis", "")],
+        [[(f'<a href="../../firma/{e(r.ticker)}/">{e(r.firma)}</a>', ""), (e(r.position), ""),
+          (zahl(r.meldungen), "zahl"), (f"{datum(r.von)} – {datum(r.bis)}", "datum")]
+         for r in p["mandate"].itertuples()])
+    timing = ""
+    if not p["ranking"].empty:
+        timing = """
+    <section class="karte">
+      <h2>Timing der Käufe</h2>
+      <p class="erklaerung">Überrendite gegenüber DAX bzw. MDAX in den 3 Monaten nach den Aktienkäufen, ab 3 Käufen je
+        Firma. Der Rang bezieht sich auf alle Insider im DAX und MDAX (<a href="../../">Startseite</a>,
+        <a href="../../methode.html#ranking">Methode</a>).</p>
+      """ + _tabelle(
+            [("Rang", "zahl"), ("Firma", ""), ("Käufe", "zahl"), ("Typisch (Median)", "zahl"), ("Durchschnitt", "zahl"),
+             ("Besser als Index", "zahl"), ("Zeitraum", "")],
+            [[(str(r.rang), "zahl"), (f'<a href="../../firma/{e(r.ticker)}/">{e(r.name)}</a>', ""),
+              (str(r.kaeufe), "zahl"), (prozent(r.median), f"zahl {_vorzeichen_klasse(r.median)}"),
+              (prozent(r.ueberrendite), "zahl"), (f"{zahl(r.trefferquote * 100)} %", "zahl"),
+              (e(f"{r.erster_kauf:%Y}" if r.erster_kauf.year == r.letzter_kauf.year
+                 else f"{r.erster_kauf:%Y}–{r.letzter_kauf:%Y}"), "datum")]
+             for r in p["ranking"].itertuples()]) + "\n    </section>"
+    geschaefte = _tabelle(
+        [("Veröffentlicht", ""), ("Geschäft", ""), ("Firma", ""), ("Art", ""), ("Instrument", ""),
+         ("Volumen", "zahl"), ("Kurs", "zahl"), ("Seitdem ggü. Index", "zahl")],
+        [[(datum(r.mitteilungsdatum), "datum"), (datum(r.geschaeftsdatum), "datum"),
+          (f'<a href="../../firma/{e(r.ticker)}/">{e(r.firma)}</a><div class="klein">{e(r.traeger_position)}'
+           + (f" · über {e(r.ueber)}" if r.ueber else "") + "</div>", ""),
+          (_art(r.art), ""), (e(r.instrument), ""), (euro(r.volumen, r.waehrung), "zahl"), (zahl(r.preis, 2), "zahl"),
+          (prozent(r.seit), f"zahl {_vorzeichen_klasse(r.seit)}")]
+         for r in g.itertuples()])
+
+    kopf = (f'<div class="marke"><a href="../">← Alle Insider</a></div><h1>{e(p["name"])}</h1>'
+            f'<p class="unterzeile">{e(" · ".join(rollen))} <span class="klein">(laut Meldungen seit 2018)</span></p>')
+    inhalt = f"""<div class="kacheln">{kacheln}</div>
+    <section class="karte">
+      <h2>Handelsvolumen je Jahr</h2>
+      <p class="erklaerung">Aktienkäufe und -verkäufe nach Geschäftsdatum, in Euro. {NUR_EIGENE}</p>
+      {_volumen_je_jahr(aktien)}
+    </section>
+    <section class="karte">
+      <h2>Firmen</h2>
+      <p class="erklaerung">Position zum Zeitpunkt der Meldungen. Ämter ohne Aktiengeschäft tauchen hier nicht auf.</p>
+      {mandate}
+    </section>{timing}
+    <section class="karte">
+      <h2>Alle Geschäfte</h2>
+      <p class="erklaerung">Teilausführungen am selben Tag sind zusammengefasst. <b>Seitdem ggü. Index</b>: Kursentwicklung
+        der Aktie seit dem Schlusskurs am Geschäftstag minus DAX bzw. MDAX, bis zum letzten Schlusskurs (bereinigt um
+        Dividenden und Splits). Bei Käufen spricht ein Plus für gutes Timing, bei Verkäufen ein Minus.</p>
+      {geschaefte}
+    </section>"""
+    firmen = ", ".join(dict.fromkeys(p["mandate"]["firma"]))
+    return _guru_rahmen(f"{p['name']}: Aktienkäufe und -verkäufe",
+                        f"Alle gemeldeten Aktiengeschäfte von {p['name']} ({firmen}) seit 2018: {len(kaeufe)} Käufe, "
+                        f"{len(verkaeufe)} Verkäufe, Handelsvolumen je Jahr und Überrendite seit dem Geschäft.",
+                        f"person/{p['adresse']}/", "../../", kopf, inhalt, v, QUELLE_DD)
+
+
+def personen_uebersicht(liste: list, v: dict) -> str:
+    zeilen = []
+    for p in liste:
+        aktien = p["geschaefte"][p["geschaefte"]["instrument"].eq("Aktie")]
+        m = p["mandate"]
+        weitere = m["firma"].nunique() - 1
+        zeilen.append([
+            (f'<a href="{e(p["adresse"])}/">{e(p["name"])}</a>', ""),
+            (f'{e(m.iloc[0]["position"])} · {e(m.iloc[0]["firma"])}'
+             + (f' <span class="klein">+ {weitere} weitere</span>' if weitere else ""), ""),
+            (zahl(aktien["art"].eq("Kauf").sum()), "zahl"), (zahl(aktien["art"].eq("Verkauf").sum()), "zahl"),
+            (datum(p["letztes"]), "datum")])
+    kopf = ('<div class="marke"><a href="../">← Insider-Monitor</a></div><h1>Insider: Vorstände und Aufsichtsräte</h1>'
+            f'<p class="unterzeile">{zahl(len(liste))} Personen aus DAX und MDAX mit gemeldeten Geschäften seit 2018.</p>')
+    inhalt = ('<section class="karte"><h2>Alle Personen</h2><p class="erklaerung">Sortiert nach dem letzten Geschäft. '
+              f'Firma und Position laut der neuesten Meldung. {NUR_EIGENE} Suche mit Strg+F bzw. ⌘+F.</p>'
+              + _tabelle([("Person", ""), ("Position · Firma", ""), ("Käufe", "zahl"), ("Verkäufe", "zahl"),
+                          ("Letztes Geschäft", "")], zeilen) + "</section>")
+    return _guru_rahmen("Insider: Vorstände und Aufsichtsräte im DAX und MDAX",
+                        "Aktienkäufe und -verkäufe aller Vorstände und Aufsichtsräte im DAX und MDAX seit 2018, "
+                        "je Person auf einer Seite.", "person/", "../", kopf, inhalt, v, QUELLE_DD)
 
 
 def sitemap(ticker: list, weitere: list = ()) -> str:

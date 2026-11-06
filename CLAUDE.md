@@ -144,6 +144,45 @@ Ergebnis (2026q2, Stichtage meist 31.03.2026):
       - Airbus und RTL mit besseren Primärquellen belegen (Airbus-IR-Seite gab 404, RTL-Seite nicht abrufbar).
 - USA-Aktien später: 13F + 13D/13G + Form 4 decken dort meist 70–90 % mit Namen ab.
 
+## Laufendes Vorhaben: Personenseiten und US-Politiker (nach Vorbild Quiver Quantitative), Stand 06.11.2026
+
+Auftrag Tobias 06.11.2026 (Bildschirmfoto Quiver, Seite Nancy Pelosi): Personenseiten bauen, erst nur Vorstand und
+Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
+- [x] **1. Personenseiten (06.11.2026, nicht gepusht, Patch `.recherche/personenseiten.patch`):** `pipeline/personen.py`,
+      Seiten `docs/person/<vorname-nachname>/` und Übersicht `docs/person/` (`seiten.personenseite`, `personen_uebersicht`),
+      Einträge in `sitemap.xml`. Inhalt wie Quiver: Kacheln (Handelsvolumen, Käufe, Verkäufe, letztes Geschäft),
+      Handelsvolumen je Jahr (Kauf/Verkauf als Säulenpaare, nur Euro, Stile `.jv-*`), Firmen/Mandate, Platz im Ranking,
+      alle Geschäfte mit **„Seitdem ggü. Index“** (Aktie minus DAX/MDAX vom Schlusskurs am Geschäftstag bis heute).
+      Personen = gleicher Name ohne Titel/Akzente, Reihenfolge der Wörter egal (`ranking.schluessel`, ersetzt
+      `_schluessel`; behebt „Dr“ ohne Punkt, „Herr“, „Pring Giza, Helen“ = „Giza, Helen Pring“, López = Lopez). Alle 42
+      Namen mit mehreren Firmen geprüft = echte Mehrfachmandate (Kaeser, Busch, Höttges, Bock …). **803 Personen.**
+      Enthalten: eigene Geschäfte + Geschäfte **eigener Gesellschaften** („über X GmbH“; EQS nennt die Führungskraft, BaFin
+      nicht → Zuordnung derselben Gesellschaft aus früheren EQS-Meldungen). Sonst fehlten Plattner, Dommermuth, Povlsen,
+      Merckle. **Nicht enthalten:** Angehörige (natürliche Personen „in enger Beziehung“), sonstige Führungspersonen,
+      börsennotierte Konzerne als „eng verbunden“ (United Internet AG, Continental). Links: Firmenseiten (Tabellen „Alle
+      Meldungen“, „Timing“), Startseite (Ticker nur DAX/MDAX, Ranking über Feld `seite` in `neueste.json`/`ranking.json`),
+      Fußzeile „Insider (Personen)“. Geprüft per Bildschirmfoto (Plattner hell, Kaeser dunkel, Dommermuth 420 px, Übersicht)
+      und gerenderte Startseite (Ranking verlinkt 257 von 269, Rest sonstige Führungspersonen und Lothar Lanz, dessen
+      Ranking-Käufe von einer Angehörigen stammen). 6,8 MB, ändert sich bei jedem täglichen Lauf (Spalte „Seitdem“).
+      **Live erst nach Bot-Lauf „Daten aktualisieren“ mit „immer“.**
+- [ ] **Datenschutz klären (vor Ausbau):** Dauerhafte Profile über natürliche Personen (DSGVO, berechtigtes Interesse);
+      BaFin löscht nach 12 Monaten, wir zeigen dauerhaft. Danach entscheiden: Angehörige und sonstige Führungspersonen
+      aufnehmen? Firmennamen mit Personennamen („Sabine Plattner GmbH & Co. Beteiligungs-KG“) stehen schon jetzt als „über …“.
+      Datenschutzerklärung (`impressum.html`) um die Personenseiten ergänzen.
+- [ ] **Nebenbefund, nicht behoben:** 13 Geschäfte stehen doppelt (gleiche Meldung an zwei Tagen bei EQS veröffentlicht,
+      z. B. Kaeser/Daimler Truck 18.01.2022), betrifft auch Firmenseiten und Event Study.
+- [ ] **2. US-Politiker (Plan, Freigabe Tobias steht aus):** eigene Daten aus den Primärquellen statt Quiver-API.
+      Quiver-API: Hobbyist ~30 $/Monat und Trader ~75 $/Monat nur **privat** (keine kommerzielle Nutzung), kommerziell erst
+      „Startup“ ~250 $/Monat bzw. Enterprise auf Anfrage (laut api.quiverquant.com 06.11.2026; Weitergabe/Anzeige
+      nicht geregelt → schriftlich klären). Primärquellen (gemeinfrei, STOCK Act):
+      Repräsentantenhaus `disclosures-clerk.house.gov/public_disc/financial-pdfs/<Jahr>FD.zip` (Verzeichnis, täglich
+      neu; 2026: 457 Transaktionsmeldungen, Typ P) + PDF je Meldung `public_disc/ptr-pdfs/<Jahr>/<DocID>.pdf`
+      (elektronisch eingereichte haben Text, getestet Pelosi 20035143; handschriftliche Scans brauchen Texterkennung);
+      Senat `efdsearch.senate.gov` (Akamai-Botsperre, Nutzungsbedingung per Klick, schwerer). Beträge nur als Spannen
+      (1.001–15.000 $ …). Reihenfolge: 1) Kongress-Geschäfte (House, dann Senat), 2) Politikerseiten wie Pelosi,
+      3) Trump/Regierung (OGE Form 278-T), 4) Lobbying (Senate LDA, offizielle API), Staatsaufträge (USAspending, offizielle
+      API), Spenden (FEC, offizielle API). Vermögen schätzen (Jahresmeldung, Spannen) und Patente erst später.
+
 ## Laufendes Vorhaben: Firmenlogos, Stand 31.10.2026
 
 Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): einmal laden, lokal in `docs/logos/` speichern
@@ -712,7 +751,7 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 
 ## Offen
 
-- [ ] **Taktung reicht nicht** (31.10.2026 erneut gezählt: 24.–30.10. je 5–7 geplante Läufe statt 48, Lücken bis 6,5 h,
+- [x] **Taktung reicht nicht** (**gelöst, geprüft 06.11.2026:** cron-job.org-Läufe 02.–05.11. je 46–48/Tag, alle erfolgreich; 31.10.2026 erneut gezählt: 24.–30.10. je 5–7 geplante Läufe statt 48, Lücken bis 6,5 h,
       0 Fehler). Lösung vorbereitet: Kommentar im Workflow, Anleitung cron-job.org an Tobias gegeben (Token fein
       abgestuft, nur Repo insider, Actions: Read and write; POST auf `…/workflows/aktualisieren.yml/dispatches` mit
       `{"ref":"main","inputs":{"immer":"false"}}`, sonst rechnet jeder Lauf neu und committet). **Eingerichtet 31.10.2026**, Testlauf 204, Lauf 17:34 UTC erfolgreich. Nach 1–2 Tagen Läufe zählen (Soll ~48/Tag), dann Punkt abhaken (Planungs-App #62). Workflow-Kommentar gepusht 31.10.2026. Alt: gepusht, aber geprüft am 24.10.2026: nur 12 geplante Läufe in ~1,5 Tagen (23.10.: 6 statt
@@ -848,6 +887,9 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   Knorr-Bremse 30.10., CAAR Käufe −1,66 → −0,97 %). Überschriften sind Vorschläge, nicht beschlossen. Wartet auf Tobias' Wahl.
 
 - **06.11.2026 (Newsletter):** Tobias: „letzten Sonntag ging nichts raus“. Ursache: Versand war nie eingerichtet (nur Entwurfsskript). Tobias will Automatik → gebaut (nicht gepusht): `sonntags_report.umschichtungen` (Kauf + Verkauf derselben Firma am selben Geschäftstag zum Kurs ±1 % = interne Übertragung, eigener Abschnitt, nicht mitgezählt; trifft seit 09/2026 ATOSS, RCM, KST, NFON, Hövelrat, alle plausibel). `--kit` legt Broadcast über Kit-API v4 an (`send_at` Sonntag 08:00 Berlin) und schickt Telegram mit Text und Link; `--entwurf` nur Entwurf zum Testen. Action „Daten aktualisieren“: Schritt „Sonntags-Report planen“ samstags ab 18 Uhr, `newsletter/<Sonntag>.md` wird committet und verhindert Doppelversand. Push-Schutz kennt `sonntags_report`. Sicherung: `.recherche/sicherung_newsletter/`. Kit-API funktioniert im Gratistarif (Test 06.11.2026: Entwurf 26853741 angelegt), Secret `KIT_API_KEY` in GitHub angelegt. **Offen (Tobias):** Testentwurf in Kit löschen, pushen, Sonntag 08.11. prüfen, ob der Report rausging.
+
+- **06.11.2026 (Personenseiten):** Quiver-Vorbild bewertet, Personenseiten für 803 Vorstände/Aufsichtsräte gebaut und
+  geprüft (Details unter „Personenseiten und US-Politiker“), Plan für US-Politiker recherchiert (House-Daten getestet).
 
 ## Vor dem Livegang: unslop
 Bevor die öffentliche Seite (oder eine größere Änderung daran) live geht, den Skill `/unslop` (`~/.claude/skills/unslop`) darüber laufen lassen, damit sie nicht nach KI-Baukasten aussieht. Audit und vorgeschlagene Richtung zuerst Tobias zeigen, erst nach seinem OK umsetzen – Designentscheidungen trifft Tobias.

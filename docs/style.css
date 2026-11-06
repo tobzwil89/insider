@@ -254,3 +254,11 @@ section.karte[id] { scroll-margin-top: 64px; }
   nav.kapitel ul { display: flex; gap: 4px; max-width: 1100px; margin: 0 auto; padding: 8px 16px; box-sizing: border-box; }
   nav.kapitel a { padding: 6px 10px; white-space: nowrap; }
 }
+
+/* Personenseiten (seiten.personenseite): Handelsvolumen je Jahr, Käufe und Verkäufe als Säulenpaar */
+.jv-saeulen { display: flex; align-items: flex-end; gap: 6px; height: 160px; border-bottom: 1px solid var(--achse); margin: 8px 0 24px; }
+.jv-jahr { flex: 1; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 2px; position: relative; min-width: 0; }
+.jv-balken { width: 42%; max-width: 22px; border-radius: 3px 3px 0 0; min-height: 2px; }
+.jv-balken.kauf { background: var(--kauf); }
+.jv-balken.verkauf { background: var(--verkauf); }
+@media (max-width: 600px) { .jv-jahr .fk-jahr { font-size: 9px; } }

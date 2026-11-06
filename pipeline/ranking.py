@@ -10,18 +10,33 @@ Gründe (Steuern, Diversifikation) und sagen wenig über Insiderwissen.
 """
 
 import re
+import unicodedata
 
 import pandas as pd
 
 TAGE = 60
 MIN_KAEUFE = 3
 # Titel nur mit Punkt entfernen, damit Namen wie "Pol" oder "Drescher" erhalten bleiben
-TITEL = re.compile(r"\b(Professor\b|Prof\.|Dr\.(-Ing\.)?|Dipl\.-?[A-Za-z.]*|h\.\s?c\.|rer\.|nat\.|pol\.|oec\.|med\.|jur\.|phil\.|Mag\.|MBA\b)")
+TITEL = re.compile(r"\b(Professor\b|Prof\.|Dr\.(-Ing\.)?|Dr\b|Dipl\.-?[A-Za-z.]*|h\.\s?c\.|rer\.|nat\.|pol\.|oec\.|med\.|jur\.|phil\.|mult\.|Mag\.|MBA\b)")
+# Anrede nur direkt hinter dem Komma entfernen ("Niedermaier, Herr Andreas"), damit der Nachname "Herr" bleibt
+ANREDE = re.compile(r",\s*(Herr|Frau)\s+")
+FALTEN = str.maketrans({"ß": "ss", "ø": "o", "Ø": "O", "æ": "ae", "Æ": "Ae", "ł": "l", "Ł": "L"})
+# Gleiche Person, verschieden geschrieben (sonst zwei Personenseiten): Schlüssel → Schlüssel
+GLEICH = {"peter ralf thomas": "p ralf thomas"}
 
 
-def _schluessel(name: str) -> str:
-    """'Georgi, Professor Dr. Andreas Arthur' und 'Georgi, Dr. Andreas Arthur' → gleicher Schlüssel."""
-    return re.sub(r"\s+", " ", TITEL.sub("", name)).strip(" ,").lower()
+def ohne_titel(name: str) -> str:
+    """'Niedermaier, Herr Dr. Andreas' → 'Niedermaier, Andreas'."""
+    return re.sub(r"\s+", " ", TITEL.sub("", ANREDE.sub(", ", name))).strip(" ,")
+
+
+def schluessel(name: str) -> str:
+    """Gleiche Person trotz anderer Schreibweise: ohne Titel und Akzente, Reihenfolge der Wörter egal
+    ('Georgi, Professor Dr. Andreas Arthur' = 'Georgi, Dr Andreas Arthur', 'Pring Giza, Helen' = 'Giza, Helen Pring',
+    'López Borrego, Miguel Ángel' = 'Lopez Borrego, Miguel Angel')."""
+    k = unicodedata.normalize("NFKD", ohne_titel(name).translate(FALTEN)).encode("ascii", "ignore").decode().lower()
+    k = " ".join(sorted(re.findall(r"[a-z0-9]+", k)))
+    return GLEICH.get(k, k)
 
 
 def kaeufe_mit_rendite(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFrame) -> pd.DataFrame:
@@ -31,7 +46,7 @@ def kaeufe_mit_rendite(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.
     k.loc[eng, "person"] = k.loc[eng, "bezug_person"]
     k.loc[eng, "position"] = k.loc[eng, "bezug_position"]
     k = k[k["person"].ne("") & k["position"].isin(["Vorstand", "Aufsichtsrat", "Sonstige Führungsperson"])]
-    k = k.assign(schluessel=k["person"].map(_schluessel))
+    k = k.assign(schluessel=k["person"].map(schluessel))
     k = (k.groupby(["schluessel", "ticker", "geschaeftsdatum"])
          .agg(person=("person", "last"), position=("position", "last"), name=("name", "first"),
               benchmark=("benchmark", "first"), volumen=("volumen", "sum"))

@@ -8,9 +8,11 @@
     firmen.json           Übersicht der Firmen mit eigener Seite
     ranking.json          Insider mit dem besten Timing (Überrendite 3 Monate nach Käufen)
     kurse/<TICKER>.json   je Firma: Schlusskurse als [Datum, Kurs] für das Diagramm
+    (neueste.json und ranking.json haben eine Spalte seite = Adresse der Personenseite oder null)
 
 Außerdem (pipeline/seiten.py): docs/firma/<TICKER>/index.html als fertige Seite je Firma (mit Großaktionären
 aus daten/stimmrechte.csv),
+docs/person/<name>/index.html je Vorstand/Aufsichtsrat (pipeline/personen.py), docs/person/index.html,
 docs/sitemap.xml und Versionsnummern (?v=) für CSS/JS.
 """
 
@@ -22,7 +24,7 @@ import shutil
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, ranking as rk, rueckkaeufe, seiten, stimmrechte
+from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, personen as ps, ranking as rk, rueckkaeufe, seiten, stimmrechte
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
 KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
@@ -57,14 +59,15 @@ def _zeilen(df: pd.DataFrame) -> list:
     return df.to_dict(orient="records")
 
 
-def meldungen_zusammenfassen(m: pd.DataFrame) -> pd.DataFrame:
-    """Teilausführungen derselben Person am selben Mitteilungstag zu einer Zeile zusammenfassen."""
+def meldungen_zusammenfassen(m: pd.DataFrame, weitere: tuple = ()) -> pd.DataFrame:
+    """Teilausführungen derselben Person am selben Mitteilungstag zu einer Zeile zusammenfassen.
+    weitere: zusätzliche Spalten, die mitkommen (erster Wert)."""
     m = m.assign(stueck=m["volumen"] / m["preis"])
     g = (m.groupby(["isin", "person", "art", "instrument", "mitteilungsdatum"], dropna=False)
          .agg(emittent=("emittent", "first"), position=("position", "first"),
               waehrung=("waehrung", "first"), volumen=("volumen", "sum"), stueck=("stueck", "sum"),
               geschaeftsdatum=("geschaeftsdatum", "min"), aktiviert=("aktiviert", "max"),
-              teilausfuehrungen=("person", "size"))
+              teilausfuehrungen=("person", "size"), **{s: (s, "first") for s in weitere})
          .reset_index())
     # Durchschnittspreis gewichtet nach Stückzahl; ohne Preisangabe bleiben Preis und Volumen leer
     g["preis"] = (g["volumen"] / g["stueck"]).where(g["stueck"] > 0)
@@ -96,11 +99,22 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
                     "cluster_personen": cl.MIN_PERSONEN, "cluster_volumen": cl.MIN_VOLUMEN,
                     "ranking_tage": rk.TAGE, "ranking_min_kaeufe": rk.MIN_KAEUFE},
     })
-    _schreibe("neueste.json", _zeilen(zusammen.head(NEUESTE)))
+    # Personenseiten (nur Vorstand und Aufsichtsrat, pipeline/personen.py); Adressen auch für Links im Ticker und Ranking
+    leute = ps.personen(meldungen_zusammenfassen(ps.zuordnen(meldungen, firmen),
+                                                 ("traeger", "traeger_position", "ueber")), firmen, kurse, rangliste)
+    adressen = {p["schluessel"]: p["adresse"] for p in leute}
+
+    def seite_von(name, position=None):
+        return adressen.get(rk.schluessel(name)) if position is None or position in ps.POSITIONEN else None
+
+    _schreibe("neueste.json", _zeilen(zusammen.head(NEUESTE).assign(
+        # nur DAX/MDAX: ein gleichnamiger Vorstand einer anderen Firma ist meist eine andere Person
+        seite=lambda d: [seite_von(n, p) if isinstance(t, str) else None
+                         for n, p, t in zip(d["person"], d["position"], d["ticker"])])))
     _schreibe("cluster.json", _zeilen(cluster.assign(ticker=cluster["isin"].map(isin_zu_ticker))))
     _schreibe("caar.json", {art: _zeilen(teil.drop(columns="art"))
                             for art, teil in caar.groupby("art")} if not caar.empty else {})
-    _schreibe("ranking.json", _zeilen(rangliste))
+    _schreibe("ranking.json", _zeilen(rangliste.assign(seite=[seite_von(n) for n in rangliste["person"]])))
     # Nicht mehr genutzte Dateien früherer Versionen entfernen
     (AUSGABE / "ereignisse.json").unlink(missing_ok=True)
     shutil.rmtree(AUSGABE / "firmen", ignore_errors=True)
@@ -171,7 +185,7 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
             aktionaere[aktionaere["firma"] == stamm["name"]],
             rueck[rueck["firma"] == stamm["name"]] if stamm["name"] in rk_geladen else None,
             next((kz[i] for i in stamm["isins"] if i in kz), None), stamm["name"] in rk_ohne,
-            ring_daten(stamm["name"], stamm["isins"][0])))
+            ring_daten(stamm["name"], stamm["isins"][0]), adressen))
         uebersicht.append({"ticker": ticker, "name": stamm["name"], "index": stamm["index"],
                            "logo": seiten.logo_datei(stamm["isins"]),
                            "meldungen": len(eigene),
@@ -187,5 +201,12 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     if depots:
         seiten.schreiben(seiten.DOCS / "gurus" / "index.html", seiten.gurus_uebersicht(depots, v))
     guru_adressen = ["gurus/"] + [f"gurus/{seiten.kurzname(d['name'])}/" for d in depots] if depots else []
-    (seiten.DOCS / "sitemap.xml").write_text(seiten.sitemap(sorted(mit_seite["ticker"].unique()), guru_adressen),
-                                             encoding="utf-8")
+    # Personenseiten jedes Mal ganz neu (Personen ohne Geschäfte mehr im Index fallen so weg)
+    shutil.rmtree(seiten.DOCS / "person", ignore_errors=True)
+    for p in leute:
+        seiten.schreiben(seiten.DOCS / "person" / p["adresse"] / "index.html", seiten.personenseite(p, v))
+    if leute:
+        seiten.schreiben(seiten.DOCS / "person" / "index.html", seiten.personen_uebersicht(leute, v))
+    personen_adressen = ["person/"] + [f"person/{p['adresse']}/" for p in leute] if leute else []
+    (seiten.DOCS / "sitemap.xml").write_text(seiten.sitemap(sorted(mit_seite["ticker"].unique()),
+                                                            guru_adressen + personen_adressen), encoding="utf-8")

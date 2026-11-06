@@ -94,7 +94,7 @@ function zeigeTicker(meldungen) {
       el("td", { class: "datum" }, fmt.datumZeit(m.aktiviert)),
       el("td", {}, firmaLink(m.emittent, m.ticker),
         m.instrument !== "Aktie" ? el("div", { class: "klein" }, m.instrument) : null),
-      el("td", {}, m.person, el("div", { class: "klein" }, fmt.position(m.position))),
+      el("td", {}, personLink(m.person, m.seite), el("div", { class: "klein" }, fmt.position(m.position))),
       el("td", {}, artMarke(m.art)),
       el("td", { class: "zahl" }, fmt.euro(m.volumen, m.waehrung)),
       el("td", { class: "zahl" }, m.preis == null ? "–" : `${fmt.zahl(m.preis, 2)}`)));
