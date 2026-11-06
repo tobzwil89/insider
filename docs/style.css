@@ -234,3 +234,23 @@ header.firmenkopf > div:first-child { min-width: 0; }
 .firmenlogo.mini { width: 44px; height: 24px; padding: 2px 4px; border-radius: 4px; }
 .firmenlogo.mini.leer { width: 24px; font-size: 12px; }
 .firmen-liste .firmenname { display: flex; align-items: center; gap: 8px; min-width: 0; }
+
+/* Kapitelleiste der Firmenseite (seiten.mit_kapiteln): breit links und mitlaufend, schmal als Zeile oben */
+nav.kapitel ul { list-style: none; margin: 0; padding: 0; }
+nav.kapitel a { display: block; color: var(--text-2); font-size: 14px; text-decoration: none; border-radius: 6px; }
+nav.kapitel a:hover { color: var(--text); background: var(--gitter); }
+nav.kapitel a[aria-current="true"] { color: var(--text); font-weight: 600; background: var(--gitter); }
+section.karte[id] { scroll-margin-top: 64px; }
+@media (min-width: 1240px) {
+  .kapitel-raster { display: grid; grid-template-columns: 180px minmax(0, 1100px); column-gap: 8px; justify-content: center; }
+  .kapitel-raster > header, .kapitel-raster > main, .kapitel-raster > footer { grid-column: 2; width: 100%; box-sizing: border-box; }
+  nav.kapitel { grid-column: 1; grid-row: 2 / span 2; align-self: start; position: sticky; top: 16px; margin-top: 16px; }
+  nav.kapitel a { padding: 6px 10px; }
+  section.karte[id] { scroll-margin-top: 16px; }
+}
+@media (max-width: 1239px) {
+  nav.kapitel { position: sticky; top: 0; z-index: 5; background: var(--seite); border-bottom: 1px solid var(--rand);
+    overflow-x: auto; scrollbar-width: none; }
+  nav.kapitel ul { display: flex; gap: 4px; max-width: 1100px; margin: 0 auto; padding: 8px 16px; box-sizing: border-box; }
+  nav.kapitel a { padding: 6px 10px; white-space: nowrap; }
+}

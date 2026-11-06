@@ -154,7 +154,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
               (euro(r.volumen), "zahl"), (prozent(r.car), f"zahl {_vorzeichen_klasse(r.car)}"),
               (prozent(r.car_ab_0) + (f'<div class="klein">erst bis Tag +{int(r.tage_nach)}</div>'
                                       if r.tage_nach < 5 else ""), f"zahl {_vorzeichen_klasse(r.car_ab_0)}")]
-             for r in ereignisse.sort_values("mitteilungsdatum").itertuples()])
+             for r in ereignisse.sort_values("mitteilungsdatum", ascending=False).itertuples()])
 
     if ranking.empty:
         rk_html = ('<p class="leer">Keine Führungskraft dieser Firma hat mindestens 3 Käufe mit abgeschlossenen '
@@ -229,7 +229,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
     titel = f"{f['name']}: Insider-Käufe und -Verkäufe"
     beschreibung = (f"Directors' Dealings bei {f['name']} ({f['ticker']}): {len(kaeufe)} Käufe und "
                     f"{len(verkaeufe)} Verkäufe von Vorstand und Aufsichtsrat seit 2018, Kursreaktionen und Timing.")
-    return f"""<!doctype html>
+    seite = f"""<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
@@ -243,6 +243,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
 <body>
   <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quellen: BaFin-Datenbank der Eigengeschäfte von Führungskräften, EQS-Archiv.</div>
 
+  <div class="kapitel-raster">
   <header class="kopf firmenkopf">
     <div>
       <div class="marke"><a href="../../">← Insider-Monitor</a></div>
@@ -252,6 +253,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
     {firmenlogo(f['isins'], f['name'], '../../', 'gross')}
   </header>
 
+  <!--KAPITEL-->
   <main>
     <div class="kacheln">{kacheln}</div>
 
@@ -316,6 +318,7 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
       Empfehlung, Wertpapiere zu kaufen oder zu verkaufen.</p>
     <p><a href="../../methode.html">Methode</a> · <a href="../../impressum.html">Impressum und Datenschutz</a></p>
   </footer>
+  </div>
 
   <script type="application/json" id="daten">{daten_json}</script>
   <script src="../../gemeinsam.js?v={v['gemeinsam.js']}"></script>
@@ -323,6 +326,22 @@ def firmenseite(f: dict, meldungen: pd.DataFrame, ereignisse: pd.DataFrame, rank
 </body>
 </html>
 """
+    return mit_kapiteln(seite)
+
+
+def mit_kapiteln(seite: str) -> str:
+    """Jedem Kapitel (Karte mit Überschrift) eine Sprungmarke geben und daraus die Kapitelleiste bauen."""
+    kapitel = []
+
+    def marke(m):
+        titel = m[1]
+        anker = re.sub(r"[^a-z0-9]+", "-", titel.lower().translate(str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}))).strip("-")
+        kapitel.append((anker, titel))
+        return f'<section class="karte" id="{anker}">\n      <h2>{titel}</h2>'
+
+    seite = re.sub(r'<section class="karte">\s*<h2>([^<]+)</h2>', marke, seite)
+    links = "".join(f'<li><a href="#{a}">{t}</a></li>' for a, t in kapitel)
+    return seite.replace("<!--KAPITEL-->", f'<nav class="kapitel" aria-label="Kapitel"><ul>{links}</ul></nav>', 1)
 
 
 def _prozent_text(x) -> str:

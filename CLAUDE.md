@@ -172,6 +172,12 @@ Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): 
 - **Tooltip Kursdiagramm (06.11.2026, Tobias):** Bei 5 Jahren lag weniger als 1 px pro Handelstag, Insider-Punkte waren
   kaum zu treffen. `liniendiagramm` in `gemeinsam.js`: Marker im Umkreis von 16 px rasten ein (sonst wie bisher nächster Tag).
   Test RHM 5 Jahre, Maus 8 px neben jedem Punkt: vorher 2/64, nachher 64/64 Tooltips mit Geschäft. Gepusht 06.11.2026.
+- **Kapitelleiste Firmenseite (06.11.2026, Tobias: „bau es so im heutigen Stil“):** `seiten.mit_kapiteln` gibt jeder
+  `<section class="karte"><h2>` eine `id` und baut daraus `<nav class="kapitel">` (fehlende Kapitel fallen von selbst weg).
+  Ab 1240 px Leiste links (180 px, mitlaufend, `.kapitel-raster` als Raster um Kopf/Leiste/Inhalt/Fuß), darunter waagerechte
+  Zeile oben (mitlaufend, wischbar). `firma.js` markiert das aktuelle Kapitel. Geprüft an RHM (hell/dunkel 1400 px, 520 px,
+  Sprünge per Messwert). Aussehen nur vorläufig, kommt mit der Neugestaltung neu. Gepusht 06.11.2026; live erst nach Bot-Lauf „immer“.
+- **Kursreaktion je Ereignis (06.11.2026, Tobias):** Tabelle jetzt neueste zuerst (`sort_values(..., ascending=False)`). Gepusht 06.11.2026.
 - Rechtlich: Logos nur zur Kennzeichnung der Firma zeigen, kein Anschein einer Partnerschaft → zu „vor dem Livegang klären“.
 
 ## Marketing und Website (Planungs-App #9), Stand 30.10.2026
