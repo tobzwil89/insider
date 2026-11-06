@@ -168,7 +168,10 @@ Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): 
       nicht neu rechnet (und `--immer` nur werktags) → nach Änderungen an `seiten.py` Action „Daten aktualisieren“ mit „immer“ starten. Noch nicht in Ticker, Cluster und Ranking (nur Firmenname).
       **Nachtrag 06.11.2026:** Die CSS-Regeln aus dem Nachtrag waren nie in `style.css` angekommen (Commit e059200 enthielt nur
       die Aktionärsring-Stile), deshalb stand das Logo klein links. Jetzt ergänzt: `header.firmenkopf` (Flex, Logo rechts),
-      `.firmenlogo.gross` 240×104, unter 600 px 120×56. Lokal geprüft (Rheinmetall 1300 px, SAP 520 px). Nicht gepusht.
+      `.firmenlogo.gross` 240×104, unter 600 px 120×56. Lokal geprüft (Rheinmetall 1300 px, SAP 520 px). Gepusht 06.11.2026 (ead6284).
+- **Tooltip Kursdiagramm (06.11.2026, Tobias):** Bei 5 Jahren lag weniger als 1 px pro Handelstag, Insider-Punkte waren
+  kaum zu treffen. `liniendiagramm` in `gemeinsam.js`: Marker im Umkreis von 16 px rasten ein (sonst wie bisher nächster Tag).
+  Test RHM 5 Jahre, Maus 8 px neben jedem Punkt: vorher 2/64, nachher 64/64 Tooltips mit Geschäft. Gepusht 06.11.2026.
 - Rechtlich: Logos nur zur Kennzeichnung der Firma zeigen, kein Anschein einer Partnerschaft → zu „vor dem Livegang klären“.
 
 ## Marketing und Website (Planungs-App #9), Stand 30.10.2026

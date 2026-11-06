@@ -161,6 +161,13 @@ function liniendiagramm(behaelter, opt) {
       const x = (ereignis.clientX - kasten.left) * breite / kasten.width;
       let bester = 0;
       for (let i = 1; i < n; i++) if (Math.abs(px(i) - x) < Math.abs(px(bester) - x)) bester = i;
+      // Marker in der Nähe (16 px) einrasten lassen, sonst trifft man sie bei langen Zeiträumen kaum
+      const y = (ereignis.clientY - kasten.top) * hoehe / kasten.height;
+      let naechster = 16;
+      for (const m of opt.marker || []) {
+        const abstand = Math.hypot(px(m.i) - x, py(m.y) - y);
+        if (abstand < naechster) { naechster = abstand; bester = m.i; }
+      }
       kreuz.setAttribute("x1", px(bester)); kreuz.setAttribute("x2", px(bester));
       kreuz.setAttribute("visibility", "visible");
       const inhalt = opt.tooltip(bester);
