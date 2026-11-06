@@ -1,4 +1,6 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,40 EUR","6.000,00 EUR",2026-11-05,2026-11-02,Tradegate,2026-11-06 12:33:44,0.4,EUR,6000.0,2026-11-06 12:43:34
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,40 EUR","6.000,00 EUR",2026-11-05,2026-11-02,Xetra,2026-11-06 12:28:22,0.4,EUR,6000.0,2026-11-06 12:43:34
 "Haier Smart Home Co., Ltd.",40027093,CNE1000048K8,"Huang, Xiaowu",Sonstige Führungsperson,Aktie,Verkauf,"21,14 HKD","422.800,00 HKD",2026-11-05,2026-11-05,Hong Kong Stock Exchange,2026-11-05 15:17:49,21.14,HKD,422800.0,2026-11-05 15:43:48
 "Haier Smart Home Co., Ltd.",40027093,CNE1000048K8,"Huang, Xiaowu",Sonstige Führungsperson,Aktie,Verkauf,"20,80 HKD","416.000,00 HKD",2026-11-05,2026-11-04,Hong Kong Stock Exchange,2026-11-05 15:17:49,20.8,HKD,416000.0,2026-11-05 15:43:48
 German Tech Holding GmbH & Co. KGaA,10142363,DE000A1MMEV4,Sachs Assets GmbH,in enger Beziehung,Aktie,Kauf,"0,07 EUR","101.522,19 EUR",2026-11-05,2026-11-03,,2026-11-05 13:39:27,0.07,EUR,101522.19,2026-11-05 14:13:42
