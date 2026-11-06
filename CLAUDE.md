@@ -166,6 +166,9 @@ Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): 
       **Nachtrag 31.10.2026 (Tobias):** Logo groß rechts im Kopf der Firmenseite (`.firmenkopf`, `.firmenlogo.gross` 220×96,
       unter 600 px 112×52) statt klein vor dem Namen. Live fehlten die Logos nach dem Push, weil der Bot ohne neue BaFin-Meldung
       nicht neu rechnet (und `--immer` nur werktags) → nach Änderungen an `seiten.py` Action „Daten aktualisieren“ mit „immer“ starten. Noch nicht in Ticker, Cluster und Ranking (nur Firmenname).
+      **Nachtrag 06.11.2026:** Die CSS-Regeln aus dem Nachtrag waren nie in `style.css` angekommen (Commit e059200 enthielt nur
+      die Aktionärsring-Stile), deshalb stand das Logo klein links. Jetzt ergänzt: `header.firmenkopf` (Flex, Logo rechts),
+      `.firmenlogo.gross` 240×104, unter 600 px 120×56. Lokal geprüft (Rheinmetall 1300 px, SAP 520 px). Nicht gepusht.
 - Rechtlich: Logos nur zur Kennzeichnung der Firma zeigen, kein Anschein einer Partnerschaft → zu „vor dem Livegang klären“.
 
 ## Marketing und Website (Planungs-App #9), Stand 30.10.2026
@@ -228,11 +231,25 @@ CTA: Newsletter, Formular mit **EmailOctopus** (läuft schon in `roleplay-landin
       Die Gespräche prüfen jetzt Zielgruppe und Preisidee aus der Positionierung (31.10.2026).
 - [ ] 4. Weiter am Produkt (Datenbank, Sentiment); Website danach.
 
+**Marke und Design (Stand 31.10.2026, Werkzeug: Claude Design statt Google Stitch):**
+- **Design System „Rhodus“** (Grundlage für alles Gestaltete): https://claude.ai/artifact/X1njLe2gDXmPDRtszcsTRN
+  Fest: Name Rhodus, Logo aus `logo/kit/` (unverändert), Farben Rhodus-Grün #1E3B2F + Creme #F3EEE2 **auch für die Website**,
+  Cinzel nur fürs Logo, **Geist** für Text und Zahlen (Tobias), Ton (du, keine erfundenen Zahlen, Sonntags-Report = CTA).
+  Offen: Untertitel, Oberfläche (Bausteine, Abstände, Datenfarben, dunkler Modus). Die heutige Seite gilt als „zu sehr
+  Research-Seite“ (Tobias) → ihr Aussehen nicht übernehmen.
+- **Startseite, drei Richtungen** auf einer Design-Leinwand: https://claude.ai/artifact/416CVL22JqidLmcVQwTuWf
+  (1 Privatbank, 2 Fintech, 3 Daten vorn). **Wartet auf Tobias' Wahl.** Danach: gewählte Gestaltung als Bausteine ins
+  Design System, echte Website erst später.
+- Beides ist privat; anderen Sitzungen über das Artifact-Werkzeug lesbar (`read` mit der Adresse).
+
 ## Nächste Schritte (Stand 31.10.2026, nach Rauszoomen mit Tobias)
 
 Ziel bleibt: Startup, Finanzdaten-Plattform „GuruFocus für Europa, günstiger“ + „Folge den Profis“ + Sentiment.
-Fundamentaldaten sind dafür Pflicht, aber nicht das Alleinstellungsmerkmal (das sind Insider, Großaktionäre, Rückkäufe,
-Guru-Depots, später Sentiment). Reihenfolge laut Empfehlung Claude:
+Fundamentaldaten sind dafür Pflicht, aber nicht das Alleinstellungsmerkmal.
+**Korrektur Tobias 06.11.2026:** Insider, Großaktionäre, Rückkäufe, Guru-Depots und alles Bisherige sind KEIN
+Alleinstellungsmerkmal (haben etablierte Anbieter auch). Das Alleinstellungsmerkmal soll eine **Sentimentanalyse von
+Reddit und Twitter/X für Krypto und Pennystocks** werden, die es bei etablierten Anbietern bisher nicht gibt.
+Reihenfolge laut Empfehlung Claude:
 1. ✅ **Eulerpool eingebaut (31.10.2026, Details unter Fundamentaldaten, Block „Eulerpool“).** Ursprünglicher Auftrag: Leser in `pipeline/fundamental.py`
    (GuV, Bilanz, Cashflow, Schätzungen; Ist-Jahre von Schätzjahren trennen; Werte in Mio. → ×1e6; verschlüsselte
    Antworten überspringen, nie entschlüsseln), in `kennzahlen.PRIORITAET` vor onvista/TradingView für EBIT und
@@ -807,3 +824,18 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   Scratchpad der Sitzung (nicht gesichert; Bearbeiten über das Artefakt). **Offen (Tobias):** Schrift für Text/Zahlen (Karte „Schriftwahl“:
   Systemschrift, Source Sans 3, IBM Plex Sans, Source Serif 4), Website auf Grün/Creme umstellen oder neutral lassen, Untertitel.
   Landingpage-Entwürfe in Claude Design erst später (Website erst, wenn das Produkt steht).
+- **31.10.2026 (Design System 2):** Tobias: heutige Seite wirkt „zu sehr Research-Seite statt Startup/Finance“ → Oberfläche wird neu
+  gestaltet. Design System auf das Feste reduziert: Logo, `rhodus-gruen`/`creme` (Tobias: „Website-Farben passen“ = Website in
+  Grün/Creme), Cinzel, Ton. Bausteine Kachel/Karte/Hinweisband/Formular und alle Farben/Größen der alten Seite entfernt (Kopie der
+  ersten Fassung im Scratchpad `rhodus-ds-v1-sicherung`, sonst über den Versionsverlauf des Artefakts). Untertitel bleibt offen.
+  Nächster Schritt: Referenzseiten von Tobias, dann Richtungen auf einer Design-Leinwand.
+- **31.10.2026 (Design System 3):** Textschrift festgelegt (Tobias): **Geist** (OFL, Google Fonts), als `sans` im Design System.
+  Vergleichskarte „Schriftwahl“ entfernt. Systemschrift (A) gefiel, sieht aber nur auf dem Mac so aus (SF Pro). Untertitel weiter offen.
+- **31.10.2026 (Startseite-Richtungen):** Drei Entwürfe der Startseite auf einer Claude-Design-Leinwand (privat):
+  https://claude.ai/artifact/416CVL22JqidLmcVQwTuWf – 1 Privatbank (viel Weißraum, Linien, ruhig), 2 Fintech (grüner Kopf,
+  Produktkarte, runde Formen, Funktionskacheln), 3 Daten vorn (Tabelle der neuesten Käufe, Event-Study-Kurve, Cluster-Karte).
+  Alle in Grün/Creme mit Geist und Logo, nur echte Zahlen (Stand 31.10.2026: 6.151 Meldungen, 94 Firmen, 179 Cluster,
+  Knorr-Bremse 30.10., CAAR Käufe −1,66 → −0,97 %). Überschriften sind Vorschläge, nicht beschlossen. Wartet auf Tobias' Wahl.
+
+## Vor dem Livegang: unslop
+Bevor die öffentliche Seite (oder eine größere Änderung daran) live geht, den Skill `/unslop` (`~/.claude/skills/unslop`) darüber laufen lassen, damit sie nicht nach KI-Baukasten aussieht. Audit und vorgeschlagene Richtung zuerst Tobias zeigen, erst nach seinem OK umsetzen – Designentscheidungen trifft Tobias.

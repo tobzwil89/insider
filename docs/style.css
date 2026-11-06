@@ -222,6 +222,15 @@ footer p { margin: 4px 0; }
   border: 1px solid var(--gitter); border-radius: 8px; }
 .firmenlogo img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
 .firmenlogo.leer { width: 52px; font-weight: 650; font-size: 22px; color: var(--text-2); background: var(--gitter); border: 0; }
+/* Firmenseite: großes Logo rechts neben Name und ISIN */
+header.firmenkopf { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; }
+header.firmenkopf > div:first-child { min-width: 0; }
+.firmenlogo.gross { width: 240px; height: 104px; padding: 12px 18px; border-radius: 12px; }
+.firmenlogo.gross.leer { width: 104px; font-size: 44px; }
+@media (max-width: 600px) {
+  .firmenlogo.gross { width: 120px; height: 56px; padding: 6px 10px; border-radius: 8px; }
+  .firmenlogo.gross.leer { width: 56px; font-size: 24px; }
+}
 .firmenlogo.mini { width: 44px; height: 24px; padding: 2px 4px; border-radius: 4px; }
 .firmenlogo.mini.leer { width: 24px; font-size: 12px; }
 .firmen-liste .firmenname { display: flex; align-items: center; gap: 8px; min-width: 0; }
