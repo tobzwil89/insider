@@ -171,7 +171,54 @@ Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
       Datenschutzerklärung (`impressum.html`) um die Personenseiten ergänzen.
 - [ ] **Nebenbefund, nicht behoben:** 13 Geschäfte stehen doppelt (gleiche Meldung an zwei Tagen bei EQS veröffentlicht,
       z. B. Kaeser/Daimler Truck 18.01.2022), betrifft auch Firmenseiten und Event Study.
-- [ ] **2. US-Politiker (Plan, Freigabe Tobias steht aus):** eigene Daten aus den Primärquellen statt Quiver-API.
+- [x] **2a. Repräsentantenhaus: Leser + Lader (06.11.2026, Freigabe Tobias „leg los“, nur lokal):** `pipeline/kongress.py`
+      (Verzeichnis-Zip je Jahr, PTR-PDF mit `pypdf`, neu in `requirements.txt`; Kapitälchen kommen als `\x00` → entfernt;
+      Zeilenleser: Inhaber, Wertpapier, Kürzel, Anlageart, Art, Geschäfts-/Meldetag, Betragsspanne, Status, Unterkonto,
+      Beschreibung; Beschreibung läuft nur nach voller Zeile ≥ 100 Zeichen weiter; Namensreste hinter der Transaktionszeile).
+      `python3 kongress_laden.py [--jahre 2026] [--max-minuten N]` → `daten/kongress.csv` (eine Zeile je Transaktion),
+      `daten/kongress_fortschritt.csv` (doc_id, status ok/scan/leer); setzt fort, speichert alle 25 Meldungen, ~3 Meldungen/s.
+      Geprüft 2026: 457 Meldungen, 401 elektronisch → 3.671 Transaktionen, alle mit Anlageart, jede Aktie mit Kürzel, kein
+      Datum fehlt; Pelosi und Moskowitz (50 Transaktionen) von Hand gegen PDF geprüft. 56 Papier-Scans (DocID 8…/9…) ohne
+      Text → `scan`, auf der Seite als Link (Texterkennung später).
+      **Daten und Seiten nur lokal** (`.gitignore`: `daten/kongress*.csv`, `daten/abgeordnete.csv`, `docs/politiker/`),
+      weil 5 U.S.C. app. § 105(c) die Nutzung „für kommerzielle Zwecke“ außer durch Nachrichtenmedien verbietet → vor dem
+      Livegang klären (Quiver, Capitol Trades u. a. veröffentlichen trotzdem). Livegang = 4 Zeilen aus `.gitignore`, Action
+      nach Muster `rueckkaeufe.yml`, Link auf der Startseite.
+- [x] **2b. Politikerseiten (06.11.2026, nur lokal):** `pipeline/politiker.py`: Abgeordnete aus „congress-legislators“
+      (gemeinfrei, `daten/abgeordnete.csv`, Amtszeiten ab 2011), Zuordnung Nachname im Bezirk → Nachname im Bundesstaat
+      (alter Bezirk nach Neuzuschnitt, McCormick GA06) → einzige Person im Bezirk; 2026: alle Transaktionen zugeordnet,
+      105 Personen, Namen geprüft. Seiten `docs/politiker/<name>/` + Übersicht (`seiten.politikerseite`,
+      `politiker_uebersicht`, Aufruf `export.kongress_exportieren`, nur wenn `daten/kongress.csv` existiert): Kacheln,
+      Volumen je Jahr (Mitte der Spannen), meistgehandelte Aktien, alle Geschäfte mit Link zur Originalmeldung und
+      „Seitdem ggü. S&P 500“ (Yahoo, in Blöcken à 150 Symbole, zweiter Versuch; über 1.000 Symbole auf einmal → Yahoo
+      liefert still nichts). Branchen-Kuchen und Fotos (amtliche Porträts sind gemeinfrei) noch nicht.
+      **Historie geladen (06.11.2026, lokal, 60 Min.):** 7.978 Meldungen 2014–2026. Ab Mitte 2022 sauber: 1.989 Meldungen,
+      20.885 Transaktionen, keine fehlende Anlageart/Status/Datum. **Älteres Formular (2014 bis Mitte 2022, 3.994
+      Meldungen)** zerlegt die Marken („F ILINg S TATUS“), setzt Kästchen als „fedcb“ und schreibt Beschreibung und
+      nächstes Wertpapier in eine Zeile → regelbasiert nicht trennbar, `kongress.ALTFORMAT` → status `alt`, nicht
+      ausgewertet (stehen wie die 2.003 Scans als Links auf der Personenseite). Bereits geladene Altformat-Zeilen einmalig
+      umgestuft (Regel: Meldung ohne jeden Status oder „leer“; 0 gemischte Meldungen). Korrekturen: „Amended“ ersetzt frühere
+      Zeilen desselben Geschäfts, „Deleted“ löscht sie (`politiker.korrekturen`). „Gemeldet“ = Einreichungsdatum laut
+      Verzeichnis, nicht das selbst eingetragene „Notification Date“ (Tippfehler wie 2204).
+      **Kurse:** Yahoo sperrte diesen Rechner nach ~3 Abrufen mit je 1.300–1.900 Symbolen für etwa eine Stunde (auch AAPL
+      einzeln „Too Many Requests“) → `politiker.kurse` mit Speicher `daten/kurse_us.parquet` (nur lokal, braucht pyarrow):
+      fehlende Symbole in Blöcken à 50 mit 5 s Pause, danach je Lauf nur die letzten Tage; leerer Block = Sperre → Abbruch,
+      nächster Lauf macht weiter. Die DAX/MDAX-Kurse der Action sind davon nicht betroffen (andere IP).
+- [ ] **2d. Älteres Formular 2014 – Mitte 2022 lesen** (3.994 Meldungen): Leser über Textpositionen (pypdf-Visitor, Spalten
+      Owner/Asset/Type/Date/Amount) oder Sprachmodell (wie DeepSeek bei Block 6b, Kosten vorher schätzen). Scans (2.003)
+      bräuchten Texterkennung.
+- [ ] **2c. Senat:** `efdsearch.senate.gov` verlangt vor der Suche eine Erklärung per Klick (Nutzung nicht kommerziell,
+      § 105(c)) → **Entscheidung Tobias**, ob er sie abgibt; die Sicherheitsprüfung hat meine Probe deshalb gestoppt.
+      Elektronische Senats-PTR sind HTML-Tabellen (einfacher als PDF), laut Erfahrungsberichten Akamai-Sperre für
+      Rechenzentrums-IPs (GitHub Actions) → lokal laden.
+- [ ] **3. Trump/Regierung (OGE 278-T), geprüft 06.11.2026:** PDFs frei bei `extapps2.oge.gov/201/Presiden.nsf/…` und
+      whitehouse.gov (ohne Klick-Erklärung, aber gleiches Gesetz § 105(c)). Trumps Meldungen sind **Scans mit schlechter
+      Texterkennung** („Tn.imp“ statt Trump), bis 113 Seiten und ~3.700 Geschäfte je Quartal (Presse) → nur mit besserer
+      Texterkennung oder Sprachmodell lesbar. Entscheidung Tobias (Kosten).
+- [ ] **4. Lobbying (LDA-API), Staatsaufträge (USAspending-API), Spenden (FEC-API):** betreffen US-Firmen → brauchen
+      US-Firmenseiten, also das größere Universum (offene Freigabe „Universum über DAX/MDAX hinaus“). FEC: Namen von
+      Spendern dürfen nicht für Werbung/Spendenaufrufe genutzt werden (52 U.S.C. 30111(a)(4)).
+- [ ] **2. US-Politiker (Plan, Freigabe Tobias 06.11.2026):** eigene Daten aus den Primärquellen statt Quiver-API.
       Quiver-API: Hobbyist ~30 $/Monat und Trader ~75 $/Monat nur **privat** (keine kommerzielle Nutzung), kommerziell erst
       „Startup“ ~250 $/Monat bzw. Enterprise auf Anfrage (laut api.quiverquant.com 06.11.2026; Weitergabe/Anzeige
       nicht geregelt → schriftlich klären). Primärquellen (gemeinfrei, STOCK Act):
@@ -897,6 +944,9 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 
 - **06.11.2026 (Personenseiten):** Quiver-Vorbild bewertet, Personenseiten für 803 Vorstände/Aufsichtsräte gebaut und
   geprüft (Details unter „Personenseiten und US-Politiker“), Plan für US-Politiker recherchiert (House-Daten getestet).
+- **06.11.2026 (Kongress):** Tobias gibt die Reihenfolge frei. Repräsentantenhaus 2014–2026 lokal geladen (Leser, Lader,
+  Zuordnung zu Abgeordneten, Politikerseiten wie Quiver), Altformat bis Mitte 2022 bewusst offen. Senat und Trump
+  warten auf Entscheidungen Tobias (Erklärung § 105(c) bzw. Kosten Texterkennung). Nur lokal, nicht live.
 
 ## Vor dem Livegang: unslop
 Bevor die öffentliche Seite (oder eine größere Änderung daran) live geht, den Skill `/unslop` (`~/.claude/skills/unslop`) darüber laufen lassen, damit sie nicht nach KI-Baukasten aussieht. Audit und vorgeschlagene Richtung zuerst Tobias zeigen, erst nach seinem OK umsetzen – Designentscheidungen trifft Tobias.

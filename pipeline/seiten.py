@@ -661,11 +661,14 @@ NUR_EIGENE = ("Enthalten sind eigene Geschäfte und Geschäfte eigener Gesellsch
               "Meldung die Person nennt. Geschäfte von Angehörigen stehen nur auf der Firmenseite.")
 
 
-def _volumen_je_jahr(aktien: pd.DataFrame) -> str:
-    """Käufe und Verkäufe je Jahr (Geschäftsdatum) als Säulenpaare, nur Euro-Beträge."""
-    eur = aktien[aktien["waehrung"].fillna("EUR").eq("EUR") & aktien["geschaeftsdatum"].notna()]
+def _volumen_je_jahr(aktien: pd.DataFrame, geld=euro) -> str:
+    """Käufe und Verkäufe je Jahr (Geschäftsdatum) als Säulenpaare. Spalten geschaeftsdatum, art, volumen und
+    (falls vorhanden) waehrung: dann nur Euro-Beträge. geld formatiert die Beträge (euro oder dollar)."""
+    eur = aktien[aktien["geschaeftsdatum"].notna()]
+    if "waehrung" in eur:
+        eur = eur[eur["waehrung"].fillna("EUR").eq("EUR")]
     if eur["volumen"].fillna(0).sum() <= 0:
-        return '<p class="leer">Keine Volumenangaben in Euro.</p>'
+        return '<p class="leer">Keine Volumenangaben.</p>'
     t = (eur.assign(jahr=eur["geschaeftsdatum"].dt.year).pivot_table(index="jahr", columns="art", values="volumen",
                                                                        aggfunc="sum", fill_value=0))
     jahre = range(int(t.index.min()), max(int(t.index.max()), pd.Timestamp.now().year) + 1)
@@ -675,14 +678,14 @@ def _volumen_je_jahr(aktien: pd.DataFrame) -> str:
     for jahr, r in t.iterrows():
         balken = "".join(
             f'<div class="jv-balken {art.lower()}" style="height:{r.get(art, 0) / hoch * 100:.1f}%" '
-            f'title="{jahr} {e(art)}: {e(euro(r.get(art, 0)))}"></div>'
+            f'title="{jahr} {e(art)}: {e(geld(r.get(art, 0)))}"></div>'
             for art in ("Kauf", "Verkauf") if r.get(art, 0) > 0)
         saeulen += f'<div class="jv-jahr">{balken}<div class="fk-jahr">{jahr}</div></div>'
-    beschreibung = "; ".join(f"{j}: Käufe {euro(r.get('Kauf', 0))}, Verkäufe {euro(r.get('Verkauf', 0))}"
+    beschreibung = "; ".join(f"{j}: Käufe {geld(r.get('Kauf', 0))}, Verkäufe {geld(r.get('Verkauf', 0))}"
                              for j, r in t.iterrows() if r.sum() > 0)
     return (f'<div class="legende"><span><span class="punkt" style="background:var(--kauf)"></span>Käufe</span>'
             f'<span><span class="punkt" style="background:var(--verkauf)"></span>Verkäufe</span>'
-            f'<span class="klein">höchster Wert {e(euro(hoch))}</span></div>'
+            f'<span class="klein">höchster Wert {e(geld(hoch))}</span></div>'
             f'<div class="jv-saeulen" role="img" aria-label="{e(beschreibung)}">{saeulen}</div>')
 
 
@@ -781,6 +784,139 @@ def personen_uebersicht(liste: list, v: dict) -> str:
     return _guru_rahmen("Insider: Vorstände und Aufsichtsräte im DAX und MDAX",
                         "Aktienkäufe und -verkäufe aller Vorstände und Aufsichtsräte im DAX und MDAX seit 2018, "
                         "je Person auf einer Seite.", "person/", "../", kopf, inhalt, v, QUELLE_DD)
+
+
+# --- US-Kongress (pipeline/kongress.py, pipeline/politiker.py) ---------------------------------------------
+
+QUELLE_KONGRESS = "Periodic Transaction Reports des US-Repräsentantenhauses (STOCK Act), Clerk of the House"
+ERKLAERUNG_KONGRESS = (
+    "Abgeordnete des US-Repräsentantenhauses müssen Wertpapiergeschäfte über 1.000 $ binnen 45 Tagen melden, auch die "
+    "von Ehepartnern und Kindern (STOCK Act). Gemeldet wird nur eine Betragsspanne, z. B. 1.001–15.000 $; Summen "
+    "rechnen mit der Mitte der Spanne und sind deshalb Schätzungen. Noch nicht ausgewertet: Papiermeldungen (Scans) und Meldungen im älteren "
+    "Formular (bis Mitte 2022); sie stehen als Links bei den Personen.")
+
+
+def dollar(x) -> str:
+    if _leer(x):
+        return "–"
+    if abs(x) >= 1e6:
+        return f"{zahl(x / 1e6, 1)} Mio. $"
+    if abs(x) >= 1e4:
+        return f"{zahl(x / 1e3)} Tsd. $"
+    return f"{zahl(x)} $"
+
+
+def _spanne(von, bis) -> str:
+    if _leer(von):
+        return "–"
+    if _leer(bis):
+        return f"über {zahl(von)} $"
+    return f"{zahl(von)} $" if von == bis else f"{zahl(von)} – {zahl(bis)} $"
+
+
+# Anlagearten laut House-Formular (fd.house.gov/reference/asset-type-codes.aspx); Aktien (ST) ohne Zusatz
+ANLAGEART = {"OP": "Option", "GS": "Staats-/Kommunalanleihe", "CS": "Unternehmensanleihe", "EF": "ETF",
+             "MF": "Investmentfonds", "CT": "Krypto", "PS": "Aktie (nicht börsennotiert)", "HN": "Hedgefonds",
+             "AB": "Wertpapier mit Sicherheiten", "OI": "Beteiligung", "OT": "Sonstiges"}
+
+
+def _wertpapier(r) -> str:
+    kuerzel = f'<b>{e(r.kuerzel)}</b> ' if r.kuerzel else ""
+    art = ANLAGEART.get(getattr(r, "anlageart", ""), "")
+    return (f'{kuerzel}<span class="klein">{e(r.wertpapier.replace(f"({r.kuerzel})", "").strip())}'
+            + (f' · <b>{e(art)}</b>' if art else "") + "</span>")
+
+
+def _kongress_art(art: str) -> str:
+    """Wie _art, aber Teilverkauf in der Farbe der Verkäufe."""
+    farbe = FARBE.get("Verkauf" if art == "Teilverkauf" else art, "var(--sonstiges)")
+    return f'<span class="art"><span class="punkt" style="background:{farbe}"></span>{e(art)}</span>'
+
+
+def politikerseite(p: dict, v: dict) -> str:
+    """p: Eintrag aus politiker.politiker (name, partei, bezirk, geschaefte, letztes, meldungen, adresse, scans)."""
+    g = p["geschaefte"]
+    kauf, verkauf = g[g["art"].eq("Kauf")], g[g["art"].isin(["Verkauf", "Teilverkauf"])]
+    kacheln = "".join([
+        _kachel("Handelsvolumen", dollar(g["betrag"].sum()), "geschätzt, Mitte der Spannen"),
+        _kachel("Käufe", zahl(len(kauf)), f"etwa {dollar(kauf['betrag'].sum())}"),
+        _kachel("Verkäufe", zahl(len(verkauf)), f"etwa {dollar(verkauf['betrag'].sum())}"),
+        _kachel("Letztes Geschäft", datum(p["letztes"]), f"{zahl(p['meldungen'])} Meldungen"),
+    ])
+    jahre = g.assign(geschaeftsdatum=g["datum"], volumen=g["betrag"],
+                     art=g["art"].replace({"Teilverkauf": "Verkauf"}))
+    aktien = g[g["anlageart"].eq("ST") & g["kuerzel"].ne("")]
+    top = (aktien.groupby("kuerzel").agg(wertpapier=("wertpapier", "first"), kaeufe=("art", lambda x: x.eq("Kauf").sum()),
+                                         verkaeufe=("art", lambda x: x.isin(["Verkauf", "Teilverkauf"]).sum()),
+                                         betrag=("betrag", "sum"), letztes=("datum", "max"))
+           .sort_values("betrag", ascending=False).head(10).reset_index())
+    top_html = _tabelle(
+        [("Aktie", ""), ("Käufe", "zahl"), ("Verkäufe", "zahl"), ("Volumen (geschätzt)", "zahl"), ("Zuletzt", "")],
+        [[(_wertpapier(r), ""), (zahl(r.kaeufe), "zahl"), (zahl(r.verkaeufe), "zahl"), (dollar(r.betrag), "zahl"),
+          (datum(r.letztes), "datum")] for r in top.itertuples()]) if len(top) else '<p class="leer">Keine Aktien.</p>'
+    geschaefte = _tabelle(
+        [("Gemeldet", ""), ("Geschäft", ""), ("Wertpapier", ""), ("Art", ""), ("Inhaber", ""), ("Betrag", "zahl"),
+         ("Seitdem ggü. S&P 500", "zahl")],
+        [[(f'<a href="{e(r.url)}" rel="nofollow">{datum(r.eingereicht)}</a>', "datum"), (datum(r.datum), "datum"),
+          (_wertpapier(r) + (f'<div class="klein">{e(r.beschreibung)}</div>' if r.beschreibung else ""), ""),
+          (_kongress_art(r.art), ""), (e(r.inhaber), ""), (_spanne(r.betrag_von, r.betrag_bis), "zahl"),
+          (prozent(r.seit), f"zahl {_vorzeichen_klasse(r.seit)}")]
+         for r in g.itertuples()])
+    scans = p.get("scans")
+    scan_html = ""
+    if scans is not None and len(scans):
+        scan_html = ('<p class="erklaerung">Außerdem ' + zahl(len(scans)) + ' weitere Meldung(en), noch nicht ausgewertet (Papier oder älteres Formular): '
+                     + ", ".join(f'<a href="{e(s.url)}" rel="nofollow">{datum(s.eingereicht)}</a>'
+                                 for s in scans.itertuples()) + ".</p>")
+    kopf = (f'<div class="marke"><a href="../">← US-Kongress</a></div><h1>{e(p["name"])}</h1>'
+            f'<p class="unterzeile">{e(p["partei"])} · Repräsentantenhaus · {e(p["bezirk"])}</p>')
+    inhalt = f"""<div class="kacheln">{kacheln}</div>
+    <section class="karte">
+      <h2>Handelsvolumen je Jahr</h2>
+      <p class="erklaerung">Käufe und Verkäufe aller Wertpapiere nach Geschäftsdatum, geschätzt aus der Mitte der
+        gemeldeten Spannen. {e(ERKLAERUNG_KONGRESS)}</p>
+      {_volumen_je_jahr(jahre, dollar)}
+    </section>
+    <section class="karte">
+      <h2>Meistgehandelte Aktien</h2>
+      {top_html}
+    </section>
+    <section class="karte">
+      <h2>Alle Geschäfte</h2>
+      <p class="erklaerung">Neueste zuerst; das Datum „Gemeldet“ führt zur Originalmeldung. Inhaber: selbst, Ehepartner,
+        gemeinsam oder Kind. <b>Seitdem ggü. S&amp;P 500</b>: Kursentwicklung der Aktie seit dem Schlusskurs am
+        Geschäftstag minus S&amp;P 500, bis zum letzten Schlusskurs (Yahoo, bereinigt). Bei Käufen spricht ein Plus für
+        gutes Timing, bei Verkäufen ein Minus. Optionen und Anleihen ohne Wert.</p>
+      {scan_html}{geschaefte}
+    </section>"""
+    return _guru_rahmen(f"{p['name']}: Aktiengeschäfte", f"Alle gemeldeten Wertpapiergeschäfte von {p['name']} "
+                        f"({p['partei']}, {p['bezirk']}) laut STOCK Act: Käufe, Verkäufe, Volumen je Jahr und "
+                        "Überrendite seit dem Geschäft.", f"politiker/{p['adresse']}/", "../../", kopf, inhalt, v,
+                        QUELLE_KONGRESS)
+
+
+def politiker_uebersicht(liste: list, neueste: pd.DataFrame, v: dict) -> str:
+    """liste: politiker.politiker(…); neueste: die letzten Geschäfte aller Abgeordneten (mit Spalte adresse)."""
+    zeilen = [[(f'<a href="{e(p["adresse"])}/">{e(p["name"])}</a><div class="klein">{e(p["partei"])} · '
+                f'{e(p["bezirk"])}</div>', ""), (zahl(len(p["geschaefte"])), "zahl"),
+               (dollar(p["geschaefte"]["betrag"].sum()), "zahl"), (datum(p["letztes"]), "datum")] for p in liste]
+    letzte = _tabelle(
+        [("Gemeldet", ""), ("Geschäft", ""), ("Abgeordnete(r)", ""), ("Wertpapier", ""), ("Art", ""),
+         ("Betrag", "zahl")],
+        [[(f'<a href="{e(r.url)}" rel="nofollow">{datum(r.eingereicht)}</a>', "datum"), (datum(r.datum), "datum"),
+          (f'<a href="{e(r.adresse)}/">{e(r.politiker)}</a><div class="klein">{e(r.partei)}</div>', ""),
+          (_wertpapier(r), ""), (_kongress_art(r.art), ""), (_spanne(r.betrag_von, r.betrag_bis), "zahl")]
+         for r in neueste.itertuples()])
+    kopf = ('<div class="marke"><a href="../">← Insider-Monitor</a></div><h1>Aktiengeschäfte im US-Kongress</h1>'
+            f'<p class="unterzeile">{zahl(len(liste))} Abgeordnete des Repräsentantenhauses mit gemeldeten Geschäften.</p>')
+    inhalt = (f'<section class="karte"><h2>Neueste Geschäfte</h2><p class="erklaerung">{e(ERKLAERUNG_KONGRESS)}</p>'
+              f'{letzte}</section><section class="karte"><h2>Alle Abgeordneten</h2><p class="erklaerung">Sortiert nach '
+              'dem letzten Geschäft. Suche mit Strg+F bzw. ⌘+F.</p>'
+              + _tabelle([("Abgeordnete(r)", ""), ("Geschäfte", "zahl"), ("Volumen (geschätzt)", "zahl"),
+                          ("Letztes Geschäft", "")], zeilen) + "</section>")
+    return _guru_rahmen("Aktiengeschäfte im US-Kongress", "Aktienkäufe und -verkäufe der Abgeordneten des "
+                        "US-Repräsentantenhauses laut STOCK Act, je Person mit Volumen und Timing.", "politiker/", "../",
+                        kopf, inhalt, v, QUELLE_KONGRESS)
 
 
 def sitemap(ticker: list, weitere: list = ()) -> str:

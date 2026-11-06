@@ -9,3 +9,11 @@ daten/kennzahlen.csv
 
 # Prüfseite für Firmenlogos (erzeugt von logos_laden.py)
 logos_uebersicht.html
+
+# US-Kongress (STOCK Act): Nutzung für kommerzielle Zwecke gesetzlich beschränkt (5 U.S.C. app. § 105(c)),
+# vor dem Livegang klären → Daten und Seiten vorerst nur lokal
+daten/kongress.csv
+daten/kongress_fortschritt.csv
+daten/abgeordnete.csv
+docs/politiker/
+daten/kurse_us.parquet

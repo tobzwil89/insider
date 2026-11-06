@@ -24,7 +24,7 @@ import shutil
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, personen as ps, ranking as rk, rueckkaeufe, seiten, stimmrechte
+from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, personen as ps, politiker as pol, ranking as rk, rueckkaeufe, seiten, stimmrechte
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
 KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
@@ -210,3 +210,37 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     personen_adressen = ["person/"] + [f"person/{p['adresse']}/" for p in leute] if leute else []
     (seiten.DOCS / "sitemap.xml").write_text(seiten.sitemap(sorted(mit_seite["ticker"].unique()),
                                                             guru_adressen + personen_adressen), encoding="utf-8")
+    kongress_exportieren(v)
+
+
+def kongress_exportieren(v: dict) -> None:
+    """Seiten der US-Abgeordneten (docs/politiker/), nur wenn daten/kongress.csv lokal existiert. Die Datei steht
+    vorerst in .gitignore (Nutzungsbeschränkung nach 5 U.S.C. app. § 105(c) erst klären) → die Action baut nichts."""
+    datei = DATEN / "kongress.csv"
+    ziel = seiten.DOCS / "politiker"
+    shutil.rmtree(ziel, ignore_errors=True)
+    if not datei.exists():
+        return
+    k = pd.read_csv(datei, dtype=str, keep_default_na=False)
+    for s in ["datum", "gemeldet", "eingereicht"]:
+        k[s] = pd.to_datetime(k[s], errors="coerce")
+    for s in ["betrag_von", "betrag_bis"]:
+        k[s] = pd.to_numeric(k[s], errors="coerce")
+    abg = pd.read_csv(pol.ABGEORDNETE, dtype={"bezirk": "Int64"}) if pol.ABGEORDNETE.exists() else pol.abgeordnete_laden()
+    z = pol.zuordnen(k, abg)
+    symbole = sorted({s for s in z.loc[z["anlageart"].eq("ST"), "kuerzel"].map(pol.yahoo) if s})
+    kurse = pol.kurse([pol.INDEX] + symbole, z["datum"].min() - pd.Timedelta(days=10))
+    leute = pol.politiker(z, kurse)
+    fs = pd.read_csv(DATEN / "kongress_fortschritt.csv", dtype=str, keep_default_na=False)
+    fs = fs[fs["status"].isin(["scan", "alt"])].assign(eingereicht=lambda d: pd.to_datetime(d["eingereicht"], errors="coerce"))
+    scans = pol.zuordnen(fs, abg).assign(url=lambda d: [pol.kongress.pdf_url(j, i) for j, i in zip(d["jahr"], d["doc_id"])])
+    for p in leute:
+        p["scans"] = scans[scans["bioguide"] == p["bioguide"]].sort_values("eingereicht", ascending=False)
+        seiten.schreiben(ziel / p["adresse"] / "index.html", seiten.politikerseite(p, v))
+    if leute:
+        adresse = {p["bioguide"]: p["adresse"] for p in leute}
+        alle = pd.concat([p["geschaefte"] for p in leute])
+        neueste = alle.sort_values(["eingereicht", "datum"], ascending=False).head(150)
+        seiten.schreiben(ziel / "index.html", seiten.politiker_uebersicht(
+            leute, neueste.assign(adresse=neueste["bioguide"].map(adresse)), v))
+    print(f"Kongress: {len(leute)} Abgeordnete, {len(z)} Transaktionen, Kurse für {kurse.shape[1]} Symbole")
