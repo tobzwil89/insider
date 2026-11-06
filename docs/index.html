@@ -15,6 +15,7 @@
 <body>
   <div class="hinweisband">Keine Anlageberatung. Alle Angaben ohne Gewähr, Quellen: BaFin-Datenbank der Eigengeschäfte von Führungskräften, EQS-Archiv.</div>
 
+  <div class="kapitel-raster">
   <header class="kopf">
     <div class="marke">Insider-Monitor</div>
     <h1>Was kaufen und verkaufen Vorstände und Aufsichtsräte?</h1>
@@ -23,10 +24,11 @@
     <div class="stand" id="stand">Lade Daten …</div>
   </header>
 
+  <nav class="kapitel" aria-label="Kapitel"><ul><li><a href="#kursreaktion">Kursreaktion um Insider-Geschäfte</a></li><li><a href="#cluster">Cluster-Käufe</a></li><li><a href="#timing">Timing der Insider</a></li><li><a href="#neueste">Neueste Meldungen</a></li><li><a href="#newsletter">Sonntags-Report</a></li><li><a href="#firmen">Firmen im DAX und MDAX</a></li></ul></nav>
   <main>
     <div class="kacheln" id="kacheln"></div>
 
-    <section class="karte">
+    <section class="karte" id="kursreaktion">
       <h2>Kursreaktion um Insider-Geschäfte</h2>
       <p class="erklaerung">Kumulierte durchschnittliche abnormale Rendite (CAAR) von 5 Handelstagen vor bis 5 nach der
         Veröffentlichung, getrennt nach Käufen und Verkäufen von Vorstand und Aufsichtsrat im DAX und MDAX.
@@ -39,7 +41,7 @@
       </details>
     </section>
 
-    <section class="karte">
+    <section class="karte" id="cluster">
       <h2>Cluster-Käufe</h2>
       <p class="erklaerung" id="cluster-erklaerung">Mindestens drei Führungskräfte einer Firma kaufen innerhalb von 14 Tagen
         Aktien. Gilt für alle Emittenten, nicht nur DAX und MDAX.</p>
@@ -47,7 +49,7 @@
       <button class="knopf mehr" id="cluster-mehr" hidden>Alle anzeigen</button>
     </section>
 
-    <section class="karte">
+    <section class="karte" id="timing">
       <h2>Timing der Insider</h2>
       <p class="erklaerung">Wie liefen die Aktien in den 3 Monaten (60 Handelstagen) nach den Käufen einer Führungskraft,
         verglichen mit DAX bzw. MDAX? Sortiert nach der typischen Überrendite (Median) aller Käufe einer Person, damit ein
@@ -58,7 +60,7 @@
       <button class="knopf mehr" id="ranking-mehr" hidden>Mehr anzeigen</button>
     </section>
 
-    <section class="karte">
+    <section class="karte" id="neueste">
       <h2>Neueste Meldungen</h2>
       <p class="erklaerung">Teilausführungen derselben Person am selben Tag sind zusammengefasst. Zeit = Veröffentlichung (EQS) bzw. Freischaltung bei der BaFin.</p>
       <div class="filter">
@@ -84,7 +86,7 @@
       <p class="erklaerung" id="report-meldung">Du bekommst erst eine Mail mit Bestätigungslink. Details unter <a href="impressum.html#newsletter">Datenschutz</a>.</p>
     </section>
 
-    <section class="karte">
+    <section class="karte" id="firmen">
       <h2>Firmen im DAX und MDAX</h2>
       <p class="erklaerung">Kursverlauf mit allen Insider-Geschäften und den Kursreaktionen je Meldung.</p>
       <input type="search" id="firmen-suche" placeholder="Firma suchen" aria-label="Firma suchen">
@@ -98,6 +100,7 @@
     <p><a href="methode.html">Methode</a> · <a href="person/">Insider (Personen)</a> · <a href="gurus/">Depots bekannter Investoren</a> ·
       <a href="impressum.html">Impressum und Datenschutz</a> · Daten: <a href="https://portal.mvp.bafin.de/database/DealingsInfo/">BaFin</a>, <a href="https://www.eqs-news.com/de/">EQS News</a>, Kurse: Yahoo Finance</p>
   </footer>
+  </div>
 
   <script src="gemeinsam.js?v=b6d03d3e"></script>
   <script src="start.js?v=af93080f"></script>

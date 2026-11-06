@@ -60,20 +60,3 @@ function zeigeKurs(f, monate) {
     zeigeKurs(f, +knopf.dataset.monate);
   }));
 })();
-
-// Kapitelleiste: das Kapitel markieren, in dem man gerade liest
-(() => {
-  const links = [...document.querySelectorAll("nav.kapitel a")];
-  let vorher = null;
-  const markieren = () => {
-    let aktuell = links[0];
-    for (const a of links) if (document.querySelector(a.hash).getBoundingClientRect().top < 120) aktuell = a;
-    if (aktuell === vorher) return;
-    vorher = aktuell;
-    for (const a of links) a.setAttribute("aria-current", a === aktuell);
-    // schmale Ansicht: aktuelles Kapitel in der waagerechten Leiste sichtbar halten
-    if (innerWidth < 1240) aktuell.closest("nav").scrollTo({ left: aktuell.offsetLeft - 16 });
-  };
-  addEventListener("scroll", markieren, { passive: true });
-  markieren();
-})();

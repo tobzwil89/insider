@@ -226,3 +226,21 @@ function rankingTabelle(liste, mitFirma = true) {
     el("td", { class: "datum" }, r.erster_kauf.slice(0, 4) === r.letzter_kauf.slice(0, 4)
       ? r.erster_kauf.slice(0, 4) : `${r.erster_kauf.slice(0, 4)}–${r.letzter_kauf.slice(0, 4)}`))));
 }
+
+// Kapitelleiste (Startseite und Firmenseiten): das Kapitel markieren, in dem man gerade liest
+(() => {
+  const links = [...document.querySelectorAll("nav.kapitel a")];
+  if (!links.length) return;
+  let vorher = null;
+  const markieren = () => {
+    let aktuell = links[0];
+    for (const a of links) if (document.querySelector(a.hash).getBoundingClientRect().top < 120) aktuell = a;
+    if (aktuell === vorher) return;
+    vorher = aktuell;
+    for (const a of links) a.setAttribute("aria-current", a === aktuell);
+    // schmale Ansicht: aktuelles Kapitel in der waagerechten Leiste sichtbar halten
+    if (innerWidth < 1240) aktuell.closest("nav").scrollTo({ left: aktuell.offsetLeft - 16 });
+  };
+  addEventListener("scroll", markieren, { passive: true });
+  markieren();
+})();

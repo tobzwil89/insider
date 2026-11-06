@@ -216,6 +216,10 @@ Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): 
   Ab 1240 px Leiste links (180 px, mitlaufend, `.kapitel-raster` als Raster um Kopf/Leiste/Inhalt/Fuß), darunter waagerechte
   Zeile oben (mitlaufend, wischbar). `firma.js` markiert das aktuelle Kapitel. Geprüft an RHM (hell/dunkel 1400 px, 520 px,
   Sprünge per Messwert). Aussehen nur vorläufig, kommt mit der Neugestaltung neu. Gepusht 06.11.2026; live erst nach Bot-Lauf „immer“.
+- **Kapitelleiste auch auf der Startseite (07.11.2026, Tobias):** `docs/index.html` von Hand ergänzt (`.kapitel-raster`,
+  `nav.kapitel`, `id` je Karte; „Sonntags-Report“ behält `#newsletter`). Markier-Skript von `firma.js` nach `gemeinsam.js`
+  verschoben (läuft nur, wenn eine Leiste da ist). Geprüft 1400/520 px, Sprünge zu Timing/Firmen/Report, RHM weiter ok.
+  Sicherung: `.recherche/sicherung_kapitel_start/`. Neue Karte auf der Startseite → Link in der Leiste von Hand ergänzen.
 - **Kursreaktion je Ereignis (06.11.2026, Tobias):** Tabelle jetzt neueste zuerst (`sort_values(..., ascending=False)`). Gepusht 06.11.2026.
 - **Erklärtexte volle Breite (06.11.2026, Tobias):** `max-width: 760px` bei `.karte .erklaerung` entfernt, gilt für alle Karten. Geprüft RHM „Aktionäre“ 1400 px. Gepusht 06.11.2026.
 - Rechtlich: Logos nur zur Kennzeichnung der Firma zeigen, kein Anschein einer Partnerschaft → zu „vor dem Livegang klären“.
