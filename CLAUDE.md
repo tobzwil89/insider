@@ -236,7 +236,7 @@ CTA: Newsletter, Formular mit **EmailOctopus** (läuft schon in `roleplay-landin
       Anfragen von fremden Seiten (CORS `*`), ungültige Adresse im Browser abgelehnt; echte Anmeldung noch nicht getestet.
       Bestätigungsmail („Incentive email“) laut Tobias eingeschaltet und deutsch. **Offen:** echte Anmeldung auf der Live-Seite testen;
       Grundlage USA-Übermittlung (Text nennt Standardvertragsklauseln; DPF-Zertifizierung nur über Drittseite gesehen) auf
-      kit.com/privacy prüfen. Versand samstags automatisch erst, wenn der Report von Hand ein paar Wochen gut war.
+      kit.com/privacy prüfen. **Versand automatisch seit 06.11.2026** (Tobias): samstags ab 18 Uhr in Kit geplant für Sonntag 8 Uhr, Telegram-Hinweis zum Prüfen/Stoppen (Details Verlauf 06.11.2026).
 - [ ] 3. Mit 5–10 Anlegern sprechen. Leitfaden, Anschreiben, Auswertungstabelle: `newsletter/GESPRAECHE.md` (31.10.2026).
       Die Gespräche prüfen jetzt Zielgruppe und Preisidee aus der Positionierung (31.10.2026).
 - [ ] 4. Weiter am Produkt (Datenbank, Sentiment); Website danach.
@@ -846,6 +846,8 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   Produktkarte, runde Formen, Funktionskacheln), 3 Daten vorn (Tabelle der neuesten Käufe, Event-Study-Kurve, Cluster-Karte).
   Alle in Grün/Creme mit Geist und Logo, nur echte Zahlen (Stand 31.10.2026: 6.151 Meldungen, 94 Firmen, 179 Cluster,
   Knorr-Bremse 30.10., CAAR Käufe −1,66 → −0,97 %). Überschriften sind Vorschläge, nicht beschlossen. Wartet auf Tobias' Wahl.
+
+- **06.11.2026 (Newsletter):** Tobias: „letzten Sonntag ging nichts raus“. Ursache: Versand war nie eingerichtet (nur Entwurfsskript). Tobias will Automatik → gebaut (nicht gepusht): `sonntags_report.umschichtungen` (Kauf + Verkauf derselben Firma am selben Geschäftstag zum Kurs ±1 % = interne Übertragung, eigener Abschnitt, nicht mitgezählt; trifft seit 09/2026 ATOSS, RCM, KST, NFON, Hövelrat, alle plausibel). `--kit` legt Broadcast über Kit-API v4 an (`send_at` Sonntag 08:00 Berlin) und schickt Telegram mit Text und Link; `--entwurf` nur Entwurf zum Testen. Action „Daten aktualisieren“: Schritt „Sonntags-Report planen“ samstags ab 18 Uhr, `newsletter/<Sonntag>.md` wird committet und verhindert Doppelversand. Push-Schutz kennt `sonntags_report`. Sicherung: `.recherche/sicherung_newsletter/`. Kit-API funktioniert im Gratistarif (Test 06.11.2026: Entwurf 26853741 angelegt), Secret `KIT_API_KEY` in GitHub angelegt. **Offen (Tobias):** Testentwurf in Kit löschen, pushen, Sonntag 08.11. prüfen, ob der Report rausging.
 
 ## Vor dem Livegang: unslop
 Bevor die öffentliche Seite (oder eine größere Änderung daran) live geht, den Skill `/unslop` (`~/.claude/skills/unslop`) darüber laufen lassen, damit sie nicht nach KI-Baukasten aussieht. Audit und vorgeschlagene Richtung zuerst Tobias zeigen, erst nach seinem OK umsetzen – Designentscheidungen trifft Tobias.
