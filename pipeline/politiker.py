@@ -38,7 +38,8 @@ def abgeordnete_laden(ab: str = "2011-01-01") -> pd.DataFrame:
                                "nachname": p["name"]["last"],
                                "name": p["name"].get("official_full") or f"{p['name']['first']} {p['name']['last']}",
                                "kammer": t["type"], "bundesstaat": t["state"], "bezirk": t.get("district"),
-                               "partei": t.get("party", ""), "start": t["start"], "ende": t["end"]})
+                               "partei": t.get("party", ""), "start": t["start"], "ende": t["end"],
+                               "fec": ";".join(p["id"].get("fec", []))})  # Kandidaten-IDs der Wahlbehörde FEC
     df = pd.DataFrame(zeilen)
     df.to_csv(ABGEORDNETE, index=False)
     return df

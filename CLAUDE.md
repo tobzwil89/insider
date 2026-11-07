@@ -215,9 +215,29 @@ Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
       whitehouse.gov (ohne Klick-Erklärung, aber gleiches Gesetz § 105(c)). Trumps Meldungen sind **Scans mit schlechter
       Texterkennung** („Tn.imp“ statt Trump), bis 113 Seiten und ~3.700 Geschäfte je Quartal (Presse) → nur mit besserer
       Texterkennung oder Sprachmodell lesbar. Entscheidung Tobias (Kosten).
-- [ ] **4. Lobbying (LDA-API), Staatsaufträge (USAspending-API), Spenden (FEC-API):** betreffen US-Firmen → brauchen
-      US-Firmenseiten, also das größere Universum (offene Freigabe „Universum über DAX/MDAX hinaus“). FEC: Namen von
-      Spendern dürfen nicht für Werbung/Spendenaufrufe genutzt werden (52 U.S.C. 30111(a)(4)).
+- [x] **4a–c. US-Firmen (Freigabe Tobias 06.11.2026 „Universum über DAX/MDAX: ja“), gebaut 06.11.2026, nicht gepusht:**
+      - `python3 -m pipeline.us_firmen` → `daten/us_firmen.csv`: S&P 500 (Wikipedia-Tabelle) + amtlicher Name aus
+        SEC `company_tickers.json` (500 Firmen; GOOGL/GOOG je CIK einmal).
+      - `python3 -m pipeline.staatsauftraege [--max-minuten N]` → `daten/staatsauftraege.csv` (kuerzel, geschaeftsjahr,
+        betrag ab US-GJ 2016) + `staatsauftraege_zuordnung.csv`: USAspending-API ohne Schlüssel, Suche nach Namen,
+        Kandidat auf Konzernebene (P, alle Töchter), Treffer nur bei gleichen Namenswörtern (+ Rechtsformen, wenige
+        Zusätze) → „Apple“ ≠ „Apple Hospitality REIT“; Sonderfälle in `NAMEN` (Google Public Sector, 3M Company).
+        Geprüft: Lockheed GJ 2025 72,9 Mrd. $, Boeing, RTX, HII, Microsoft gefunden; Apple hat keine nennenswerten.
+        ~1,3 Firmen/Min. (USAspending langsam), setzt fort.
+      - `python3 -m pipeline.spenden` → `daten/spenden.csv` (+ `spenden_kandidaten.csv`, `spenden_pacs.csv`, zusammen
+        1,4 MB): FEC-Massendateien je Zyklus 2022/24/26 ohne Schlüssel (cm, cn, pas2), Firmen-PACs (Typ Q/N, Org. C) über
+        „Connected Organization“, Spenden Art 24K an Kandidaten, Kandidat → bioguide über `fec` in `abgeordnete.csv`.
+        ~210 Firmen mit PAC, 64–75 Mio. $ je Zyklus; größte 2023/24 Home Depot, AT&T, Comcast, Honeywell, UPS, Boeing,
+        Lockheed. Namen: offiziell (congress-legislators) bzw. `spenden.fec_name` („WITTMAN, ROBERT J. MR.“ → „Robert J. Wittman“).
+      - Seiten `docs/us/<KÜRZEL>/` + `docs/us/` (`seiten.us_firmenseite`, `us_uebersicht`, `export.us_exportieren`):
+        Kacheln, Staatsaufträge je GJ (Balken), PAC-Spenden nach Partei je Zyklus + größte Empfänger; **lokal zusätzlich**
+        „Geschäfte von Abgeordneten“ in dieser Aktie (NVDA: 274 seit Mitte 2022) und Spenden-Abschnitt auf den
+        Politikerseiten. Die US-Seiten nutzen nur gemeinfreie Daten → **gehen mit dem nächsten Push live** (Fußzeile
+        „US-Firmen: Staat und Politik“, Sitemap), Kongress-Teil fehlt dort, weil `daten/kongress.csv` lokal bleibt.
+      - Manuell (vierteljährlich): `us_firmen`, `staatsauftraege` (Zuordnung löschen für Neuprüfung), `spenden`.
+- [ ] **4d. Lobbying:** `lda.gov/api/v1/` (und das alte `lda.senate.gov`) antworten 06.11.2026 mit 403 von Akamai, auch die
+      Doku, auch von außen → vermutlich Schlüssel nötig: **Tobias** registriert kostenlos unter lda.gov/api/register
+      (E-Mail), Schlüssel in `.env` als `LDA_API_KEY`.
 - [ ] **2. US-Politiker (Plan, Freigabe Tobias 06.11.2026):** eigene Daten aus den Primärquellen statt Quiver-API.
       Quiver-API: Hobbyist ~30 $/Monat und Trader ~75 $/Monat nur **privat** (keine kommerzielle Nutzung), kommerziell erst
       „Startup“ ~250 $/Monat bzw. Enterprise auf Anfrage (laut api.quiverquant.com 06.11.2026; Weitergabe/Anzeige
@@ -947,6 +967,10 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **06.11.2026 (Kongress):** Tobias gibt die Reihenfolge frei. Repräsentantenhaus 2014–2026 lokal geladen (Leser, Lader,
   Zuordnung zu Abgeordneten, Politikerseiten wie Quiver), Altformat bis Mitte 2022 bewusst offen. Senat und Trump
   warten auf Entscheidungen Tobias (Erklärung § 105(c) bzw. Kosten Texterkennung). Nur lokal, nicht live.
+- **06.11.2026 (Kongress 2):** Senat als Aufgabe #68 in der Planungs-App und in `US_KONGRESS_OFFEN.md` (Tobias: „jetzt
+  nicht“). Kostenschätzung Auslesen per Sprachmodell gemessen (~3,70 $, höchstens ~6 $, Details in der .md). US-Universum
+  freigegeben → S&P 500 mit Staatsaufträgen (USAspending) und PAC-Spenden (FEC), Seiten `docs/us/`. Lobbying-Register
+  braucht einen Schlüssel von Tobias.
 
 ## Vor dem Livegang: unslop
 Bevor die öffentliche Seite (oder eine größere Änderung daran) live geht, den Skill `/unslop` (`~/.claude/skills/unslop`) darüber laufen lassen, damit sie nicht nach KI-Baukasten aussieht. Audit und vorgeschlagene Richtung zuerst Tobias zeigen, erst nach seinem OK umsetzen – Designentscheidungen trifft Tobias.

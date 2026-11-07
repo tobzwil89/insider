@@ -24,7 +24,7 @@ import shutil
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, personen as ps, politiker as pol, ranking as rk, rueckkaeufe, seiten, stimmrechte
+from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, personen as ps, politiker as pol, ranking as rk, rueckkaeufe, seiten, spenden, stimmrechte
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
 KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
@@ -208,19 +208,58 @@ def exportiere(meldungen: pd.DataFrame, firmen: pd.DataFrame, kurse: pd.DataFram
     if leute:
         seiten.schreiben(seiten.DOCS / "person" / "index.html", seiten.personen_uebersicht(leute, v))
     personen_adressen = ["person/"] + [f"person/{p['adresse']}/" for p in leute] if leute else []
+    spenden_alle = spenden.lesen()
+    abgeordnete = kongress_exportieren(v, spenden_alle)
+    us_adressen = us_exportieren(v, spenden_alle, abgeordnete)
+    # Politikerseiten nicht in die Sitemap: sie entstehen nur lokal
     (seiten.DOCS / "sitemap.xml").write_text(seiten.sitemap(sorted(mit_seite["ticker"].unique()),
-                                                            guru_adressen + personen_adressen), encoding="utf-8")
-    kongress_exportieren(v)
+                                                            guru_adressen + personen_adressen + us_adressen),
+                                             encoding="utf-8")
 
 
-def kongress_exportieren(v: dict) -> None:
+def us_exportieren(v: dict, spenden_alle: pd.DataFrame, abgeordnete: list) -> list:
+    """Seiten der US-Firmen (docs/us/) aus daten/us_firmen.csv, staatsauftraege*.csv, spenden*.csv. Die Geschäfte von
+    Abgeordneten kommen nur dazu, wenn die Politikerseiten (lokal) gebaut wurden. Gibt die Adressen für die Sitemap."""
+    ziel = seiten.DOCS / "us"
+    shutil.rmtree(ziel, ignore_errors=True)
+    if not (DATEN / "us_firmen.csv").exists():
+        return []
+    firmen = pd.read_csv(DATEN / "us_firmen.csv")
+    sa_datei, zu_datei = DATEN / "staatsauftraege.csv", DATEN / "staatsauftraege_zuordnung.csv"
+    sa = pd.read_csv(sa_datei) if sa_datei.exists() else pd.DataFrame(columns=["kuerzel", "geschaeftsjahr", "betrag"])
+    zu = pd.read_csv(zu_datei, keep_default_na=False) if zu_datei.exists() else pd.DataFrame(columns=["kuerzel", "empfaenger"])
+    empfaenger = dict(zip(zu["kuerzel"], zu["empfaenger"]))
+    politiker = {p["bioguide"]: p["adresse"] for p in abgeordnete}
+    kongress = None
+    if abgeordnete:
+        kongress = pd.concat([p["geschaefte"].assign(adresse=p["adresse"]) for p in abgeordnete])
+        kongress = kongress[kongress["anlageart"].eq("ST")]
+    gj = seiten._us_geschaeftsjahr()
+    zeilen = []
+    for f in firmen.to_dict("records"):
+        auftraege = dict(zip(*(sa.loc[sa["kuerzel"] == f["kuerzel"], s] for s in ["geschaeftsjahr", "betrag"])))
+        sp = spenden_alle[spenden_alle["kuerzel"] == f["kuerzel"]]
+        k = kongress[kongress["symbol"] == f["kuerzel"]] if kongress is not None else None
+        seiten.schreiben(ziel / f["kuerzel"] / "index.html", seiten.us_firmenseite(
+            f, auftraege, empfaenger.get(f["kuerzel"], ""), sp, k, politiker, v))
+        zeilen.append({**f, "auftraege": auftraege.get(gj - 1), "spenden": sp.loc[sp["zyklus"] == 2024, "betrag"].sum(),
+                       "kongress": len(k) if k is not None else 0})
+    zeilen.sort(key=lambda z: -(z["auftraege"] or 0))
+    seiten.schreiben(ziel / "index.html", seiten.us_uebersicht(zeilen, kongress is not None, v))
+    print(f"US-Firmen: {len(zeilen)} Seiten, {sum(1 for z in zeilen if z['auftraege'])} mit Staatsaufträgen, "
+          f"{sum(1 for z in zeilen if z['spenden'])} mit PAC-Spenden")
+    return ["us/"] + [f"us/{z['kuerzel']}/" for z in zeilen]
+
+
+def kongress_exportieren(v: dict, spenden_alle: pd.DataFrame) -> list:
     """Seiten der US-Abgeordneten (docs/politiker/), nur wenn daten/kongress.csv lokal existiert. Die Datei steht
-    vorerst in .gitignore (Nutzungsbeschränkung nach 5 U.S.C. app. § 105(c) erst klären) → die Action baut nichts."""
+    vorerst in .gitignore (Nutzungsbeschränkung nach 5 U.S.C. app. § 105(c) erst klären) → die Action baut nichts.
+    Gibt die Personen zurück (für die US-Firmenseiten), sonst eine leere Liste."""
     datei = DATEN / "kongress.csv"
     ziel = seiten.DOCS / "politiker"
     shutil.rmtree(ziel, ignore_errors=True)
     if not datei.exists():
-        return
+        return []
     k = pd.read_csv(datei, dtype=str, keep_default_na=False)
     for s in ["datum", "gemeldet", "eingereicht"]:
         k[s] = pd.to_datetime(k[s], errors="coerce")
@@ -234,8 +273,10 @@ def kongress_exportieren(v: dict) -> None:
     fs = pd.read_csv(DATEN / "kongress_fortschritt.csv", dtype=str, keep_default_na=False)
     fs = fs[fs["status"].isin(["scan", "alt"])].assign(eingereicht=lambda d: pd.to_datetime(d["eingereicht"], errors="coerce"))
     scans = pol.zuordnen(fs, abg).assign(url=lambda d: [pol.kongress.pdf_url(j, i) for j, i in zip(d["jahr"], d["doc_id"])])
+    us_namen = dict(pd.read_csv(DATEN / "us_firmen.csv")[["kuerzel", "name"]].values) if (DATEN / "us_firmen.csv").exists() else {}
     for p in leute:
         p["scans"] = scans[scans["bioguide"] == p["bioguide"]].sort_values("eingereicht", ascending=False)
+        p["spenden_html"] = seiten.politiker_spenden(spenden_alle[spenden_alle["bioguide"] == p["bioguide"]], us_namen)
         seiten.schreiben(ziel / p["adresse"] / "index.html", seiten.politikerseite(p, v))
     if leute:
         adresse = {p["bioguide"]: p["adresse"] for p in leute}
@@ -244,3 +285,4 @@ def kongress_exportieren(v: dict) -> None:
         seiten.schreiben(ziel / "index.html", seiten.politiker_uebersicht(
             leute, neueste.assign(adresse=neueste["bioguide"].map(adresse)), v))
     print(f"Kongress: {len(leute)} Abgeordnete, {len(z)} Transaktionen, Kurse für {kurse.shape[1]} Symbole")
+    return leute

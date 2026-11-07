@@ -467,7 +467,7 @@ def _liste(titel: str, zeilen: list) -> str:
     return f'<div class="fk-gruppe"><h3>{e(titel)}</h3><dl>{dl}</dl></div>'
 
 
-def _balken(titel: str, reihe: dict, waehrung) -> str:
+def _balken(titel: str, reihe: dict, waehrung, zusatz: str = "je Geschäftsjahr, helle Säulen = Schätzung") -> str:
     """Senkrechte Balken je Jahr, Schätzungen („2026e“) heller. reihe: {Jahr: Wert}."""
     werte = [w for w in reihe.values() if not _leer(w)]
     if not werte:
@@ -478,8 +478,8 @@ def _balken(titel: str, reihe: dict, waehrung) -> str:
         f'title="{e(j)}: {e(_betrag(w, waehrung))}"><div class="fk-balken" style="height:{abs(w) / hoch * 100:.1f}%">'
         f'</div><div class="fk-jahr">{e(str(j)[2:] if len(str(j)) >= 4 else j)}</div></div>'
         for j, w in reihe.items() if not _leer(w))
-    return (f'<div class="fk-diagramm"><h3>{e(titel)} <span class="klein">je Geschäftsjahr, helle Säulen = '
-            f'Schätzung, höchster Wert {e(_betrag(hoch, waehrung))}</span></h3><div class="fk-saeulen">{saeulen}</div></div>')
+    return (f'<div class="fk-diagramm"><h3>{e(titel)} <span class="klein">{e(zusatz)}, '
+            f'höchster Wert {e(_betrag(hoch, waehrung))}</span></h3><div class="fk-saeulen">{saeulen}</div></div>')
 
 
 KATEGORIE_TEXT = {  # Einteilung nach Peter Lynch, Regeln in kennzahlen.kategorie
@@ -799,6 +799,8 @@ ERKLAERUNG_KONGRESS = (
 def dollar(x) -> str:
     if _leer(x):
         return "–"
+    if abs(x) >= 1e9:
+        return f"{zahl(x / 1e9, 1)} Mrd. $"
     if abs(x) >= 1e6:
         return f"{zahl(x / 1e6, 1)} Mio. $"
     if abs(x) >= 1e4:
@@ -880,7 +882,7 @@ def politikerseite(p: dict, v: dict) -> str:
     <section class="karte">
       <h2>Meistgehandelte Aktien</h2>
       {top_html}
-    </section>
+    </section>{p.get("spenden_html", "")}
     <section class="karte">
       <h2>Alle Geschäfte</h2>
       <p class="erklaerung">Neueste zuerst; das Datum „Gemeldet“ führt zur Originalmeldung. Inhaber: selbst, Ehepartner,
@@ -917,6 +919,144 @@ def politiker_uebersicht(liste: list, neueste: pd.DataFrame, v: dict) -> str:
     return _guru_rahmen("Aktiengeschäfte im US-Kongress", "Aktienkäufe und -verkäufe der Abgeordneten des "
                         "US-Repräsentantenhauses laut STOCK Act, je Person mit Volumen und Timing.", "politiker/", "../",
                         kopf, inhalt, v, QUELLE_KONGRESS)
+
+
+# --- US-Firmen (S&P 500): Staatsaufträge, PAC-Spenden, Kongress-Geschäfte ----------------------------------
+
+PARTEI_FEC = {"DEM": "Demokraten", "REP": "Republikaner"}
+QUELLE_US = "USAspending.gov (Staatsaufträge), Wahlbehörde FEC (PAC-Spenden), SEC, Wikipedia (Index-Liste)"
+ERKLAERUNG_PAC = (
+    "Ein PAC (Political Action Committee) ist die Spendenkasse eines Konzerns, gespeist von Mitarbeitern; Firmen selbst "
+    "dürfen Kandidaten nicht direkt unterstützen. Gezählt sind direkte Spenden an Wahlkampfkomitees von Kandidaten für "
+    "Kongress und Präsidentenamt (Wahlzyklen 2021/22 bis 2025/26, Stand der FEC-Massendaten).")
+
+
+def _us_geschaeftsjahr(heute=None) -> int:
+    """US-Geschäftsjahr läuft von Oktober bis September: November 2026 gehört zu 2027."""
+    h = pd.Timestamp(heute or pd.Timestamp.today())
+    return h.year + 1 if h.month >= 10 else h.year
+
+
+def _kandidat(r, politiker: dict, wurzel: str) -> str:
+    name = r.kandidat or r.cand_id  # schon lesbar aufbereitet (spenden.fec_name bzw. offizieller Name)
+    a = politiker.get(r.bioguide)
+    return f'<a href="{wurzel}politiker/{e(a)}/">{e(name)}</a>' if a else e(name)
+
+
+def us_firmenseite(f: dict, auftraege: dict, empfaenger: str, spenden: pd.DataFrame, kongress: pd.DataFrame | None,
+                   politiker: dict, v: dict) -> str:
+    """f: kuerzel, name, sektor, branche. auftraege: {Geschäftsjahr: Betrag}. spenden: spenden.lesen() dieser Firma.
+    kongress: Geschäfte von Abgeordneten in dieser Aktie (mit adresse, politiker) oder None (Daten nur lokal).
+    politiker: bioguide → Adresse der Politikerseite (leer, wenn es die Seiten nicht gibt)."""
+    gj = _us_geschaeftsjahr()
+    voll = {j: b for j, b in auftraege.items() if j < gj}
+    letztes_gj = max(voll) if voll else None
+    s24 = spenden[spenden["zyklus"] == 2024]
+    rep = s24.loc[s24["partei"] == "REP", "betrag"].sum() / s24["betrag"].sum() if s24["betrag"].sum() else None
+    kacheln = [
+        _kachel("Staatsaufträge", dollar(voll[letztes_gj]) if letztes_gj else "–",
+                f"US-Geschäftsjahr {letztes_gj}" if letztes_gj else "keine gefunden"),
+        _kachel("PAC-Spenden", dollar(s24["betrag"].sum()) if len(s24) else "–", "Wahlzyklus 2023/24"),
+        _kachel("Davon an Republikaner", f"{zahl(rep * 100)} %" if rep is not None else "–",
+                "Rest überwiegend an Demokraten" if rep is not None else ""),
+    ]
+    if kongress is not None:
+        kacheln.append(_kachel("Geschäfte von Abgeordneten", zahl(len(kongress)),
+                               f"zuletzt {datum(kongress['datum'].max())}" if len(kongress) else "seit Mitte 2022"))
+    auftrag_html = (_balken("Zugesagte Mittel aus Aufträgen", {j: auftraege[j] for j in sorted(auftraege)}, "$",
+                            f"je US-Geschäftsjahr (Okt.–Sept.), {gj} unvollständig")
+                    + f'<p class="klein">Zugeordnet: {e(empfaenger)} mit allen Töchtern (Konzernebene bei USAspending).</p>'
+                    if auftraege else '<p class="leer">Keine Bundesaufträge gefunden (oder der Name passt nicht eindeutig).</p>')
+    if spenden.empty:
+        spenden_html = '<p class="leer">Kein Firmen-PAC gefunden.</p>'
+    else:
+        p = spenden.assign(gruppe=spenden["partei"].map(PARTEI_FEC).fillna("andere"))
+        tab = p.pivot_table(index="zyklus", columns="gruppe", values="betrag", aggfunc="sum", fill_value=0)
+        aufteilung = _tabelle(
+            [("Wahlzyklus", "")] + [(g, "zahl") for g in ["Republikaner", "Demokraten", "andere"] if g in tab] + [("Zusammen", "zahl")],
+            [[(f"{z - 1}/{str(z)[2:]}", "datum")] + [(dollar(r[g]), "zahl") for g in ["Republikaner", "Demokraten", "andere"] if g in tab]
+             + [(dollar(r.sum()), "zahl")] for z, r in tab.sort_index(ascending=False).iterrows()])
+        top = (p.groupby(["cand_id", "bioguide", "kandidat", "partei", "amt"], dropna=False)
+               .agg(betrag=("betrag", "sum"), zyklen=("zyklus", lambda x: ", ".join(f"{z - 1}/{str(z)[2:]}" for z in sorted(set(x)))))
+               .reset_index().sort_values("betrag", ascending=False).head(20))
+        spenden_html = aufteilung + "<h3>Größte Empfänger</h3>" + _tabelle(
+            [("Kandidat(in)", ""), ("Partei", ""), ("Amt", ""), ("Spenden", "zahl"), ("Wahlzyklen", "")],
+            [[(_kandidat(r, politiker, "../../"), ""), (e(PARTEI_FEC.get(r.partei, r.partei)), ""), (e(r.amt), ""),
+              (dollar(r.betrag), "zahl"), (e(r.zyklen), "datum")] for r in top.itertuples()])
+    kongress_html = ""
+    if kongress is not None:
+        k = kongress.sort_values(["eingereicht", "datum"], ascending=False).head(100)
+        kongress_html = f"""
+    <section class="karte">
+      <h2>Geschäfte von Abgeordneten</h2>
+      <p class="erklaerung">Käufe und Verkäufe dieser Aktie durch Mitglieder des US-Repräsentantenhauses (STOCK Act),
+        ausgewertet ab Mitte 2022. {e(ERKLAERUNG_KONGRESS)}</p>
+      """ + (_tabelle(
+            [("Gemeldet", ""), ("Geschäft", ""), ("Abgeordnete(r)", ""), ("Art", ""), ("Inhaber", ""), ("Betrag", "zahl")],
+            [[(f'<a href="{e(r.url)}" rel="nofollow">{datum(r.eingereicht)}</a>', "datum"), (datum(r.datum), "datum"),
+              (f'<a href="../../politiker/{e(r.adresse)}/">{e(r.politiker)}</a><div class="klein">{e(r.partei)}</div>', ""),
+              (_kongress_art(r.art), ""), (e(r.inhaber), ""), (_spanne(r.betrag_von, r.betrag_bis), "zahl")]
+             for r in k.itertuples()]) if len(k) else '<p class="leer">Keine gemeldeten Geschäfte seit Mitte 2022.</p>') + """
+    </section>"""
+    kopf = (f'<div class="marke"><a href="../">← US-Firmen</a></div><h1>{e(f["name"])}</h1>'
+            f'<p class="unterzeile">{e(f["kuerzel"])} · S&amp;P 500 · {e(f["sektor"])} · {e(f["branche"])}</p>')
+    inhalt = f"""<div class="kacheln">{"".join(kacheln)}</div>
+    <section class="karte">
+      <h2>Staatsaufträge</h2>
+      <p class="erklaerung">Zugesagte Mittel (Obligations) aus Aufträgen der US-Bundesregierung laut USAspending.gov,
+        dem amtlichen Ausgabenregister. Ohne Zuschüsse und Kredite. Bundesstaaten und Gemeinden fehlen.</p>
+      {auftrag_html}
+    </section>
+    <section class="karte">
+      <h2>PAC-Spenden an Politiker</h2>
+      <p class="erklaerung">{e(ERKLAERUNG_PAC)}</p>
+      {spenden_html}
+    </section>{kongress_html}
+    <section class="karte">
+      <h2>Lobbying</h2>
+      <p class="leer">Folgt: Das Lobbying-Register des US-Senats (LDA) gibt Daten nur mit Schlüssel heraus.</p>
+    </section>"""
+    return _guru_rahmen(f"{f['name']} ({f['kuerzel']}): Staatsaufträge und politische Spenden",
+                        f"{f['name']}: Aufträge der US-Bundesregierung je Jahr, Spenden des Firmen-PACs an Politiker"
+                        + (" und Aktiengeschäfte von Abgeordneten." if kongress is not None else "."),
+                        f"us/{f['kuerzel']}/", "../../", kopf, inhalt, v, QUELLE_US)
+
+
+def us_uebersicht(zeilen: list, mit_kongress: bool, v: dict) -> str:
+    """zeilen: dicts mit kuerzel, name, sektor, auftraege (letztes volles GJ), spenden (Zyklus 2024), kongress."""
+    tab = _tabelle(
+        [("Firma", ""), ("Sektor", ""), ("Staatsaufträge", "zahl"), ("PAC-Spenden 2023/24", "zahl")]
+        + ([("Geschäfte von Abgeordneten", "zahl")] if mit_kongress else []),
+        [[(f'<a href="{e(z["kuerzel"])}/">{e(z["name"])}</a><div class="klein">{e(z["kuerzel"])}</div>', ""),
+          (e(z["sektor"]), ""), (dollar(z["auftraege"]) if z["auftraege"] else "–", "zahl"),
+          (dollar(z["spenden"]) if z["spenden"] else "–", "zahl")]
+         + ([(zahl(z["kongress"]), "zahl")] if mit_kongress else []) for z in zeilen])
+    kopf = ('<div class="marke"><a href="../">← Insider-Monitor</a></div><h1>US-Firmen: Staat und Politik</h1>'
+            f'<p class="unterzeile">{zahl(len(zeilen))} Firmen des S&amp;P 500: Aufträge der Bundesregierung und '
+            'Spenden an Politiker.</p>')
+    inhalt = (f'<section class="karte"><h2>Alle Firmen</h2><p class="erklaerung">Staatsaufträge im letzten vollen '
+              f'US-Geschäftsjahr ({_us_geschaeftsjahr() - 1}), PAC-Spenden im Wahlzyklus 2023/24. Sortiert nach '
+              f'Staatsaufträgen. Suche mit Strg+F bzw. ⌘+F.</p>{tab}</section>')
+    return _guru_rahmen("US-Firmen: Staatsaufträge und politische Spenden", "Aufträge der US-Bundesregierung und "
+                        "Spenden der Firmen-PACs an Politiker für alle Firmen des S&P 500.", "us/", "../", kopf,
+                        inhalt, v, QUELLE_US)
+
+
+def politiker_spenden(spenden: pd.DataFrame, firmen: dict) -> str:
+    """Abschnitt für die Politikerseite: Firmen-PACs, die an diese Person gespendet haben. firmen: kuerzel → Name."""
+    if spenden.empty:
+        return ""
+    top = (spenden.groupby("kuerzel").agg(betrag=("betrag", "sum"), zyklen=("zyklus", lambda x: ", ".join(
+        f"{z - 1}/{str(z)[2:]}" for z in sorted(set(x))))).reset_index().sort_values("betrag", ascending=False))
+    return f"""
+    <section class="karte">
+      <h2>Spenden von Firmen-PACs</h2>
+      <p class="erklaerung">{e(ERKLAERUNG_PAC)} Zusammen {e(dollar(top["betrag"].sum()))} von {zahl(len(top))} Firmen
+        des S&amp;P 500.</p>
+      """ + _tabelle([("Firma", ""), ("Spenden", "zahl"), ("Wahlzyklen", "")],
+                     [[(f'<a href="../../us/{e(r.kuerzel)}/">{e(firmen.get(r.kuerzel, r.kuerzel))}</a>'
+                        f'<div class="klein">{e(r.kuerzel)}</div>', ""), (dollar(r.betrag), "zahl"), (e(r.zyklen), "datum")]
+                      for r in top.head(15).itertuples()]) + "\n    </section>"
 
 
 def sitemap(ticker: list, weitere: list = ()) -> str:
