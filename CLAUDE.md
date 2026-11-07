@@ -204,37 +204,48 @@ Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
       einzeln „Too Many Requests“) → `politiker.kurse` mit Speicher `daten/kurse_us.parquet` (nur lokal, braucht pyarrow):
       fehlende Symbole in Blöcken à 50 mit 5 s Pause, danach je Lauf nur die letzten Tage; leerer Block = Sperre → Abbruch,
       nächster Lauf macht weiter. Die DAX/MDAX-Kurse der Action sind davon nicht betroffen (andere IP).
-- [ ] **2d. Älteres Formular 2014 – Mitte 2022 lesen** (3.994 Meldungen), **Skript fertig 07.11.2026, wartet auf den
-      DeepSeek-Lauf von Tobias** (Claude darf `.env` nicht lesen): `kongress_altformat.py --texte` lädt die PDF-Texte mit
-      Seitentrennern nach `daten/kongress_alt_texte.csv` (kostenlos, erledigt); `--probe 30` → `.recherche/kongress_alt_probe.csv`
-      zum Prüfen von Hand; ohne Schalter alle → `daten/kongress_alt.csv` (Spalten wie `kongress.csv`) und
-      `kongress_alt_fortschritt.csv`. DeepSeek liest nur die Rohfelder (Inhaber-Code, Wertpapier, Art P/S/E, Daten, Betrag
-      als Text, Status, Unterkonto …), die Umwandlung macht derselbe Code wie beim neuen Formular (`kongress._betrag`,
-      `_name_ergaenzen`, `ART`, `INHABER`). Lange Meldungen gehen seitenweise in Stücken bis 12.000 Zeichen (Antwortlänge;
-      ein Geschäft genau an der Seitengrenze kann dabei verloren gehen). `export.kongress_exportieren` nimmt
-      `kongress_alt.csv` dazu und zeigt ausgelesene Meldungen nicht mehr als Link. Texte vollständig (3.994, 9,4 Mio. Zeichen,
-      ~36.000 Geschäfte nach Datumspaaren gezählt, nicht 52.000), 4.136 Anfragen → Schätzung ~1,70 $. Probe mit
-      Palmer 2018 (zwei Geschäfte von Hand) durch den Export geprüft.
-      **Papier-Scans (2.003) gehen so nicht:** Apple Vision liest Name, Kürzel, Daten, aber die angekreuzten Kästchen
-      (Kauf/Verkauf, Betragsspanne) gar nicht (Probe Fleischmann 2024) → nur mit einem Sprachmodell, das Bilder liest
-      (anderer Anbieter, Kosten offen) → **Entscheidung Tobias**.
-- [ ] **2c. Senat:** `efdsearch.senate.gov` verlangt vor der Suche eine Erklärung per Klick (Nutzung nicht kommerziell,
-      § 105(c)) → **Entscheidung Tobias**, ob er sie abgibt; die Sicherheitsprüfung hat meine Probe deshalb gestoppt.
-      Elektronische Senats-PTR sind HTML-Tabellen (einfacher als PDF), laut Erfahrungsberichten Akamai-Sperre für
-      Rechenzentrums-IPs (GitHub Actions) → lokal laden.
+- [x] **2c/2d. Senat, älteres House-Formular und House-Scans aus fertigem Datensatz (07.11.2026, Tobias: „nimm das
+      ältere Formular und die Scans aus dem Datensatz“, nur lokal).** `efdsearch.senate.gov` verlangt eine
+      Klick-Erklärung (Nutzung nicht kommerziell), die Claude nicht abgeben darf → stattdessen **Hugging Face
+      `austin-starks/congressional-stock-trades`** (Parquet je Jahr, ~9 MB, ~20 h aktuell; Code MIT, Daten „other“ mit
+      Hinweis auf 5 U.S.C. § 13107(c), räumt keine Rechte ein): House + Senat 2012–2026, 10.883 Meldungen, 187.288
+      Geschäfte; elektronische Senatsmeldungen aus HTML, Papier/Scans per Texterkennung + Seitenbild, nur veröffentlicht,
+      wenn zwei Lesungen übereinstimmen; `memberId` = bioguide. **Abgleich mit unseren House-Daten ab Mitte 2022:** 1.976
+      von 1.989 Meldungen gleich viele Geschäfte, Datum und Art 100 %, Kürzel 99,2 % (er lässt Vorzugsaktien wie `T$A`
+      leer), Betrag 99,5 % (er genauer: Cent, „Over“); er verwirft Zeilen mit unmöglichem Datum (Cawthorn 20020894).
+      Älteres Formular: 36.729 Geschäfte gegen 36.783 Datumspaare im eigenen PDF-Text, 99 % der Meldungen gleich.
+      `python3 -m pipeline.kongress_datensatz` → `daten/kongress_datensatz.csv` (41 MB, .gitignore; Spalten wie
+      `kongress.csv` + kammer, bioguide, url): **Senat 22.090 Geschäfte, 83 Personen; House 144.326 Geschäfte aus 6.358
+      Meldungen** (älteres Formular 36.729, Scans 107.539, davon Ro Khanna ~43.000, McCaul ~34.000). Vom House nur
+      Meldungen, die unser Leser nicht mit `ok` gelesen hat; ab Mitte 2022 bleibt die eigene Quelle.
+      Anlageart: Scans/Papier haben keine → Aktie, wenn der Datensatz ein Börsenkürzel bestätigt (`resolutionStatus`
+      printed/resolved). `export.kongress_exportieren` hängt den Datensatz an (`politiker.datensatz_zuordnen`: Name,
+      Partei, Bezirk aus `abgeordnete.csv`), Seiten zeigen „Senat · AL“ bzw. „Repräsentantenhaus · CA17“, Link zur
+      Originalmeldung. Kursspeicher begann 28.04.2015 → `ueberrendite_seit` gibt „–“, wenn am Geschäftstag kein Kurs da
+      ist (vorher stiller Fehlwert). Geprüft per Bildschirmfoto (Tuberville). Manuell neu laden wie `kongress_laden.py`.
+      **Ersetzt:** `kongress_altformat.py` (DeepSeek-Weg, gelöscht; `daten/kongress_alt_texte.csv` kann weg) und die
+      Scan-Frage. **Abhängigkeit:** ein einzelner Betreiber; fällt er aus, bleibt der letzte Stand. Eigener Senatsleser nur
+      mit Klick-Erklärung (Entscheidung Tobias).
 - [ ] **3. Trump/Regierung (OGE 278-T), geprüft 06.11.2026:** PDFs frei bei `extapps2.oge.gov/201/Presiden.nsf/…` und
       whitehouse.gov (ohne Klick-Erklärung, aber gleiches Gesetz § 105(c)). Trumps Meldungen sind **Scans mit schlechter
       Texterkennung** („Tn.imp“ statt Trump), bis 113 Seiten und ~3.700 Geschäfte je Quartal (Presse) → nur mit besserer
       Texterkennung oder Sprachmodell lesbar. Entscheidung Tobias (Kosten).
-      **Stand 07.11.2026, Skript fertig, wartet auf den DeepSeek-Lauf von Tobias:** `trump_laden.py --texte` holt die Liste
-      über die Domino-Schnittstelle (`President and Vice President Index?ReadViewEntries&ExpandView&OutputFormat=JSON`,
-      20 Meldungen 278-T 08/2025–09/2026, ohne 2 Jahresberichte und den Abschlussbericht 2021), lädt die PDFs nach
-      `.recherche/trump/` und erkennt jede Seite neu mit Apple Vision (`ocr.swift`, gibt Positionen aus; gleiche Höhe = gleiche
-      Tabellenzeile) → `daten/trump_texte.csv`: **378 Seiten, ~16.000 Zeilen**, erledigt. Lesbar bis auf Ziffern (6/8, `$` als
-      S/5); höhere Auflösung half nicht. `--probe 3`, dann ohne Schalter → `daten/trump.csv` (Nr., Beschreibung, Art, Datum,
-      Betrag, über 30 Tage). Jahr nach dem Meldedatum → Meldejahr (`datum_korrigiert`); Tag kann um wenige Tage falsch sein.
-      Schätzung ~0,30 $. Prüfen danach: Zeilennummern je Meldung lückenlos? Eine Meldung ist „AMENDED“ (08.12.2025 (2)) →
-      vor der Anzeige klären, was sie ersetzt. Noch keine Seite gebaut.
+      **Ausgelesen 07.11.2026 (Schlüssel von Tobias: z.AI, `ZAI_API_KEY` in `.env`, ~0,46 $):** `trump_laden.py --bilder`
+      holt die Liste über die Domino-Schnittstelle (`President and Vice President Index?ReadViewEntries&ExpandView&
+      OutputFormat=JSON`, 20 Meldungen 278-T 08/2025–09/2026, ohne Jahresberichte und Abschlussbericht 2021), lädt die PDFs
+      nach `.recherche/trump/` und speichert jede Seite als JPEG (`seitenbilder.swift`, `.recherche/trump_bilder/`, 399 MB,
+      nach dem Lauf löschbar; Liste `daten/trump_seiten.csv`). Danach liest das Bildmodell **GLM-4.6V-FlashX** (0,04/0,40 $
+      je Mio. Token, 2 Anfragen gleichzeitig, bis 3 Versuche, Kostendeckel `BUDGET`) jede Seite → `daten/trump.csv`.
+      **Texterkennung verworfen:** Apple Vision verlor ganze Spalten (Art nur in 60 %, Datum in 75 % der Zeilen), ein
+      Textmodell (GLM-4.7-Flash) erfand dann Werte (Verkäufe vom 8.7.2026 als „purchase 11.08.2025“); `ocr.swift` gelöscht.
+      Prüfung von Hand am Bild: Seite 31 (09.8.2026) 33/33 Zeilen richtig mit FlashX und mit dem kostenlosen
+      GLM-4.6V-Flash (nur 1 Anfrage gleichzeitig, deshalb nicht genommen). **Ergebnis: 378/378 Seiten, 10.616 Geschäfte**
+      (6.504 Käufe, 4.112 Verkäufe); Zeilennummern in 18 von 20 Meldungen lückenlos (2.26.2026 (1): Nr. 156/166 fehlen,
+      2 doppelt; 1.14.2026: Nr. 108 fehlt; AMENDED: 4 doppelt). Betrag fehlt bei 11 %: Meldung 08.12.2026 und Seite 5 der
+      AMENDED-Meldung sind rechts abgeschnitten gescannt (Spalte „Amount“ fehlt schon im PDF). 2 Daten nach dem Meldedatum
+      aufs Meldejahr korrigiert. **Offen:** Meldung „08.12.2025 (2) AMENDED“ (145 Zeilen) klären, was sie in der
+      Meldung 08.12.2025 (507 Zeilen) ersetzt; Seite für Trump bauen (Kürzel fehlen, nur Firmennamen wie
+      „WORKDAY INC CLASS A“ → Zuordnung zu Kürzeln nötig, z. B. SEC company_tickers).
 - [x] **4a–c. US-Firmen (Freigabe Tobias 06.11.2026 „Universum über DAX/MDAX: ja“), gebaut 06.11.2026, nicht gepusht:**
       - `python3 -m pipeline.us_firmen` → `daten/us_firmen.csv`: S&P 500 (Wikipedia-Tabelle) + amtlicher Name aus
         SEC `company_tickers.json` (500 Firmen; GOOGL/GOOG je CIK einmal).
@@ -256,8 +267,10 @@ Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
         „US-Firmen: Staat und Politik“, Sitemap), Kongress-Teil fehlt dort, weil `daten/kongress.csv` lokal bleibt.
       - Manuell (vierteljährlich): `us_firmen`, `staatsauftraege` (Zuordnung löschen für Neuprüfung), `spenden`.
 - [ ] **4d. Lobbying:** `lda.gov/api/v1/` (und das alte `lda.senate.gov`) antworten 06.11.2026 mit 403 von Akamai, auch die
-      Doku, auch von außen → vermutlich Schlüssel nötig: **Tobias** registriert kostenlos unter lda.gov/api/register
-      (E-Mail), Schlüssel in `.env` als `LDA_API_KEY`.
+      Doku, auch von außen. **07.11.2026:** Tobias erreicht lda.gov auch im Browser nicht (auch privat) → kein
+      Schlüsselproblem, Akamai sperrt Abrufe von außerhalb (lda.gov, lda.senate.gov, auch `/system/public/` = 403).
+      Erreichbar ist die Lobbying-Suche des Repräsentantenhauses `disclosurespreview.house.gov` (dieselben LD-1/LD-2-
+      Meldungen, Datenschnittstelle hinter der Suchseite noch nicht untersucht) → nächster Weg, ohne Schlüssel.
 - [ ] **2. US-Politiker (Plan, Freigabe Tobias 06.11.2026):** eigene Daten aus den Primärquellen statt Quiver-API.
       Quiver-API: Hobbyist ~30 $/Monat und Trader ~75 $/Monat nur **privat** (keine kommerzielle Nutzung), kommerziell erst
       „Startup“ ~250 $/Monat bzw. Enterprise auf Anfrage (laut api.quiverquant.com 06.11.2026; Weitergabe/Anzeige
@@ -995,6 +1008,10 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
   repariert und gepusht (9b4a2af). Kongress-Geschäfte in GOOG/FOX/NWS stehen jetzt auf den Seiten GOOGL/FOXA/NWSA
   (`us_firmen.ZWEITE_GATTUNG`, Alphabet 115 → 245). Älteres Formular und Trump bis kurz vor den bezahlten Lauf vorbereitet
   (Texte geladen, Skripte fertig), DeepSeek-Lauf startet Tobias. Papier-Scans brauchen ein Bild-Modell (Entscheidung).
+  Danach (Tobias: „Senat anfangen“, „älteres Formular und Scans aus dem Datensatz“): Senat, älteres House-Formular
+  und House-Scans aus dem Hugging-Face-Datensatz congressional-stock-trades, gegen eigene Daten geprüft, nur lokal;
+  DeepSeek-Weg für das ältere Formular entfällt. Trump danach mit z.AI-Bildmodell GLM-4.6V-FlashX ausgelesen
+  (10.616 Geschäfte aus 378 Seiten, ~0,46 $), Texterkennung verworfen, weil sie Spalten verlor.
 
 ## Vor dem Livegang: unslop
 Bevor die öffentliche Seite (oder eine größere Änderung daran) live geht, den Skill `/unslop` (`~/.claude/skills/unslop`) darüber laufen lassen, damit sie nicht nach KI-Baukasten aussieht. Audit und vorgeschlagene Richtung zuerst Tobias zeigen, erst nach seinem OK umsetzen – Designentscheidungen trifft Tobias.

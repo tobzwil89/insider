@@ -79,6 +79,20 @@ def zuordnen(meldungen: pd.DataFrame, abgeordnete: pd.DataFrame) -> pd.DataFrame
                             partei=[w[2] for w in werte])
 
 
+def datensatz_zuordnen(df: pd.DataFrame, abgeordnete: pd.DataFrame) -> pd.DataFrame:
+    """Geschäfte aus pipeline.kongress_datensatz (bioguide schon gesetzt) → Name, Partei aus der letzten Amtszeit,
+    Bezirk aus der letzten Amtszeit in dieser Kammer (Senat: Bundesstaat „AL“, Repräsentantenhaus: „CA11“)."""
+    a = abgeordnete.sort_values("start")
+    letzte = a.groupby("bioguide").last()
+    sen = a[a["kammer"] == "sen"].groupby("bioguide").last()
+    rep = a[a["kammer"] == "rep"].groupby("bioguide").last()
+    rep_bez = rep["bundesstaat"] + rep["bezirk"].fillna(0).astype(int).astype(str).str.zfill(2)
+    b = df["bioguide"]
+    bezirk = b.map(sen["bundesstaat"]).where(df["kammer"].eq("sen"), b.map(rep_bez))
+    return df.assign(politiker=b.map(letzte["name"]).fillna(df["name"]),
+                     partei=b.map(letzte["partei"]).map(lambda p: PARTEI.get(p, p)).fillna(""), bezirk=bezirk.fillna(""))
+
+
 def yahoo(kuerzel: str) -> str | None:
     """Kürzel aus der Meldung → Yahoo-Symbol (BRK.B → BRK-B); Vorzugsaktien mit $ und Leeres → None."""
     k = str(kuerzel).strip().upper()
@@ -138,7 +152,8 @@ def ueberrendite_seit(kurse: pd.DataFrame, symbol: str | None, tag) -> float | N
         return None
     paar = kurse[[symbol, INDEX]].dropna()
     t0 = paar.index.searchsorted(tag)
-    if t0 >= len(paar) - 1:
+    # Kurs am Geschäftstag fehlt (Speicher beginnt später, z. B. Senat 2012–2015): kein Wert statt eines falschen
+    if t0 >= len(paar) - 1 or paar.index[t0] > tag + pd.Timedelta(days=7):
         return None
     start, ende = paar.iloc[t0], paar.iloc[-1]
     return (ende[symbol] / start[symbol] - 1) - (ende[INDEX] / start[INDEX] - 1)
@@ -169,14 +184,17 @@ def politiker(meldungen: pd.DataFrame, kurse: pd.DataFrame) -> list:
     m = korrekturen(meldungen[meldungen["bioguide"] != ""]).copy()
     m["betrag"] = [mitte(v, b) for v, b in zip(m["betrag_von"], m["betrag_bis"])]
     m["symbol"] = m["kuerzel"].map(yahoo)
-    m["url"] = [kongress.pdf_url(j, d) for j, d in zip(m["jahr"], m["doc_id"])]
+    # Senat bringt den Link zur Meldung mit, beim Repräsentantenhaus wird er gebaut
+    m["url"] = [u if u else kongress.pdf_url(j, d) for u, j, d in zip(m.get("url", pd.Series("", m.index)).fillna(""),
+                                                                      m["jahr"], m["doc_id"])]
     aktie = m["anlageart"].eq("ST") & m["art"].ne("Tausch")
     m["seit"] = [ueberrendite_seit(kurse, s, d) if a else None for s, d, a in zip(m["symbol"], m["datum"], aktie)]
     liste = []
     for bg, g in m.groupby("bioguide"):
         g = g.sort_values(["eingereicht", "datum"], ascending=False)
         liste.append({"bioguide": bg, "name": g["politiker"].iloc[0], "partei": g["partei"].iloc[0],
-                      "bezirk": g["bezirk"].iloc[0], "geschaefte": g, "letztes": g["datum"].max(),
+                      "bezirk": g["bezirk"].iloc[0], "kammer": g["kammer"].iloc[0] if "kammer" in g else "rep",
+                      "geschaefte": g, "letztes": g["datum"].max(),
                       "meldungen": g["doc_id"].nunique()})
     vergeben = {}
     for p in liste:

@@ -788,12 +788,16 @@ def personen_uebersicht(liste: list, v: dict) -> str:
 
 # --- US-Kongress (pipeline/kongress.py, pipeline/politiker.py) ---------------------------------------------
 
-QUELLE_KONGRESS = "Periodic Transaction Reports des US-Repräsentantenhauses (STOCK Act), Clerk of the House"
+QUELLE_KONGRESS = ("Periodic Transaction Reports (STOCK Act): Repräsentantenhaus vom Clerk of the House (ab Mitte 2022 "
+                   "selbst gelesen), Senat sowie älteres Formular und Papiermeldungen des Repräsentantenhauses aus dem "
+                   "Datensatz congressional-stock-trades (Hugging Face)")
 ERKLAERUNG_KONGRESS = (
-    "Abgeordnete des US-Repräsentantenhauses müssen Wertpapiergeschäfte über 1.000 $ binnen 45 Tagen melden, auch die "
-    "von Ehepartnern und Kindern (STOCK Act). Gemeldet wird nur eine Betragsspanne, z. B. 1.001–15.000 $; Summen "
-    "rechnen mit der Mitte der Spanne und sind deshalb Schätzungen. Noch nicht ausgewertet: Papiermeldungen (Scans) und Meldungen im älteren "
-    "Formular (bis Mitte 2022); sie stehen als Links bei den Personen.")
+    "Mitglieder des US-Kongresses (Repräsentantenhaus und Senat) müssen Wertpapiergeschäfte über 1.000 $ binnen 45 Tagen "
+    "melden, auch die von Ehepartnern und Kindern (STOCK Act). Gemeldet wird nur eine Betragsspanne, z. B. 1.001–15.000 $; "
+    "Summen rechnen mit der Mitte der Spanne und sind deshalb Schätzungen. Bei Papiermeldungen (Scans) kann der Tag "
+    "eines Geschäfts um wenige Tage falsch gelesen sein.")
+KAMMER = {"rep": "Repräsentantenhaus", "sen": "Senat"}
+MAX_GESCHAEFTE = 1000  # Tabelle „Alle Geschäfte“: sonst 20 MB bei Ro Khanna (43.000 Geschäfte aus Depot-Scans)
 
 
 def dollar(x) -> str:
@@ -863,15 +867,18 @@ def politikerseite(p: dict, v: dict) -> str:
           (_wertpapier(r) + (f'<div class="klein">{e(r.beschreibung)}</div>' if r.beschreibung else ""), ""),
           (_kongress_art(r.art), ""), (e(r.inhaber), ""), (_spanne(r.betrag_von, r.betrag_bis), "zahl"),
           (prozent(r.seit), f"zahl {_vorzeichen_klasse(r.seit)}")]
-         for r in g.itertuples()])
+         for r in g.head(MAX_GESCHAEFTE).itertuples()])
+    if len(g) > MAX_GESCHAEFTE:
+        geschaefte = (f'<p class="erklaerung">Gezeigt sind die neuesten {zahl(MAX_GESCHAEFTE)} von {zahl(len(g))} '
+                      'Geschäften; Kacheln, Volumen und meistgehandelte Aktien zählen alle.</p>' + geschaefte)
     scans = p.get("scans")
     scan_html = ""
     if scans is not None and len(scans):
-        scan_html = ('<p class="erklaerung">Außerdem ' + zahl(len(scans)) + ' weitere Meldung(en), noch nicht ausgewertet (Papier oder älteres Formular): '
+        scan_html = ('<p class="erklaerung">Außerdem ' + zahl(len(scans)) + ' weitere Meldung(en), nicht auslesbar: '
                      + ", ".join(f'<a href="{e(s.url)}" rel="nofollow">{datum(s.eingereicht)}</a>'
                                  for s in scans.itertuples()) + ".</p>")
     kopf = (f'<div class="marke"><a href="../">← US-Kongress</a></div><h1>{e(p["name"])}</h1>'
-            f'<p class="unterzeile">{e(p["partei"])} · Repräsentantenhaus · {e(p["bezirk"])}</p>')
+            f'<p class="unterzeile">{e(p["partei"])} · {KAMMER.get(p.get("kammer"), "")} · {e(p["bezirk"])}</p>')
     inhalt = f"""<div class="kacheln">{kacheln}</div>
     <section class="karte">
       <h2>Handelsvolumen je Jahr</h2>
@@ -900,7 +907,7 @@ def politikerseite(p: dict, v: dict) -> str:
 def politiker_uebersicht(liste: list, neueste: pd.DataFrame, v: dict) -> str:
     """liste: politiker.politiker(…); neueste: die letzten Geschäfte aller Abgeordneten (mit Spalte adresse)."""
     zeilen = [[(f'<a href="{e(p["adresse"])}/">{e(p["name"])}</a><div class="klein">{e(p["partei"])} · '
-                f'{e(p["bezirk"])}</div>', ""), (zahl(len(p["geschaefte"])), "zahl"),
+                f'{KAMMER.get(p.get("kammer"), "")} · {e(p["bezirk"])}</div>', ""), (zahl(len(p["geschaefte"])), "zahl"),
                (dollar(p["geschaefte"]["betrag"].sum()), "zahl"), (datum(p["letztes"]), "datum")] for p in liste]
     letzte = _tabelle(
         [("Gemeldet", ""), ("Geschäft", ""), ("Abgeordnete(r)", ""), ("Wertpapier", ""), ("Art", ""),
@@ -910,14 +917,16 @@ def politiker_uebersicht(liste: list, neueste: pd.DataFrame, v: dict) -> str:
           (_wertpapier(r), ""), (_kongress_art(r.art), ""), (_spanne(r.betrag_von, r.betrag_bis), "zahl")]
          for r in neueste.itertuples()])
     kopf = ('<div class="marke"><a href="../">← Insider-Monitor</a></div><h1>Aktiengeschäfte im US-Kongress</h1>'
-            f'<p class="unterzeile">{zahl(len(liste))} Abgeordnete des Repräsentantenhauses mit gemeldeten Geschäften.</p>')
+            f'<p class="unterzeile">{zahl(sum(p.get("kammer") != "sen" for p in liste))} Abgeordnete des '
+            f'Repräsentantenhauses und {zahl(sum(p.get("kammer") == "sen" for p in liste))} Senatoren mit gemeldeten '
+            'Geschäften.</p>')
     inhalt = (f'<section class="karte"><h2>Neueste Geschäfte</h2><p class="erklaerung">{e(ERKLAERUNG_KONGRESS)}</p>'
               f'{letzte}</section><section class="karte"><h2>Alle Abgeordneten</h2><p class="erklaerung">Sortiert nach '
               'dem letzten Geschäft. Suche mit Strg+F bzw. ⌘+F.</p>'
               + _tabelle([("Abgeordnete(r)", ""), ("Geschäfte", "zahl"), ("Volumen (geschätzt)", "zahl"),
                           ("Letztes Geschäft", "")], zeilen) + "</section>")
-    return _guru_rahmen("Aktiengeschäfte im US-Kongress", "Aktienkäufe und -verkäufe der Abgeordneten des "
-                        "US-Repräsentantenhauses laut STOCK Act, je Person mit Volumen und Timing.", "politiker/", "../",
+    return _guru_rahmen("Aktiengeschäfte im US-Kongress", "Aktienkäufe und -verkäufe der Mitglieder von "
+                        "US-Repräsentantenhaus und Senat laut STOCK Act, je Person mit Volumen und Timing.", "politiker/", "../",
                         kopf, inhalt, v, QUELLE_KONGRESS)
 
 
@@ -989,8 +998,8 @@ def us_firmenseite(f: dict, auftraege: dict, empfaenger: str, spenden: pd.DataFr
         kongress_html = f"""
     <section class="karte">
       <h2>Geschäfte von Abgeordneten</h2>
-      <p class="erklaerung">Käufe und Verkäufe dieser Aktie durch Mitglieder des US-Repräsentantenhauses (STOCK Act),
-        ausgewertet ab Mitte 2022. {e(ERKLAERUNG_KONGRESS)}</p>
+      <p class="erklaerung">Käufe und Verkäufe dieser Aktie durch Mitglieder des US-Kongresses (STOCK Act), ausgewertet
+        beim Repräsentantenhaus ab 2014, beim Senat ab 2012. {e(ERKLAERUNG_KONGRESS)}</p>
       """ + (_tabelle(
             [("Gemeldet", ""), ("Geschäft", ""), ("Abgeordnete(r)", ""), ("Art", ""), ("Inhaber", ""), ("Betrag", "zahl")],
             [[(f'<a href="{e(r.url)}" rel="nofollow">{datum(r.eingereicht)}</a>', "datum"), (datum(r.datum), "datum"),

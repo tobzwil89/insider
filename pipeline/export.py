@@ -261,23 +261,29 @@ def kongress_exportieren(v: dict, spenden_alle: pd.DataFrame) -> list:
     shutil.rmtree(ziel, ignore_errors=True)
     if not datei.exists():
         return []
-    k = pd.read_csv(datei, dtype=str, keep_default_na=False)
-    # Älteres Formular 2014 – Mitte 2022, mit DeepSeek gelesen (kongress_altformat.py), falls vorhanden
-    alt_datei, alt_fertig = DATEN / "kongress_alt.csv", DATEN / "kongress_alt_fortschritt.csv"
-    if alt_datei.exists():
-        k = pd.concat([k, pd.read_csv(alt_datei, dtype=str, keep_default_na=False)], ignore_index=True)
-    alt_gelesen = set(pd.read_csv(alt_fertig, dtype=str)["doc_id"]) if alt_fertig.exists() else set()
-    for s in ["datum", "gemeldet", "eingereicht"]:
-        k[s] = pd.to_datetime(k[s], errors="coerce")
-    for s in ["betrag_von", "betrag_bis"]:
-        k[s] = pd.to_numeric(k[s], errors="coerce")
+    def lesen(d) -> pd.DataFrame:
+        k = pd.read_csv(d, dtype=str, keep_default_na=False)
+        for s in ["datum", "gemeldet", "eingereicht"]:
+            k[s] = pd.to_datetime(k[s], errors="coerce")
+        for s in ["betrag_von", "betrag_bis"]:
+            k[s] = pd.to_numeric(k[s], errors="coerce")
+        return k
+
     abg = pd.read_csv(pol.ABGEORDNETE, dtype={"bezirk": "Int64"}) if pol.ABGEORDNETE.exists() else pol.abgeordnete_laden()
-    z = pol.zuordnen(k, abg)
+    z = pol.zuordnen(lesen(datei), abg).assign(kammer="rep", url="")
+    # Senat und die House-Meldungen, die unser Leser nicht schafft (älteres Formular, Scans), aus dem fertigen
+    # Datensatz (pipeline/kongress_datensatz.py); bioguide und Link zur Meldung sind dort schon gesetzt
+    ds_datei, ds_meldungen = DATEN / "kongress_datensatz.csv", set()
+    if ds_datei.exists():
+        ds = lesen(ds_datei)
+        ds = ds[ds["bioguide"] != ""]
+        ds_meldungen = set(ds["doc_id"])
+        z = pd.concat([z, pol.datensatz_zuordnen(ds, abg)], ignore_index=True)
     symbole = sorted({s for s in z.loc[z["anlageart"].eq("ST"), "kuerzel"].map(pol.yahoo) if s})
     kurse = pol.kurse([pol.INDEX] + symbole, z["datum"].min() - pd.Timedelta(days=10))
     leute = pol.politiker(z, kurse)
     fs = pd.read_csv(DATEN / "kongress_fortschritt.csv", dtype=str, keep_default_na=False)
-    fs = fs[fs["status"].isin(["scan", "alt"]) & ~fs["doc_id"].isin(alt_gelesen)].assign(eingereicht=lambda d: pd.to_datetime(d["eingereicht"], errors="coerce"))
+    fs = fs[fs["status"].isin(["scan", "alt"]) & ~fs["doc_id"].isin(ds_meldungen)].assign(eingereicht=lambda d: pd.to_datetime(d["eingereicht"], errors="coerce"))
     scans = pol.zuordnen(fs, abg).assign(url=lambda d: [pol.kongress.pdf_url(j, i) for j, i in zip(d["jahr"], d["doc_id"])])
     us_namen = dict(pd.read_csv(DATEN / "us_firmen.csv")[["kuerzel", "name"]].values) if (DATEN / "us_firmen.csv").exists() else {}
     for p in leute:
