@@ -39,8 +39,21 @@ Probe sauber ist; sonst ein Sprachmodell mit Bildeingabe, Preis vorher prüfen).
 
 DeepSeek-Guthaben war am 29.10.2026 leer (0,05 $) → vor dem Lauf aufladen.
 
+**Stand 07.11.2026:** Altformat und Trump sind bis zum bezahlten Schritt vorbereitet (`kongress_altformat.py`,
+`trump_laden.py`, Texte liegen in `daten/`). Trump gemessen: 378 Seiten, ~16.000 Zeilen → neu geschätzt ~0,30 $.
+Die Scans gehen mit Apple Vision + DeepSeek **nicht**: Die Kreuze für Kauf/Verkauf und Betragsspanne werden nicht als
+Text erkannt. Dafür braucht es ein Modell, das Bilder liest (~9.200 Seiten) → Preis vorher prüfen, Entscheidung Tobias.
+
+Befehle (im Projektordner, wo `.env` liegt):
+
+    python3 kongress_altformat.py --probe 30     # ~0,02 $, Ergebnis .recherche/kongress_alt_probe.csv
+    python3 kongress_altformat.py                # Rest, ~1,70 $ (36.000 Geschäfte)
+    python3 trump_laden.py --probe 3             # Ergebnis .recherche/trump_probe.csv
+    python3 trump_laden.py                       # Rest, ~0,30 $
+
 ## 4. Kleinere Punkte
 
+- Erledigt 07.11.2026: Geschäfte in GOOG/FOX/NWS erscheinen auf den Seiten GOOGL/FOXA/NWSA.
 - Umbenannte oder übernommene Kürzel haben keine Kurse (SQ → XYZ, PXD, ATVI, DFS, MMC, BK …): 5 % der Aktiengeschäfte
   ohne „Seitdem ggü. S&P 500“. Bei Bedarf Tabelle altes → neues Kürzel.
 - Branchen-Kuchen wie bei Quiver (Sektor je Kürzel fehlt noch), Fotos (amtliche Porträts sind gemeinfrei).

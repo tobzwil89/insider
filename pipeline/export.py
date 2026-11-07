@@ -24,7 +24,7 @@ import shutil
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, personen as ps, politiker as pol, ranking as rk, rueckkaeufe, seiten, spenden, stimmrechte
+from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, personen as ps, politiker as pol, ranking as rk, rueckkaeufe, seiten, spenden, stimmrechte, us_firmen
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
 KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
@@ -234,12 +234,13 @@ def us_exportieren(v: dict, spenden_alle: pd.DataFrame, abgeordnete: list) -> li
     if abgeordnete:
         kongress = pd.concat([p["geschaefte"].assign(adresse=p["adresse"]) for p in abgeordnete])
         kongress = kongress[kongress["anlageart"].eq("ST")]
+        kongress = kongress.assign(firma=kongress["symbol"].replace(us_firmen.ZWEITE_GATTUNG))
     gj = seiten._us_geschaeftsjahr()
     zeilen = []
     for f in firmen.to_dict("records"):
         auftraege = dict(zip(*(sa.loc[sa["kuerzel"] == f["kuerzel"], s] for s in ["geschaeftsjahr", "betrag"])))
         sp = spenden_alle[spenden_alle["kuerzel"] == f["kuerzel"]]
-        k = kongress[kongress["symbol"] == f["kuerzel"]] if kongress is not None else None
+        k = kongress[kongress["firma"] == f["kuerzel"]] if kongress is not None else None
         seiten.schreiben(ziel / f["kuerzel"] / "index.html", seiten.us_firmenseite(
             f, auftraege, empfaenger.get(f["kuerzel"], ""), sp, k, politiker, v))
         zeilen.append({**f, "auftraege": auftraege.get(gj - 1), "spenden": sp.loc[sp["zyklus"] == 2024, "betrag"].sum(),
@@ -261,6 +262,11 @@ def kongress_exportieren(v: dict, spenden_alle: pd.DataFrame) -> list:
     if not datei.exists():
         return []
     k = pd.read_csv(datei, dtype=str, keep_default_na=False)
+    # Älteres Formular 2014 – Mitte 2022, mit DeepSeek gelesen (kongress_altformat.py), falls vorhanden
+    alt_datei, alt_fertig = DATEN / "kongress_alt.csv", DATEN / "kongress_alt_fortschritt.csv"
+    if alt_datei.exists():
+        k = pd.concat([k, pd.read_csv(alt_datei, dtype=str, keep_default_na=False)], ignore_index=True)
+    alt_gelesen = set(pd.read_csv(alt_fertig, dtype=str)["doc_id"]) if alt_fertig.exists() else set()
     for s in ["datum", "gemeldet", "eingereicht"]:
         k[s] = pd.to_datetime(k[s], errors="coerce")
     for s in ["betrag_von", "betrag_bis"]:
@@ -271,7 +277,7 @@ def kongress_exportieren(v: dict, spenden_alle: pd.DataFrame) -> list:
     kurse = pol.kurse([pol.INDEX] + symbole, z["datum"].min() - pd.Timedelta(days=10))
     leute = pol.politiker(z, kurse)
     fs = pd.read_csv(DATEN / "kongress_fortschritt.csv", dtype=str, keep_default_na=False)
-    fs = fs[fs["status"].isin(["scan", "alt"])].assign(eingereicht=lambda d: pd.to_datetime(d["eingereicht"], errors="coerce"))
+    fs = fs[fs["status"].isin(["scan", "alt"]) & ~fs["doc_id"].isin(alt_gelesen)].assign(eingereicht=lambda d: pd.to_datetime(d["eingereicht"], errors="coerce"))
     scans = pol.zuordnen(fs, abg).assign(url=lambda d: [pol.kongress.pdf_url(j, i) for j, i in zip(d["jahr"], d["doc_id"])])
     us_namen = dict(pd.read_csv(DATEN / "us_firmen.csv")[["kuerzel", "name"]].values) if (DATEN / "us_firmen.csv").exists() else {}
     for p in leute:

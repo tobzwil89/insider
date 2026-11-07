@@ -18,6 +18,8 @@ from pipeline import DATEN, HEADER
 DATEI = DATEN / "us_firmen.csv"
 WIKIPEDIA = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
 SEC = "https://www.sec.gov/files/company_tickers.json"
+# Zweite Gattung → Kürzel in der Liste (für die Kongress-Geschäfte auf der Firmenseite)
+ZWEITE_GATTUNG = {"GOOG": "GOOGL", "FOX": "FOXA", "NWS": "NWSA"}
 
 
 def laden() -> pd.DataFrame:

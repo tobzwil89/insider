@@ -17,3 +17,6 @@ daten/kongress_fortschritt.csv
 daten/abgeordnete.csv
 docs/politiker/
 daten/kurse_us.parquet
+# älteres Formular (kongress_altformat.py) und Trump (trump_laden.py), gleiche Rechtslage
+daten/kongress_alt*.csv
+daten/trump*.csv
