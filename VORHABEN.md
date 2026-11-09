@@ -174,6 +174,11 @@ Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
       ohne zuständige Behörde (BayLDA). (4) „Keine Anlageberatung“ nennt die Seite „privates, nichtkommerzielles Projekt“
       (passt nicht zur Pro-Stufe). (5) „Datenquellen“ nennt die US-Quellen (USAspending, FEC, LD-2, SEC) nicht.
       Art. 15–21 sind genannt.
+      **09.11.2026 behoben (Auftrag Tobias):** (1) Satz zu kontrollierten Gesellschaften in `#personen`, (2) Absatz
+      „Verantwortlich im Sinne der DSGVO“, (3) Art. 77 + BayLDA mit Link, (5) Datenquellen ergänzt (Logos Wikidata/Commons,
+      Stimmrechte EQS, N-PORT, NBIM, 13F, SEC company_tickers, USAspending, FEC, LD-2; alle vorher live geprüft).
+      (4) bleibt bewusst (stimmt heute), Streichen vor einer Bezahlstufe notiert. Keine doppelten Ids, Bildschirmfoto
+      1300/520 px. Nicht genannt: Aktienrückkäufe (EQS) und congress-legislators (Namen in den PAC-Spenden).
 - [ ] **Nebenbefund, nicht behoben:** 13 Geschäfte stehen doppelt (gleiche Meldung an zwei Tagen bei EQS veröffentlicht,
       z. B. Kaeser/Daimler Truck 18.01.2022), betrifft auch Firmenseiten und Event Study.
 - [x] **2a. Repräsentantenhaus: Leser + Lader (06.11.2026, Freigabe Tobias „leg los“, nur lokal):** `pipeline/kongress.py`

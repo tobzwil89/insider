@@ -127,3 +127,5 @@ Neue Einträge unten anhängen: `- **TT.MM.JJJJ (Thema):** …`
   `VORHABEN.md`, Verlauf nach `VERLAUF.md`; Sicherung `.recherche/sicherung_claude_md/CLAUDE_2026-11-09.md`.
 - **09.11.2026 (Livegang):** Lobbying/Trump-Code gepusht (099af96), `/us/` mit Lobbying live; Test ohne nur lokale
   Dateien bestanden. Datenschutzabsatz `#personen` ins Impressum eingebaut (#75), Lücken der Erklärung in `VORHABEN.md`.
+- **09.11.2026 (Impressum 2):** Funde der Prüfung behoben: Verantwortlicher nach DSGVO, Art. 77 + BayLDA, Satz zu
+  kontrollierten Gesellschaften, live genutzte Datenquellen ergänzt; Notiz „nichtkommerziell streichen vor Bezahlstufe“.

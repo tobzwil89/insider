@@ -50,6 +50,8 @@ Diese Datei ist absichtlich kurz (wird bei jedem Start geladen). Details stehen 
   `trump.csv`, `docs/politiker/`; Grund 5 U.S.C. § 13107(c)), Fundamentaldaten (`fundamental.csv`, `kennzahlen.csv`;
   inoffizielle Quellen), `kurse_us.parquet`, `lobbying_berichte.csv`, `sec_tickers.json`.
 - **Vor dem Livegang:** Skill `/unslop` über die Seite laufen lassen, Audit zuerst Tobias zeigen; Designentscheidungen trifft Tobias.
+- **Vor dem Start einer Bezahlstufe:** im Impressum den Satz „privates, nichtkommerzielles Projekt“ (Abschnitt
+  „Keine Anlageberatung“) streichen. Dann wird die Frage zu den Kongressdaten (#74, `RECHTSFRAGEN.md`) akut.
 
 ## Stand je Vorhaben (Kurzfassung, Details in `VORHABEN.md`)
 
@@ -68,8 +70,8 @@ Firmenseiten `/firma/<TICKER>/` mit Kursdiagramm, Kapitelleiste, Logos, Aktionä
 - **Firmenlogos:** live. Offen: Tobias sieht Verdachtsfälle durch (Nordex, TUI, Jenoptik, Hella, Porsche AG, Fuchs);
   Logos fehlen noch in Ticker/Cluster/Ranking.
 - **Personenseiten** (803 Vorstände/Aufsichtsräte, `/person/`): **live.** Datenschutzabsatz `#personen` in
-  `docs/impressum.html` eingebaut 09.11.2026 (#75, Text aus `RECHTSFRAGEN.md` Abschnitt 2). Offen: Anwalt liest gegen;
-  Lücken der übrigen Erklärung (siehe `VORHABEN.md`, Datenschutz). Nebenbefund: 13 Geschäfte doppelt (gleiche Meldung an zwei Tagen bei EQS).
+  `docs/impressum.html` eingebaut 09.11.2026 (#75, Text aus `RECHTSFRAGEN.md` Abschnitt 2). Lücken der Erklärung behoben
+  09.11.2026 (Verantwortlicher, Art. 77/BayLDA, Gesellschaften, Quellen). Offen: Anwalt liest gegen. Nebenbefund: 13 Geschäfte doppelt (gleiche Meldung an zwei Tagen bei EQS).
 - **US-Politiker** (House + Senat 2012–2026, Trump 278-T): **nur lokal**, bis die Rechtsfrage #74 geklärt ist
   (`RECHTSFRAGEN.md` Abschnitt 1). Trump-Seite gebaut 08.11.2026 (91 % mit Kürzel). Offen: Erklärtexte der Trump-Seite
   sprechen noch von Kongress/Inhaber; Fotos, Branchen-Kuchen. Datensatz-Abhängigkeit: Hugging Face

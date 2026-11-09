@@ -38,6 +38,10 @@ einem Nachrichtenangebot.
 5. Senat: Die Seite efdsearch.senate.gov verlangt eine Klick-Erklärung „keine kommerzielle Nutzung“. Bindet sie
    uns, wenn wir die Senatsdaten aus einem fremden Datensatz nehmen?
 
+**Vor dem Livegang einer Bezahlstufe (Notiz 09.11.2026):** Im Impressum steht heute „privates, nichtkommerzielles
+Projekt“ (stimmt derzeit). Sobald eine Bezahlstufe startet, diesen Satz streichen; dann wird diese Frage akut,
+weil die Ausnahme für Nachrichtenmedien die einzige Grundlage für eine kommerzielle Nutzung wäre.
+
 **Vorläufige Empfehlung Claude:** Bis zur Antwort lokal lassen. Wenn live, dann nur im kostenlosen Teil und als
 Berichterstattung gestaltet (Texte, Einordnung), nicht als Handelssignal hinter der Bezahlschranke.
 
