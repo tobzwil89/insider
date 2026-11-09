@@ -1,4 +1,7 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+adidas AG,40001509,,NNS Investments (Cyprus) Limited,in enger Beziehung,Derivat,Sonstiges,"4,26 EUR","370.219,80 EUR",2026-11-06,2026-11-05,,2026-11-09 06:57:57,4.26,EUR,370219.8,2026-11-09 07:13:32
+MAX Automation SE,40001154,DE000A2DA588,Günther Holding SE,in enger Beziehung,Aktie,Sonstiges,,,2026-11-06,2026-11-04,,2026-11-09 06:57:57,,,,2026-11-09 07:13:32
+adidas AG,40001509,,NNS Investments (Cyprus) Limited,in enger Beziehung,Derivat,Sonstiges,"1,87 EUR","162.690,00 EUR",2026-11-06,2026-11-03,,2026-11-09 06:52:51,1.87,EUR,162690.0,2026-11-09 07:13:32
 German Tech Holding GmbH & Co. KGaA,10142363,DE000A1MMEV4,"Koning, Gerhard",Aufsichtsrat,Aktie,Kauf,"0,07 EUR","25.200,00 EUR",2026-11-06,2026-11-03,,2026-11-06 13:05:33,0.07,EUR,25200.0,2026-11-06 13:13:35
 Deutsche Lufthansa Aktiengesellschaft,40001478,DE0008232125,"Stange, Dr. Astrid",Aufsichtsrat,Aktie,Kauf,"8,33 EUR","153.759,00 EUR",2026-11-06,2026-11-05,Tradegate Berlin Stock Exchange,2026-11-06 13:05:33,8.33,EUR,153759.0,2026-11-06 13:13:35
 Rheinmetall Aktiengesellschaft,40002496,DE0007030009,"Papperger, Armin Theodor",Vorstand,Aktie,Kauf,"858,95 EUR","502.484,40 EUR",2026-11-06,2026-11-05,XETRA,2026-11-06 12:59:40,858.95,EUR,502484.4,2026-11-06 13:13:35
