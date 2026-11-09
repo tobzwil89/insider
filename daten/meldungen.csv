@@ -1,4 +1,10 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+SCI AG,40007484,DE0006051014,"Wiederhold, Oliver",Vorstand,Aktie,Sonstiges,"20,50 EUR","534.025,00 EUR",2026-11-06,2026-11-05,,2026-11-09 07:18:48,20.5,EUR,534025.0,2026-11-09 07:43:37
+The Naga Group AG,40026068,DE000A41YCM0,Netcore Investments Limited,in enger Beziehung,Aktie,Kauf,"2,32 EUR","11.622,18 EUR",2026-11-06,2026-11-05,Xetra,2026-11-09 07:13:39,2.32,EUR,11622.18,2026-11-09 07:43:37
+Rheinmetall Aktiengesellschaft,40002496,DE0007030009,"Papperger, Armin Theodor",Vorstand,Aktie,Kauf,"804,40 EUR","200.295,60 EUR",2026-11-06,2026-11-06,Tradegate,2026-11-09 07:08:32,804.4,EUR,200295.6,2026-11-09 07:43:37
+NORMA Group SE,40014127,DE000A1H8BV3,"Seeger, Birgit",Vorstand,Aktie,Kauf,"14,00 EUR","6.705,10 EUR",2026-11-08,2026-11-06,TRADEGATE EXCHANGE,2026-11-09 07:08:32,14.0,EUR,6705.1,2026-11-09 07:43:37
+NORMA Group SE,40014127,DE000A1H8BV3,"Seeger, Birgit",Vorstand,Aktie,Kauf,"14,40 EUR","6.019,20 EUR",2026-11-06,2026-11-05,Tradegate Exchange,2026-11-09 07:08:32,14.4,EUR,6019.2,2026-11-09 07:43:37
+"DZ BANK AG Deutsche Zentral-Genossenschaftsbank, Frankfurt am Main",10101261,DE000DN5Z3R5,"Hodrus, Josef",Aufsichtsrat,Schuldtitel,Sonstiges,"1.000,00 EUR","50.000,00 EUR",2026-11-06,2026-11-06,,2026-11-09 07:08:32,1000.0,EUR,50000.0,2026-11-09 07:43:37
 adidas AG,40001509,,NNS Investments (Cyprus) Limited,in enger Beziehung,Derivat,Sonstiges,"4,26 EUR","370.219,80 EUR",2026-11-06,2026-11-05,,2026-11-09 06:57:57,4.26,EUR,370219.8,2026-11-09 07:13:32
 MAX Automation SE,40001154,DE000A2DA588,Günther Holding SE,in enger Beziehung,Aktie,Sonstiges,,,2026-11-06,2026-11-04,,2026-11-09 06:57:57,,,,2026-11-09 07:13:32
 adidas AG,40001509,,NNS Investments (Cyprus) Limited,in enger Beziehung,Derivat,Sonstiges,"1,87 EUR","162.690,00 EUR",2026-11-06,2026-11-03,,2026-11-09 06:52:51,1.87,EUR,162690.0,2026-11-09 07:13:32
