@@ -48,10 +48,10 @@ Alle Ideen folgen den bestehenden Regeln: Pipeline rechnet, statische Dateien au
 
 ### A. Kapitalmarktdaten mit Meldepflicht (empfohlen)
 
-1. **Stimmrechtsmitteilungen (§§ 33 ff. WpHG)**: Schwellen 3/5/10/15/20/25/30/50/75 %. Zeigt aktivistische Investoren,
+1. ✅ **Umgesetzt (28.–30.10.2026, `pipeline/stimmrechte.py`, Details `VORHABEN.md`).** **Stimmrechtsmitteilungen (§§ 33 ff. WpHG)**: Schwellen 3/5/10/15/20/25/30/50/75 %. Zeigt aktivistische Investoren,
    Übernahmekandidaten, Ausstieg großer Anteilseigner. Erscheint über EQS → `pipeline/eqs.py` erweitern
    (andere Nachrichtenkategorie, anderes Formular). *Ungeprüft: Kategorie-Parameter im `admin-ajax.php`-Aufruf.*
-2. **Aktienrückkäufe (Art. 5 MAR)**: wöchentliche Meldung der Emittenten (Stückzahl, Durchschnittspreis).
+2. ✅ **Umgesetzt (30.10.2026, `pipeline/rueckkaeufe.py`, Details `VORHABEN.md`).** **Aktienrückkäufe (Art. 5 MAR)**: wöchentliche Meldung der Emittenten (Stückzahl, Durchschnittspreis).
    Ebenfalls über EQS. Wenig beachtet, gut zu lesen. Auf der Firmenseite als zweite Markierungsart im Kursdiagramm denkbar.
 3. **Netto-Leerverkaufspositionen ab 0,5 %** (EU-Leerverkaufsverordnung): öffentlich im Bundesanzeiger
    mit Fonds, Emittent, Position, Datum. Für einen Tracker für stark leerverkaufte Titel: Welche Fonds bauen wo

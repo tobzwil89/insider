@@ -1,5 +1,12 @@
 # Bestandsaufnahme: alte Projekte und was der Insider-Monitor davon übernehmen kann
 
+> **Hinweis (09.11.2026): historischer Stand vom 22.10.2026, nicht umgeschrieben.** Überholt sind:
+> - **„Statisch bleiben“** (Abschnitte 4 und 6): Tobias hat am 31.10.2026 entschieden: Datenbank Supabase (Postgres),
+>   Sammler bleiben in GitHub Actions, Website-Technik offen (`ARCHITEKTUR.md`).
+> - **Sentiment zuerst aus EQS-Ad-hoc-Mitteilungen** (Abschnitte 5 und 7): Tobias hat am 06.11.2026 **Reddit und X für
+>   Krypto und Pennystocks** als Schwerpunkt gewählt (Alleinstellungsmerkmal; Probe in `~/Desktop/Claude/sentiment-probe`).
+> Aktueller Stand: `CLAUDE.md`.
+
 Stand: 22.10.2026. Durchgesehen wurden vier Ordner auf Tobias' Rechner (nur gelesen, nichts geändert).
 Ziel laut Tobias: langfristig eine Seite wie gurufocus.com bzw. alleaktien.de, **mit Sentiment-Score** und
 **mehr Aktien als DAX/MDAX**. Stand und Architektur des Insider-Monitors: `CLAUDE.md`, `GURUFOCUS.md`, `ALTERNATIVE_DATEN.md`.

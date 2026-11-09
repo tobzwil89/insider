@@ -1,5 +1,10 @@
 # Vorbild GuruFocus: was sie gut machen und was wir übernehmen
 
+> **Hinweis (09.11.2026): historischer Stand vom 22.10.2026, nicht umgeschrieben.** Überholt ist die Annahme
+> **„statisch bleiben, eigener Server erst später“** (Abschnitte 4 und 5): Tobias hat am 31.10.2026 entschieden:
+> Datenbank Supabase (Postgres), Sammler bleiben in GitHub Actions, Website-Technik offen (`ARCHITEKTUR.md`).
+> Die Analyse von GuruFocus selbst gilt weiter. Aktueller Stand: `CLAUDE.md`.
+
 Stand: 22.10.2026. Grundlage ist eine Analyse von gurufocus.com mit REA (Netzwerk-Mitschnitt im echten Chrome,
 statische Analyse aller 48 JavaScript-Dateien, Zeitmessung über die Performance-API des Browsers) sowie ein
 Vergleich mit dem Insider-Monitor (Live-Seite und Code in diesem Ordner).

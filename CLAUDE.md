@@ -106,7 +106,8 @@ Firmenseiten `/firma/<TICKER>/` mit Kursdiagramm, Kapitelleiste, Logos, Aktionä
 - Nur Marktmodell (DAX/MDAX), Schätzfenster −130 bis −11, Ereignisfenster ±5 Handelstage.
 - Cluster: ≥ 3 Personen in 14 Tagen, ≥ 50.000 €. Ranking: 60 Handelstage, nur Käufe, ≥ 3 Käufe, Median der Überrendite.
 - ISIN als feste ID, Ticker für Anzeige und Adresse. EQS-Historie mit ~88 % Abdeckung reicht.
-- Statisch bleiben (GitHub Pages), bis Screener/Nutzerkonten/Echtzeit einen Server nötig machen.
+- Architektur (31.10.2026, `ARCHITEKTUR.md`): Datenbank Supabase (Postgres, gratis), Sammler bleiben in GitHub Actions,
+  0 € bis MVP; Website-Technik offen. Bis zur Umsetzung läuft die Seite weiter statisch auf GitHub Pages.
 
 ## Bekannte Lücken der Daten
 

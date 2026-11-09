@@ -3,145 +3,14 @@
 Unverändert aus der alten CLAUDE.md übernommen: alle Vorhaben mit Plan, Prüfungen, Zahlen und Begründungen.
 Der aktuelle Kurzstand steht in `CLAUDE.md`. Neue Details zu einem Vorhaben hier im passenden Abschnitt ergänzen.
 
-## Stimmrechte abgeschlossen (30.10.2026), nächstes Vorhaben: Rückkäufe
 
-30.10.2026 umgesetzt (nicht gepusht, Tobias pusht): Auslöser war Tobias' Hinweis „Hugo Boss über 100 %“.
-- **Stände vor 2018 ausgeblendet** (Tobias: ja): automatische Einträge mit Schwellendatum < 2018 fallen weg, geprüfte bleiben.
-- **Doppelzählungen** in `stimmrechte.grossaktionaere`: (a) *Konzernkette*: Halter, die je am selben Tag denselben Bestand
-  gemeldet haben, bilden eine Kette; je Kette gilt der neueste Stand (vor dem 3-%-Filter, damit Unterschreitungen zählen:
-  Parsifal 3,05 % → David Zorub 2,92 %); gleicher Bestand → eine Zeile, weitere Namen klein darunter („dieselben Aktien
-  auch bei“). (b) *Umfirmierung*: ein Halter mit gleichem Namensanfang (4 Zeichen) meldet später genau diesen Stand als
-  „vorher“ (PFC S.r.l. → PFC S.p.A., Norwegen-Schreibweisen). Ohne Namensbedingung 83 Treffer mit Fehlern (Bund/Hensoldt,
-  Bertermann/Auto1) → verworfen. Ebenso verworfen: gleicher Wert ab 10 % an verschiedenen Tagen (löschte Bund 25,1 %).
-- Sortierung nach Aktien statt Zusammen; Erklärtext: Instrumente sind keine Aktien, Spalten Instrumente/Zusammen nicht addierbar.
-- Geprüfte Liste ergänzt: Porsche, Porsche SE, Traton → eine Zeile „Familien Porsche und Piëch“ (100 / 100 / 87,52 %,
-  Mitteilungen 04.04.2025, `*` vor 05.04.2025); Knorr-Bremse: Heinz Hermann Thiele ausgeblendet (Erbfall 2021, Stiftung 58,99 %).
-- Ergebnis: 309 Zeilen bei 83 Firmen, keine Firma mehr über 100 % in Aktien. Hugo Boss 70,2 %
-  (Ashley 49,41, Zignago/PFC 14,15, Silchester 5,08, Banken/Händler 1,6). Screenshot geprüft, `docs/` zurückgesetzt.
-- **Rheinmetall/Scout24:** kein Leserfehler, EQS zeigt bei je einer Mitteilung (2016) einen fremden KKR-Pressetext →
-  `stimmrechte.DEFEKT` (als `anderes`), beide Firmen fertig. `stimmrechte_laden.py` meldet offene Firmen jetzt
-  („Noch offen (n): …“), getestet mit simuliertem Fehler.
-- **Von Hand nachgetragen (30.10.2026, nach den Mitteilungen geprüft):** Brenntag Kühne Holding 20,10 % (Stähelin meldet als
-  Testamentsvollstrecker, eine Zeile); Fonds stecken im Anteil ihres Verwalters → Fonds ausgeblendet: Artisan Funds (Brenntag,
-  Adidas), Flossbach SICAV (Brenntag, Bechtle), First Eagle Global Fund (Merck); FMC: alte Dodge-&-Cox-Meldung 2022 aus,
-  Fonds 2026 bleibt. Nemetschek: Ralf 2022 ausgeblendet (dieselbe Nemetschek-Stiftung, heute 45,07 % laut Georg 02.07.2026).
-  Ergebnis 303 Zeilen. Rebase-Konflikt in `daten/stimmrechte.csv` (Bot hatte angehängt) gelöst, beide Teile behalten, Sicherung
-  im Branch `sicherung-vor-rebase` (nach erfolgreichem Push löschbar: `git branch -D sicherung-vor-rebase`).
-- **Bekannte Reste:** Leser speichert bei manchen Familienformularen nur Vornamen („Dr. Wolfgang“, „Georg F.W.“,
-  „Maria Elisabeth“). Neue Fonds-/Verwalter-Paare tauchen mit neuen Mitteilungen auf → bei der jährlichen Prüfung der
-  geprüften Liste mit ansehen. Verschoben (Tobias): Henkel-Poolmeldungen `anderes`, 806 Fließtexte 2008–2012 (DeepSeek).
-**Vorhaben Stimmrechte ist erledigt** (Tobias 30.10.2026). Rückkäufe: siehe eigenes Vorhaben unten (Block 4 wartet auf Push und Start der Action).
+# Laufende Vorhaben
 
-## Geplantes Vorhaben: Aktionärsring (Planungs-App #65), Stand 31.10.2026
-
-Auftrag Tobias 31.10.2026: Auf der Firmenseite soll man sehen, wer wie viel hält, aufgeteilt auf fast 100 %. Heute stehen
-dort im Median ~36 % Großaktionäre, der Rest fehlt und wirkt unvollständig. **Darstellung: Ring** (Entscheidung Tobias),
-Aussehen nach Entwurf von Tobias (nicht selbst gestalten). Grundsatz: Der Ring zeigt 100 %, aber nicht 100 % mit Namen;
-der unbekannte Rest wird benannt, nie erfunden (Aktienregister nicht öffentlich, Meldepflicht erst ab 3 %).
-
-**Test N-PORT (31.10.2026, Skripte `.recherche/nport_test.py`, `.recherche/nport_netto.py`, Treffer
-`.recherche/2026q2_nport_treffer.csv`):** SEC-Datensatz „Form N-PORT Data Sets“
-(`www.sec.gov/files/dera/data/form-n-port-data-sets/<JJJJ>q<N>_nport.zip`, ~440 MB gepackt je Quartal, alle US-Fonds mit
-vollständigen Beständen, Stichtag bis ~3 Monate alt). Direkt aus dem Zip gelesen (25 s), Tabellen IDENTIFIERS (ISIN) →
-FUND_REPORTED_HOLDING (Stück, nur `UNIT=NS`, `ASSET_CAT=EC`) → FUND_REPORTED_INFO/REGISTRANT/SUBMISSION; je Fonds
-(`SERIES_ID`) nur der neueste Bericht; Prozent = Stück / Gesamtstimmrechte aus der letzten Stimmrechtsmitteilung.
-Ergebnis (2026q2, Stichtage meist 31.03.2026):
-- US-Fonds halten im Median **10,7 %** (DAX 14,1, MDAX 7,6; Spitze Brenntag 31 %, Lanxess 25 %).
-- **Netto nach Abzug der Überschneidung** (Fondsfamilie steckt schon im Großaktionär, z. B. iShares in BlackRock, MFS bei
-  Zalando): Median **+8,7 Prozentpunkte** mit Namen. Mit Namen zusammen dann Median 48 % statt 36 %.
-  Beispiele (groß → zusammen): SAP 26 → 36 %, Zalando 22 → 33 %, Siemens 10 → 22 %, Allianz 8 → 17 %, Hugo Boss 70 → 78 %.
-  32 von 81 Firmen bleiben unter 40 % mit Namen. Erwartung vorher (10–25 Pp.) war zu hoch, die Wirklichkeit liegt am unteren Rand.
-- ADR/andere ISIN bringen wenig (SAP +0,4 %). Fehlende Treffer: Fresenius, Qiagen (andere ISIN, vgl. `EP_KENNUNG`);
-  Firmen mit zwei Gattungen (VW, Henkel, Sartorius, BMW, Porsche) brauchen Gesamtzahl je Gattung, sonst falsche Prozente.
-- Fondsfamilien-Zuordnung im Test grob über Stichwörter → im echten Bau saubere Tabelle Fondsgesellschaft → Konzern.
-
-**Plan (Schritt für Schritt, je Schritt abbrechbar):**
-- [x] 1. **Ring gebaut (31.10.2026, nicht gepusht).** Tobias: „einfach einen Ring, in unseren Farben“ (kein Entwurf nötig).
-      `seiten.aktionaersring(aktionaere)` über der Großaktionärs-Tabelle: CSS-Ring (`conic-gradient`, kein Skript), nur Spalte
-      Aktien (Instrumente sind keine Aktien), Halter ≥ 1 % einzeln (höchstens 7), kleinere als „Weitere gemeldete Halter“,
-      Summe auf 100 % gedeckelt; Blau `--kauf` in abnehmender Stärke, Rest „Übrige Aktien“ (Streubesitz, Halter unter 3 %,
-      eigene Aktien) in `--ring-rest` (Grau, im dunklen Modus kräftiger als `--gitter`). Mitte: „x % mit Namen bekannt“.
-      Stile `.ring*` am Ende von `style.css`. 85 Firmenseiten mit Ring. Geprüft per Bildschirmfoto hell/dunkel, 950 und 520 px
-      (SAP 26 %, Hugo Boss 70 %, Allianz 8 %). Sicherung vorher: `.recherche/sicherung_ring/`.
-- [x] 2. **Eigene Aktien im Ring (31.10.2026, nicht gepusht).** Quelle: Mitteilungen nach § 40 Abs. 1 Satz 2 WpHG (Firma meldet
-      ihren Bestand, wenn er 3, 5 oder 10 % berührt), die schon als `anderes` in `stimmrechte.csv` lagen. Rückkäufe taugen
-      nicht (Einziehungen unbekannt). `stimmrechte.eigene_aktien_lesen` (Formular DE/EN: Abschnitt 3 Datum, „Neu“/„Resulting
-      situation“ → Anteil und Gesamtzahl), `stimmrechte.eigene_aktien` (letzter Stand je Firma ab 2018, **nur ≥ 3 %**, weil
-      darunter keine Meldepflicht mehr besteht). `stimmrechte_laden.eigene_aktien_nachladen()` läuft am Ende jedes Aufrufs
-      (auch nachts) und liest nur fehlende → `daten/stimmrechte_eigene_aktien.csv` (wird von der Action über
-      `daten/stimmrechte*.csv` mit committet). Erstlauf lokal: 123 Mitteilungen in 5 Min., keine Lesefehler.
-      **11 Firmen mit ≥ 3 %:** SAP 5,0, Scout24 5,0, Salzgitter 4,9, United Internet 10,0 (2023), FMC, Mercedes, DHL, Ionos,
-      Hochtief (2020), Lanxess (2019), Munich Re (2019) je ~3 %. Alte Stände können zwischen den Schwellen (3–5, 5–10 %)
-      veraltet sein → Datum mit Link steht in der Legende. Segment „Eigene Aktien der Firma“ in `--sonstiges` (Mittelgrau),
-      zählt zu „mit Namen bekannt“ (SAP 26 → 31 %). Keine Firma steht zugleich als eigener Großaktionär drin (geprüft).
-      Geprüft per Bildschirmfoto hell/dunkel.
-      **Nebenbefund (nicht behoben):** Halternamen mit Ort, z. B. „Salzgitter Aktiengesellschaft, Salzgitter,, Deutschland“ bei Aurubis.
-- [x] 3. **US-Fonds im Ring (31.10.2026, nicht gepusht).** `pipeline/fonds_us.py`: `laden()` liest das neueste Quartal von
-      der SEC-Seite, lädt nur, wenn es in `daten/fonds_us.csv` noch fehlt (Zip in temporären Ordner, danach gelöscht,
-      ~1,5 Min.), behält nur unsere ISINs, je ISIN und Fondsträger eine Zeile (isin, gesellschaft, stueck, fonds, stichtag,
-      quartal; 2026q3: 9.508 Zeilen, 94 Firmen, 650 KB; nur das neueste Quartal). `KONZERNE`: Fondsträger → Konzern
-      (iShares → BlackRock, EUPAC/New Perspective … → Capital Group, Hartford → auch Wellington usw.) mit Muster für
-      Großaktionärsnamen. `je_firma` rechnet in % der Gesamtstimmrechte (letzte Stimmrechtsmitteilung) und lässt Konzerne
-      weg, die schon als Großaktionär gemeldet sind (geprüft: SAP ohne iShares, Zalando ohne MFS, Brenntag ohne Artisan,
-      Harris, Hartford). Ring: bis 4 Konzerne einzeln „(US-Fonds)“, Rest „Weitere US-Fonds“, dunkleres Blau, Stand und
-      Hinweis unter dem ersten Eintrag. **Nicht bei Firmen mit zwei Gattungen** (VW, Henkel, Sartorius, BMW, Fuchs …)
-      und Porsche (`NUR_VORZUG`), weil die Stimmrechte nur Stammaktien zählen. Workflow „Stimmrechte laden“: nachts
-      Schritt „US-Fonds laden“ (`continue-on-error`), committet `daten/fonds_us.csv` mit.
-      **Ergebnis: Median „mit Namen bekannt“ 49 % (vorher 36 %), 73 Seiten mit US-Fonds.** SAP 26 → 41 % (mit eigenen
-      Aktien), Allianz 8 → 18 %, Siemens 10 → 22 %, Hugo Boss 70 → 77 %, Brenntag 70 %. Bildschirmfoto hell/dunkel geprüft.
-      Offen: Fresenius/Qiagen ohne Treffer (andere ISIN), Vorzugsaktien-Firmen ohne Fonds (bräuchten Gesamtzahl je
-      Gattung), „Weitere US-Fonds“ oft 4–6 % (Zuordnungstabelle bei Bedarf erweitern).
-- [x] 4. **Norwegischer Staatsfonds (31.10.2026, nicht gepusht).** `pipeline/norwegen.py`: NBIM-JSON-Schnittstelle der Seite
-      nbim.no/en/investments/all-investments/ (`/api/investments/v2/init.json` → neueste Datei, z. B. `2026-06-30.json`;
-      Felder n = Name, cc = Land, at = 0 Aktien, o = Eigentumsanteil %). Halbjährlich, lädt nur bei neuem Stand →
-      `daten/norwegen.csv` (firma, name_nbim, anteil, stichtag). Zuordnung über bereinigten Namen + `NAMEN` (9 Abweichungen,
-      z. B. DHL = „Deutsche Post AG“). 88 von 90 Firmen; Airbus fehlt bei NBIM absichtlich (ethischer Ausschluss), Deutz
-      nicht gehalten. Segment „Norwegischer Staatsfonds“ in `--link`; entfällt, wenn Norwegen schon Großaktionär ist
-      (Vonovia: Ministry of Finance 10,1 %) und bei Firmen mit zwei Gattungen (NBIM nennt nur einen Anteil je Firma).
-      Workflow „Stimmrechte laden“: Schritt „Norwegischen Staatsfonds laden“ nachts, committet `daten/norwegen.csv`.
-- [x] 5. **Vorzugsaktien und Firmen ohne EQS-Stimmrechte (31.10.2026, nicht gepusht).** `daten/aktiengattungen.csv`
-      (firma, isin, gattung stamm/vorzug/einzig, stueck, eigene, stand, quelle; alle Zahlen mit Quelle, Fuchs nach HV 05/2026
-      65,5 Mio. je Gattung). `export.ring_daten` (Hilfsfunktion in `exportiere`): Stammseite = Großaktionäre + US-Fonds der
-      Stamm-ISIN / Stammaktien; Vorzugsseite = nur US-Fonds der Vorzugs-ISIN / Vorzugsaktien (+ eigene Aktien), Satz über dem
-      Ring „Der Ring zeigt die Vorzugsaktien …“; `einzig` = eine Gattung, Gesamtzahl aus der Tabelle (Wacker, DWS haben keine
-      EQS-Stimmrechte). Fresenius/TUI (alte + neue ISIN) zählen jetzt alle ISINs der Firma. Kein Ring, wenn nichts bekannt ist.
-      `firmenseite(ring=…)` statt einzelner Argumente. **Geprüfte Großaktionäre ergänzt** (`grossaktionaere_geprueft.csv`):
-      VW (Porsche SE 53,3, Niedersachsen 20,0, Katar 17,0; VW-Seite Aktionärsstruktur 31.12.2025), Sartorius (Testaments-
-      vollstrecker 50,3, Bio-Rad 34,8, eigene Aktien 8,6 % der Stämme; H1-Factsheet, auf ausgegebene Aktien umgerechnet),
-      Wacker (Familie 66,9 = 100 − Streubesitz 33,09 laut IR), DWS (Deutsche Bank 79,5), Airbus (SOGEPA 10,83, GZBV 10,82,
-      SEPI 4,08; Zweitquelle uamr.de, Stand 31.12.2025), RTL (Bertelsmann 75,1; Quelle Wikipedia, Angaben schwanken 75,1–76,3).
-      **Namen bereinigt:** `stimmrechte.anzeigename` kürzt „Name, Ort, Land“ nur, wenn der letzte Teil ein Land ist
-      (Salzgitter-Fall); 11 Kandidaten geprüft, „Günter, Prof. Dr. Zimmer“ und „ACS, ACTIVIDADES …“ bleiben ganz.
-      **Ergebnis:** 94 Seiten mit Ring, Median „mit Namen bekannt“ ohne Vorzugsseiten **50,5 %** (Start: 36 %); VW-Stämme 91 %,
-      Sartorius 94 %, DWS 81 %, RTL 76 %, Wacker 73 %, Airbus 26 %. Vorzugsseiten 2–9 % (dort gibt es keine Meldepflicht).
-      Bildschirmfotos hell/dunkel geprüft.
-- [x] 6. **Darstellung überarbeitet (31.10.2026, Rückmeldung Tobias mit Bildschirmfoto Commerzbank):** Ring wirkte nach links
-      verschoben, Blautöne nicht unterscheidbar, zwei Listen (Legende + Tabelle) mit widersprüchlichen Zahlen (BlackRock
-      3,1 % Aktien im Ring, 4,38 % „Zusammen“ in der Tabelle). Lösung: `seiten.aktionaersstruktur` ersetzt `aktionaersring`
-      + Großaktionärs-Tabelle: **eine Tabelle = Legende** (Farbfeld, Halter, Anteil, Stand) rechts neben dem Ring über die
-      volle Breite (CSS-Grid 180 px | Rest, unter 640 px untereinander). **Nur Aktienanteil**, Spalten Instrumente/Zusammen
-      entfallen; Instrumente klein beim Halter („zusätzlich x % über Instrumente, zählen nicht mit“). Kleine Halter in
-      „Weitere gemeldete Halter“ mit Namen, Link und Instrumenten klein. US-Fonds als eine Zeile mit Aufteilung klein.
-      Farben: feste kategoriale Palette `--serie-1…8` (dataviz-Richtlinie, gleiche Familie wie `--kauf`/`--verkauf`,
-      hell/dunkel mit `validate_palette.js` geprüft: alle Pflichtprüfungen bestanden, Kontrastwarnung durch beschriftete
-      Tabelle abgedeckt), 2-px-Lücken zwischen Segmenten. Halter ab 1 % einzeln, solange Farben frei sind (max. 8).
-      Einheitlich eine Nachkommastelle. Überschrift „Aktionäre“, Erklärtext gekürzt. Vorzugsseiten: Hinweis „Anteile bezogen
-      auf die Vorzugsaktien“, Stimmrechte der Stammaktien als ein Satz darunter. Bildschirmfotos CBK hell, SAP dunkel,
-      VOW3 520 px geprüft. Dabei versehentlich gelöschte Logo-Stile in `style.css` sofort wiederhergestellt.
-- **Offen / Pflege (Thema sonst abgeschlossen):**
-      - BMW: aktuelle Zahl der Stamm-/Vorzugsaktien fehlt (letzte Stimmrechtsmitteilung 2020) → US-Fonds bei BMW aus.
-      - Qiagen, RTL, Airbus: keine Gesamtzahl der Aktien → keine US-Fonds. Qiagen meldet Stimmrechte über **pressetext**
-        statt EQS (auch für andere Auslandsfirmen prüfen: zweite Quelle für Stimmrechtsmitteilungen).
-      - Bio-Rad hält ~28 % der Sartorius-Vorzüge (Factsheet), Vorzugsseiten kennen bisher keine Großaktionäre.
-      - Jährlich prüfen: `aktiengattungen.csv` (Kapitalmaßnahmen, Einziehungen) und neue Einträge in `grossaktionaere_geprueft.csv`.
-      - Airbus und RTL mit besseren Primärquellen belegen (Airbus-IR-Seite gab 404, RTL-Seite nicht abrufbar).
-- USA-Aktien später: 13F + 13D/13G + Form 4 decken dort meist 70–90 % mit Namen ab.
-
-## Laufendes Vorhaben: Personenseiten und US-Politiker (nach Vorbild Quiver Quantitative), Stand 06.11.2026
+## Personenseiten und US-Politiker (nach Vorbild Quiver Quantitative), Stand 09.11.2026
 
 Auftrag Tobias 06.11.2026 (Bildschirmfoto Quiver, Seite Nancy Pelosi): Personenseiten bauen, erst nur Vorstand und
 Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
-- [x] **1. Personenseiten (06.11.2026, nicht gepusht, Patch `.recherche/personenseiten.patch`):** `pipeline/personen.py`,
+- [x] **1. Personenseiten (06.11.2026, gepusht d2290be; Patch `.recherche/personenseiten.patch`):** `pipeline/personen.py`,
       Seiten `docs/person/<vorname-nachname>/` und Übersicht `docs/person/` (`seiten.personenseite`, `personen_uebersicht`),
       Einträge in `sitemap.xml`. Inhalt wie Quiver: Kacheln (Handelsvolumen, Käufe, Verkäufe, letztes Geschäft),
       Handelsvolumen je Jahr (Kauf/Verkauf als Säulenpaare, nur Euro, Stile `.jv-*`), Firmen/Mandate, Platz im Ranking,
@@ -268,7 +137,7 @@ Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
       Spannen). **AMENDED geklärt:** „08.12.2025 (2) AMENDED“ deckt 02.–22.07.2025 ab, genau die Lücke zwischen (1) und (3),
       keine Zeile kommt in einer anderen Meldung vor → ersetzt nur ein nicht mehr gelistetes Original, nichts zu tun.
       **Offen:** Erklärtexte der Trump-Seite sprechen noch von Kongress/Inhaber.
-- [x] **4a–c. US-Firmen (Freigabe Tobias 06.11.2026 „Universum über DAX/MDAX: ja“), gebaut 06.11.2026, nicht gepusht:**
+- [x] **4a–c. US-Firmen (Freigabe Tobias 06.11.2026 „Universum über DAX/MDAX: ja“), gebaut 06.11.2026, gepusht 07.11.2026 (83f661e, Code 9b4a2af):**
       - `python3 -m pipeline.us_firmen` → `daten/us_firmen.csv`: S&P 500 (Wikipedia-Tabelle) + amtlicher Name aus
         SEC `company_tickers.json` (500 Firmen; GOOGL/GOOG je CIK einmal).
       - `python3 -m pipeline.staatsauftraege [--max-minuten N]` → `daten/staatsauftraege.csv` (kuerzel, geschaeftsjahr,
@@ -285,7 +154,7 @@ Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
       - Seiten `docs/us/<KÜRZEL>/` + `docs/us/` (`seiten.us_firmenseite`, `us_uebersicht`, `export.us_exportieren`):
         Kacheln, Staatsaufträge je GJ (Balken), PAC-Spenden nach Partei je Zyklus + größte Empfänger; **lokal zusätzlich**
         „Geschäfte von Abgeordneten“ in dieser Aktie (NVDA: 274 seit Mitte 2022) und Spenden-Abschnitt auf den
-        Politikerseiten. Die US-Seiten nutzen nur gemeinfreie Daten → **gehen mit dem nächsten Push live** (Fußzeile
+        Politikerseiten. Die US-Seiten nutzen nur gemeinfreie Daten → **live seit 09.11.2026** (siehe 4d) (Fußzeile
         „US-Firmen: Staat und Politik“, Sitemap), Kongress-Teil fehlt dort, weil `daten/kongress.csv` lokal bleibt.
       - Manuell (vierteljährlich): `us_firmen`, `staatsauftraege` (Zuordnung löschen für Neuprüfung), `spenden`.
 - [ ] **4d. Lobbying:** `lda.gov/api/v1/` (und das alte `lda.senate.gov`) antworten 06.11.2026 mit 403 von Akamai, auch die
@@ -323,50 +192,6 @@ Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
       (1.001–15.000 $ …). Reihenfolge: 1) Kongress-Geschäfte (House, dann Senat), 2) Politikerseiten wie Pelosi,
       3) Trump/Regierung (OGE Form 278-T), 4) Lobbying (Senate LDA, offizielle API), Staatsaufträge (USAspending, offizielle
       API), Spenden (FEC, offizielle API). Vermögen schätzen (Jahresmeldung, Spannen) und Patente erst später.
-
-## Laufendes Vorhaben: Firmenlogos, Stand 31.10.2026
-
-Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): einmal laden, lokal in `docs/logos/` speichern
-(keine fremden Dienste beim Seitenaufruf), von Hand durchsehen, erst danach auf der Website einbauen.
-- [x] 1. **Skript (31.10.2026, nicht gepusht):** `python3 logos_laden.py` (`--neu` lädt alles neu) → `docs/logos/<ISIN>.svg|png|jpg`
-      (1,4 MB), Liste `daten/logos.csv` (isin, name, datei, quelle, url), Übersicht `logos_uebersicht.html` (im
-      Projektordner, nicht in `docs/`, in `.gitignore`). Quelle Wikidata (ISIN P946 → Logo P154, Datei von Commons);
-      `daten/logos_hand.csv` (isin,url) hat Vorrang. Per ISIN 88 von 97; die übrigen per Namenssuche bei Wikidata
-      gefunden und in die Handliste eingetragen (Fresenius 2. ISIN, Qiagen, Aroundtown, Fuchs ×2, Jenoptik, Renk, Schaeffler).
-      **Ergebnis 97 von 97.** Hochtief fehlte bei Wikidata und Commons → SVG von hochtief.com in die Handliste. Keine SVG enthält `<script>`.
-- [ ] 2. **Tobias:** Übersicht durchsehen. Verdacht auf veraltete Logos (Claude, nicht geprüft): Nordex (mit „acciona“),
-      TUI (mit „Aktiengesellschaft“), Jenoptik (blaues Kästchen), Hella (Forvia-Doppellogo), Porsche AG (Wappen statt Schriftzug),
-      Fuchs (kleines PNG mit Werbespruch).
-- [x] 2a. Tobias 31.10.2026: „Passt, alles einbauen“ (Verdachtsfälle bleiben vorerst).
-- [x] 3. **Eingebaut (31.10.2026, nicht gepusht):** `seiten.logo_datei`/`firmenlogo` (Logo neben dem Namen im Kopf der
-      Firmenseite, weiße Kachel auch im dunklen Modus, ohne Logo Anfangsbuchstabe), Feld `logo` in `firmen.json`
-      (`export.py`), kleines Logo in der Firmenliste der Startseite (`start.js`), Stile `.firmenlogo`/`.titelzeile` am Ende
-      von `style.css`. Lokal geprüft per Bildschirmfoto (SAP hell, Hochtief dunkel 420 px, Firmenliste): 94 von 94 Seiten mit Logo.
-      Die Firmenseiten baut der Bot beim nächsten Lauf neu.
-      **Nachtrag 31.10.2026 (Tobias):** Logo groß rechts im Kopf der Firmenseite (`.firmenkopf`, `.firmenlogo.gross` 220×96,
-      unter 600 px 112×52) statt klein vor dem Namen. Live fehlten die Logos nach dem Push, weil der Bot ohne neue BaFin-Meldung
-      nicht neu rechnet (und `--immer` nur werktags) → nach Änderungen an `seiten.py` Action „Daten aktualisieren“ mit „immer“ starten. Noch nicht in Ticker, Cluster und Ranking (nur Firmenname).
-      **Nachtrag 06.11.2026:** Die CSS-Regeln aus dem Nachtrag waren nie in `style.css` angekommen (Commit e059200 enthielt nur
-      die Aktionärsring-Stile), deshalb stand das Logo klein links. Jetzt ergänzt: `header.firmenkopf` (Flex, Logo rechts),
-      `.firmenlogo.gross` 240×104, unter 600 px 120×56. Lokal geprüft (Rheinmetall 1300 px, SAP 520 px). Gepusht 06.11.2026 (ead6284).
-- **Tooltip Kursdiagramm (06.11.2026, Tobias):** Bei 5 Jahren lag weniger als 1 px pro Handelstag, Insider-Punkte waren
-  kaum zu treffen. `liniendiagramm` in `gemeinsam.js`: Marker im Umkreis von 16 px rasten ein (sonst wie bisher nächster Tag).
-  Test RHM 5 Jahre, Maus 8 px neben jedem Punkt: vorher 2/64, nachher 64/64 Tooltips mit Geschäft. Gepusht 06.11.2026.
-- **Kapitelleiste Firmenseite (06.11.2026, Tobias: „bau es so im heutigen Stil“):** `seiten.mit_kapiteln` gibt jeder
-  `<section class="karte"><h2>` eine `id` und baut daraus `<nav class="kapitel">` (fehlende Kapitel fallen von selbst weg).
-  Ab 1240 px Leiste links (180 px, mitlaufend, `.kapitel-raster` als Raster um Kopf/Leiste/Inhalt/Fuß), darunter waagerechte
-  Zeile oben (mitlaufend, wischbar). `firma.js` markiert das aktuelle Kapitel. Geprüft an RHM (hell/dunkel 1400 px, 520 px,
-  Sprünge per Messwert). Aussehen nur vorläufig, kommt mit der Neugestaltung neu. Gepusht 06.11.2026; live erst nach Bot-Lauf „immer“.
-- **Kapitelleiste auch auf der Startseite (07.11.2026, Tobias):** `docs/index.html` von Hand ergänzt (`.kapitel-raster`,
-  `nav.kapitel`, `id` je Karte; „Sonntags-Report“ behält `#newsletter`). Markier-Skript von `firma.js` nach `gemeinsam.js`
-  verschoben (läuft nur, wenn eine Leiste da ist). Geprüft 1400/520 px, Sprünge zu Timing/Firmen/Report, RHM weiter ok.
-  Sicherung: `.recherche/sicherung_kapitel_start/`. Neue Karte auf der Startseite → Link in der Leiste von Hand ergänzen.
-  **Fehler und Reparatur 07.11.2026:** Die Sprungmarken `#cluster` und `#firmen` gab es schon als Ids der Listen,
-  `start.js` füllte deshalb die ganze Karte (Firmenliste und Cluster zerschossen, live). Umbenannt in `#cluster-kaeufe`
-  und `#firmenliste`; keine doppelten Ids mehr auf Start- und Firmenseiten. Lehre: vor neuen Ids nach vorhandenen suchen.
-- **Kursreaktion je Ereignis (06.11.2026, Tobias):** Tabelle jetzt neueste zuerst (`sort_values(..., ascending=False)`). Gepusht 06.11.2026.
-- **Erklärtexte volle Breite (06.11.2026, Tobias):** `max-width: 760px` bei `.karte .erklaerung` entfernt, gilt für alle Karten. Geprüft RHM „Aktionäre“ 1400 px. Gepusht 06.11.2026.
-- Rechtlich: Logos nur zur Kennzeichnung der Firma zeigen, kein Anschein einer Partnerschaft → zu „vor dem Livegang klären“.
 
 ## Marketing und Website (Planungs-App #9), Stand 30.10.2026
 
@@ -448,95 +273,37 @@ CTA: Newsletter, Formular mit **EmailOctopus** (läuft schon in `roleplay-landin
   Event Study). Neu gegenüber dem Design System: Gold `#c9a961` als Akzent (nur Vorschlag). Sentiment als Platzhalter
   „In Arbeit“. **Wartet auf Tobias' Wahl** (auch gegenüber den ersten drei Richtungen).
 
-## Nächste Schritte (Stand 31.10.2026, nach Rauszoomen mit Tobias)
+## Sentiment und News (Alleinstellungsmerkmal), Stand 08.11.2026
 
-Ziel bleibt: Startup, Finanzdaten-Plattform „GuruFocus für Europa, günstiger“ + „Folge den Profis“ + Sentiment.
-Fundamentaldaten sind dafür Pflicht, aber nicht das Alleinstellungsmerkmal.
-**Korrektur Tobias 06.11.2026:** Insider, Großaktionäre, Rückkäufe, Guru-Depots und alles Bisherige sind KEIN
-Alleinstellungsmerkmal (haben etablierte Anbieter auch). Das Alleinstellungsmerkmal soll eine **Sentimentanalyse von
-Reddit und Twitter/X für Krypto und Pennystocks** werden, die es bei etablierten Anbietern bisher nicht gibt.
-Reihenfolge laut Empfehlung Claude:
-1. ✅ **Eulerpool eingebaut (31.10.2026, Details unter Fundamentaldaten, Block „Eulerpool“).** Ursprünglicher Auftrag: Leser in `pipeline/fundamental.py`
-   (GuV, Bilanz, Cashflow, Schätzungen; Ist-Jahre von Schätzjahren trennen; Werte in Mio. → ×1e6; verschlüsselte
-   Antworten überspringen, nie entschlüsseln), in `kennzahlen.PRIORITAET` vor onvista/TradingView für EBIT und
-   Schätzungen; dann alle Firmen automatisch gegen `/api/1/aaqs/by-isin` abgleichen (nur Prüfung, nicht anzeigen) und
-   Formeln nachschärfen (ROCE, Verschuldung). Danach Fundamentaldaten als fertig betrachten, **nicht weiter ausbauen**.
-2. **Kleine Fehler auf der Live-Seite zuerst beheben:** Rückkäufe „keine Daten“ ✅ (31.10., gepusht);
-   Taktung: cron-job.org einrichten (Tobias, Abschnitt Offen).
-3. **Positionierung: erledigt 31.10.2026** (siehe Marketing Schritt 1). Name: **Rhodus** (31.10.2026, TMview frei), Untertitel offen.
-4. **Newsletter „Sonntags-Report“ + 5–10 Gespräche mit Anlegern** (Marketing Schritt 2–3): erste echte Rückmeldung.
-5. **Architektur entschieden (31.10.2026, `ARCHITEKTUR.md` unten):** Supabase (Postgres, kostenlos), Sammler bleiben
-   in GitHub Actions, kein Hetzner bis MVP, 0 € bis MVP. Umsetzung (Block 1–2) nach der Positionierung (erledigt) und
-   bevor das Universum über DAX/MDAX hinaus wächst, **kann also jetzt starten**; braucht ein Supabase-Konto von Tobias.
-   Website-Technik ist noch festzulegen.
-6. **Vor dem Livegang:** Rechtslage der Quellen; legaler Weg mit Anzeigerecht wäre Eulerpool Builder (99 $/Monat).
+**Stand 09.11.2026:** Tobias hat am 06.11.2026 den Schwerpunkt gewählt: **Sentiment aus Reddit und X für Krypto und
+Pennystocks** (Alleinstellungsmerkmal). Private Probe in `~/Desktop/Claude/sentiment-probe` (eigene CLAUDE.md), nächster
+Schritt Krypto-Wale (#78). Die Liste unten ist der Vorschlag vom 28.10.2026 (frühere Überschrift: „Freigabe Tobias steht aus“).
 
-## Einstieg für einen neuen Chat (Stand 28.10.2026)
+Tobias 28.10.2026: „Ich brauche unbedingt eine Sentiment- und News-Sektion“, ohne KI-Agent. **Vorgabe: Startup, kein
+Hobbyprojekt. Tech-Stack offen (eigene Datenbank kommt), Markt global, nicht auf GitHub Actions oder Deutschland beschränken.**
+Gründliche Prüfung von last30days-skill: `DATENQUELLEN.md` Abschnitt 4.
 
-**Was das ist:** Tobias baut aus dem Insider-Monitor
-ein **Startup**: eine Finanzdaten-Plattform nach Vorbild GuruFocus/AlleAktien, **global** (Deutschland, USA, weitere
-Märkte), mit eigener Datenbank. Der heutige Stand (statische Website auf GitHub Pages, Python-Pipeline in GitHub Actions)
-ist nur der Anfang; **Tech-Stack ist offen**, Umzug auf eine richtige Datenbank ist geplant.
+Vorschlag (Reihenfolge offen, Entscheidung Tobias):
+- [ ] **Ranking-Engine aus last30days übernehmen** (MIT, nur Standardbibliothek): einheitliches Datenmodell, Relevanz,
+      Engagement-Gewichtung, Rank Fusion, Duplikate, Story-Cluster → Grundgerüst für News-Feed und Sentiment.
+- [ ] **Quellen anbinden:** Pflichtmeldungen (EQS, SEC 8-K), Polymarket, Stellenanzeigen (Greenhouse/Lever/Ashby),
+      Bluesky, Hacker News, Reddit (Arctic-Shift-Archiv, interne Seitenteile), X (Cookies/GraphQL oder API), YouTube (yt-dlp),
+      StockTwits und alle weiteren Anschlüsse aus `DATENQUELLEN.md` Abschnitt 4.
+- [ ] **Stimmungswert je Firma und Tag** in der Datenbank: jede Meldung/jeden Beitrag einmal bewerten (Finanz-Wörterbuch,
+      FinBERT oder Sprachmodell im Stapel), Firmenzuordnung über ISIN/Ticker; danach Event Study auf Stimmungsänderungen.
+- [ ] **Lizenzierte Nachrichten** für die News-Sektion prüfen: GDELT (frei), Benzinga/Polygon/Tiingo (bezahlt).
+- [ ] **Nächster Schritt: Krypto-Wale (Tobias 08.11.2026, Planungs-App #78).** Test eine Woche: große Überweisungen
+      auf Solana/Ethereum über Gratis-Schnittstellen (Etherscan, Solana-RPC, mempool.space), Börsenadressen erkennen
+      (Zufluss zur Börse = möglicher Verkauf), bei neuen Memecoins Entwickler-/Sniper-/gebündelte Käufe vor dem Start
+      (Vorbild Bubblemaps). Ziel: „Wal/Entwickler kauft vor dem Reddit/X-Hype“ als Teil des Alleinstellungsmerkmals.
+      Recherche `DATENQUELLEN.md` Abschnitt 10; Optionsfluss à la Bullflow verworfen (anonym, Lizenz, kein USP).
+**Tobias 28.10.2026: Alles Recherchierte wird übernommen**, auch Cookies und Umgehung von Bot-Sperren (noch nicht live,
+kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLEN.md`). Stand 28.10.2026: noch nichts
+gebaut, erst Recherche (überholt, siehe Stand oben).
 
-**Aktuelle Phase: Recherche.** Noch nichts davon gebaut. Ergebnisse in `DATENQUELLEN.md` (zuerst Lesehinweis und
-Abschnitt 7 lesen). Geprüft: OpenBB, last30days-skill, FinceptTerminal.
+# Erledigte Vorhaben
 
-**Lesereihenfolge:** diese Datei (Stand, Vorhaben, Offen) → `DATENQUELLEN.md` (Quellen für den Ausbau) →
-`GURUFOCUS.md` (Vorbild, Aufbau der Seiten) → `ALTERNATIVE_DATEN.md` (Rechtslage, Meldeschwellen, Ausbauideen) →
-`BESTANDSAUFNAHME.md` (alte eigene Projekte) → `README.md` (Dateien und Befehle).
-
-**So arbeitet Tobias (bitte einhalten):**
-- Deutsch, einfache Sprache, direkt; widersprechen, wenn er falschliegt; klare Empfehlung statt Optionsliste.
-- **Startup-Sicht:** Repositories und Quellen nach Nutzen fürs Produkt bewerten, nicht nach „passt in die GitHub Action“
-  oder „nur deutsche Aktien“. In der Recherche **alles aufnehmen**, auch graue Wege (Browser-Cookies, Umgehung von
-  Bot-Sperren); Rechtslage nur als Hinweis „vor dem Start klären“.
-- **Nicht ungefragt bauen:** Fragt er „Ist X nützlich?“, ist das eine Recherchefrage, kein Bauauftrag.
-- **Alles notieren**, laufend in dieser Datei (Stand, Offen, Verlauf) und in den Recherchedateien.
-- Er **pusht selbst**: am Ende jedes Schritts die Befehle zum Committen/Pushen als Codeblock geben (Dateien einzeln
-  `git add`, nie `git add .`; `.env` mit API-Schlüssel ist in `.gitignore`).
-- Bei schweren Datenquellen fertige Lösungen bevorzugen, bei einfachen schlank selbst bauen.
-
-**Offene Entscheidungen von Tobias:** Reihenfolge des Ausbaus (Sentiment/News, USA über SEC, Datenbank-Umzug);
-ob die Regel „kein Fincept-Code“ bleibt (Urheberrecht AGPL, nicht nur Nutzungsbedingungen); Taktung der Action (s. „Offen“).
-
-
-## Aktueller Stand (22.10.2026 abends)
-
-**Live:** BaFin-Meldungen ab 22.10.2025 (alle 30 Min.) plus EQS-Archiv 2018 bis 21.10.2025; Event Study über
-1.572 Ereignisse; Cluster-Käufe mit Telegram; Ranking „Timing der Insider“ (265 Personen); Impressum ausgefüllt.
-Ergebnis: Käufe AAR t0 +0,24 %*, t+1 +0,23 %*, vorher signifikant negativ; Verkäufe t+1 −0,41 %*.
-Jahreszahlen EQS passen zu den BA-Daten (2018: 211 vs. 239, 2019: 219 vs. 194, 2021: 497 vs. 452).
-
-**Seit 22.10.2026 abends ebenfalls live** (Umsetzung GURUFOCUS.md Punkt 1–4): Firmenseiten als fertiges HTML unter
-`/firma/<TICKER>/` (`pipeline/seiten.py`, Texte mit `html.escape`, Markierungen als eingebettetes JSON), Kurse in
-`docs/data/kurse/<TICKER>.json`, Weiterleitung `firma.html?t=…`, `sitemap.xml`, `robots.txt`, automatische
-Versionsnummern `?v=<Prüfsumme>`, Speculation Rules auf der Startseite. `ereignisse.json` und `data/firmen/` entfernt
-(7,5 → 4,8 MB). GBp-Fix (TUI/Unifirm, 16 Meldungen repariert). Live geprüft: 6 Firmenseiten antworten (200),
-Deutz/SAP per Screenshot korrekt, Diagramm auch bei 500 px Breite (63 Markierungen bei Rheinmetall).
-
-**Befund Taktung (22.10.2026):** Mit `*/30` hat GitHub in 17 Stunden nur 3 geplante Läufe gestartet (alle erfolgreich).
-Geändert auf `13,43 * * * *` (krumme Minuten, lokal, **noch nicht gepusht**). Nach 1–2 Tagen prüfen:
-`curl -s "https://api.github.com/repos/tobzwil89/insider/actions/workflows/aktualisieren.yml/runs?per_page=100"`.
-Reicht das nicht, externen Auslöser nehmen (z. B. cron-job.org ruft `workflow_dispatch` über die GitHub-API auf;
-braucht ein Token mit Actions-Recht).
-
-**Abgleich mit dem ursprünglichen Plan** (Auftrag vom 21.10.2026): Action prüft BaFin regelmäßig ✅ (Taktung s. o.),
-Kurse + AR nach BA-Methode + JSON ✅, GitHub Pages unter insider.tobiaszwilling.me ✅, Live-Ticker ✅, Cluster-Käufe ✅,
-Kurs mit Insider-Markierungen ✅, CAR-Kurve Käufe vs. Verkäufe laufend ✅, Ranking bestes Timing ✅, Telegram bei
-Clustern ✅, „keine Anlageberatung“ + Impressum ✅. Zusätzlich: Historie 2018–2025 aus EQS, Methode-Seite, Firmenseiten als HTML.
-
-**Was manuell bleibt** (alles andere läuft automatisch):
-1. Vierteljährlich nach Indexänderungen (März, Juni, Sept., Dez.): `python3 -m pipeline.firmen`, Ergebnis prüfen, pushen;
-   danach „Historie laden“ starten (lädt nur neue Firmen, weil die Fortschrittsliste sie nicht kennt).
-2. Bei E-Mail von GitHub über einen fehlgeschlagenen Lauf: nachsehen (meist BaFin/Yahoo/EQS kurz nicht erreichbar,
-   der nächste Lauf holt alles nach; dauerhaft nur bei Formatänderungen der Quellen).
-3. Gelegentlich prüfen, ob die geplanten Läufe noch aktiv sind (60-Tage-Regel; der tägliche Lauf committet immer,
-   das sollte als Aktivität reichen).
-
-**Review:** `/code-review ultra` ist kostenpflichtig (nicht kostenlos). Empfehlung: `/code-review high` lokal in einem
-neuen Chat (frischer Blick, kein Zusatzpreis über die normale Nutzung hinaus), vor dem GuruFocus-Ausbau.
-
-## Laufendes Vorhaben: Stimmrechtsmitteilungen (§§ 33 ff. WpHG) ab 2018
+## Erledigt: Stimmrechtsmitteilungen (§§ 33 ff. WpHG) ab 2018 (abgeschlossen 30.10.2026)
 
 Auftrag Tobias 22.10.2026: Stimmrechte aus EQS, Historie **ab 2018**, in Blöcken, die man jederzeit abbrechen kann und
 die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notieren. Danach: Rückkäufe. Probe-Ergebnisse:
@@ -576,13 +343,13 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
         Bekannt, nicht behoben: Scout24 2019, 2 Mitteilungen Sand Grove ohne Prozentwerte.
       - 214 × `anderes`: 74 eigene Aktien, 13 × § 43, Korrekturen; **Aroundtown 60** (luxemburgisches Formular, wie bei
         Directors' Dealings nicht unterstützt) und ~40 verstreute (Elmos 9, Delivery Hero 7, Beiersdorf 6 …), noch nicht angesehen.
-- [x] **Block 4 – Laufend aktuell halten (28.10.2026, noch nicht gepusht):** `stimmrechte_laden.py --tage 14` lädt für
+- [x] **Block 4 – Laufend aktuell halten (28.10.2026, gepusht f71f27b):** `stimmrechte_laden.py --tage 14` lädt für
       alle Firmen nur Mitteilungen der letzten 14 Tage, die noch fehlen; Fortschrittsliste bleibt unberührt.
       Eigener nächtlicher Zeitplan in `stimmrechte.yml` (`37 2 * * *`, höchstens 60 Min.), weil der Lauf **~12 Min.**
       dauert (EQS-Pause 2 s je Abruf) und das 15-Min.-Limit von „Daten aktualisieren“ sprengen würde. Knopfdruck
       lädt weiter die Historie. Lokal getestet: 12 Min., 28 neue Mitteilungen (23.–28.10.), keine Duplikate, keine
       leeren Pflichtfelder. Nach dem Push: am nächsten Morgen unter Actions prüfen, ob der Lauf um ~03:37 Uhr lief.
-- [x] **Block 5 – Anzeige (28.10.2026, noch nicht gepusht):** Abschnitt „Großaktionäre“ auf jeder Firmenseite
+- [x] **Block 5 – Anzeige (28.10.2026, gepusht f26ea18):** Abschnitt „Großaktionäre“ auf jeder Firmenseite
       (`stimmrechte.grossaktionaere`, Aufruf in `export.py`, HTML in `seiten.py`). Je Firma und Halter die letzte
       Mitteilung (nach Schwellendatum). Gezeigt nur **≥ 3 % Aktien oder ≥ 5 % zusammen**: Darunter kann ein Halter
       ohne Meldung aussteigen (Schwellen Instrumente/Summe beginnen erst bei 5 %), der Stand wäre unsicher.
@@ -608,7 +375,7 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
             `formular=anderes` dort und zusätzlich mit Text nach `stimmrechte_texte.csv`. Leser kennt jetzt auch das alte
             Datumsformat (ohne „/“, sonst aus dem EQS-Kopf). Getestet: Krones (13, ab 2008) und Talanx (1) lokal geladen.
             Workflow „Stimmrechte laden“ hat den Schalter „Archiv vor 2018“. **Tobias:** pushen, mit Haken starten,
-            wiederholen bis „Alle Firmen fertig“.
+            wiederholen bis „Alle Firmen fertig“. **Erledigt:** gepusht 687ebfe, alle 90 Firmen in `stimmrechte_alt_fortschritt.csv`.
       - [ ] **6b – Auslesen mit DeepSeek** (lokal, Schlüssel in `.env`, steht in `.gitignore`): je Text Halter, Sitz,
             Schwellendatum, Aktien/Instrumente/Summe als JSON → Zeilen mit `formular=fliesstext` in `stimmrechte.csv`.
             Erst 30 Texte gegen Handprüfung, dann alle. Anzeige: Hinweis „Stand laut Mitteilung von …“, Text auf der
@@ -633,7 +400,7 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
                   Hueck/Hella, Wacker/Siltronic (57,8 statt ~31 %), Renk 2011 = alte Renk AG. Richtig: HDI/Talanx,
                   Kronseder/Krones, KPS+Schulenberg/Eventim, Quandt/BMW, Henkel-Pool, Weichai/Kion, Nemetschek.
                   **Tobias 29.10.2026: Daten nur als Kandidatenliste, von Hand prüfen.**
-            - [x] **6c – Geprüfte Großaktionäre (29.10.2026, nicht gepusht):** `daten/grossaktionaere_geprueft.csv`
+            - [x] **6c – Geprüfte Großaktionäre (29.10.2026, gepusht fb2962f):** `daten/grossaktionaere_geprueft.csv`
                   (firma, halter, aktien, stand, geprueft, quelle), eingelesen in `export.py`, verarbeitet in
                   `stimmrechte.grossaktionaere(df, geprueft)`: Halter mit Wert ersetzt den automatischen Eintrag (Schlüssel
                   über `_schluessel`), ohne Wert blendet ihn aus, `*` blendet alle automatischen Einträge der Firma vor `stand`
@@ -654,7 +421,141 @@ die nicht auf Tobias' Rechner laufen (GitHub Action). Alles laufend hier notiere
 - Porsche SE / Porsche AG (28.10.2026): 100 % je Familienmitglied ist korrekt (Stammaktien vollständig zugerechnet,
   gehandelt werden nur Vorzüge). Hinweis auf der Seite über `seiten.NUR_VORZUG`; „Name (1.)“ = „Name“ im Schlüssel.
 
-## Laufendes Vorhaben: Aktienrückkäufe (Art. 5 MAR) ab 2018
+## Erledigt: Stimmrechte, Nacharbeiten 30.10.2026 (Doppelzählungen, Hugo Boss)
+
+30.10.2026 umgesetzt (gepusht 7f6b4cf): Auslöser war Tobias' Hinweis „Hugo Boss über 100 %“.
+- **Stände vor 2018 ausgeblendet** (Tobias: ja): automatische Einträge mit Schwellendatum < 2018 fallen weg, geprüfte bleiben.
+- **Doppelzählungen** in `stimmrechte.grossaktionaere`: (a) *Konzernkette*: Halter, die je am selben Tag denselben Bestand
+  gemeldet haben, bilden eine Kette; je Kette gilt der neueste Stand (vor dem 3-%-Filter, damit Unterschreitungen zählen:
+  Parsifal 3,05 % → David Zorub 2,92 %); gleicher Bestand → eine Zeile, weitere Namen klein darunter („dieselben Aktien
+  auch bei“). (b) *Umfirmierung*: ein Halter mit gleichem Namensanfang (4 Zeichen) meldet später genau diesen Stand als
+  „vorher“ (PFC S.r.l. → PFC S.p.A., Norwegen-Schreibweisen). Ohne Namensbedingung 83 Treffer mit Fehlern (Bund/Hensoldt,
+  Bertermann/Auto1) → verworfen. Ebenso verworfen: gleicher Wert ab 10 % an verschiedenen Tagen (löschte Bund 25,1 %).
+- Sortierung nach Aktien statt Zusammen; Erklärtext: Instrumente sind keine Aktien, Spalten Instrumente/Zusammen nicht addierbar.
+- Geprüfte Liste ergänzt: Porsche, Porsche SE, Traton → eine Zeile „Familien Porsche und Piëch“ (100 / 100 / 87,52 %,
+  Mitteilungen 04.04.2025, `*` vor 05.04.2025); Knorr-Bremse: Heinz Hermann Thiele ausgeblendet (Erbfall 2021, Stiftung 58,99 %).
+- Ergebnis: 309 Zeilen bei 83 Firmen, keine Firma mehr über 100 % in Aktien. Hugo Boss 70,2 %
+  (Ashley 49,41, Zignago/PFC 14,15, Silchester 5,08, Banken/Händler 1,6). Screenshot geprüft, `docs/` zurückgesetzt.
+- **Rheinmetall/Scout24:** kein Leserfehler, EQS zeigt bei je einer Mitteilung (2016) einen fremden KKR-Pressetext →
+  `stimmrechte.DEFEKT` (als `anderes`), beide Firmen fertig. `stimmrechte_laden.py` meldet offene Firmen jetzt
+  („Noch offen (n): …“), getestet mit simuliertem Fehler.
+- **Von Hand nachgetragen (30.10.2026, nach den Mitteilungen geprüft):** Brenntag Kühne Holding 20,10 % (Stähelin meldet als
+  Testamentsvollstrecker, eine Zeile); Fonds stecken im Anteil ihres Verwalters → Fonds ausgeblendet: Artisan Funds (Brenntag,
+  Adidas), Flossbach SICAV (Brenntag, Bechtle), First Eagle Global Fund (Merck); FMC: alte Dodge-&-Cox-Meldung 2022 aus,
+  Fonds 2026 bleibt. Nemetschek: Ralf 2022 ausgeblendet (dieselbe Nemetschek-Stiftung, heute 45,07 % laut Georg 02.07.2026).
+  Ergebnis 303 Zeilen. Rebase-Konflikt in `daten/stimmrechte.csv` (Bot hatte angehängt) gelöst, beide Teile behalten, Sicherung
+  im Branch `sicherung-vor-rebase` (nach erfolgreichem Push löschbar: `git branch -D sicherung-vor-rebase`; Zweig existiert am 09.11.2026 nicht mehr).
+- **Bekannte Reste:** Leser speichert bei manchen Familienformularen nur Vornamen („Dr. Wolfgang“, „Georg F.W.“,
+  „Maria Elisabeth“). Neue Fonds-/Verwalter-Paare tauchen mit neuen Mitteilungen auf → bei der jährlichen Prüfung der
+  geprüften Liste mit ansehen. Verschoben (Tobias): Henkel-Poolmeldungen `anderes`, 806 Fließtexte 2008–2012 (DeepSeek).
+**Vorhaben Stimmrechte ist erledigt** (Tobias 30.10.2026). Rückkäufe: siehe eigenes Vorhaben (Block 4 erledigt 30.10.2026).
+
+## Erledigt: Aktionärsring (Planungs-App #65), 31.10.2026, nur noch Pflege
+
+Auftrag Tobias 31.10.2026: Auf der Firmenseite soll man sehen, wer wie viel hält, aufgeteilt auf fast 100 %. Heute stehen
+dort im Median ~36 % Großaktionäre, der Rest fehlt und wirkt unvollständig. **Darstellung: Ring** (Entscheidung Tobias),
+Aussehen nach Entwurf von Tobias (nicht selbst gestalten). Grundsatz: Der Ring zeigt 100 %, aber nicht 100 % mit Namen;
+der unbekannte Rest wird benannt, nie erfunden (Aktienregister nicht öffentlich, Meldepflicht erst ab 3 %).
+
+**Test N-PORT (31.10.2026, Skripte `.recherche/nport_test.py`, `.recherche/nport_netto.py`, Treffer
+`.recherche/2026q2_nport_treffer.csv`):** SEC-Datensatz „Form N-PORT Data Sets“
+(`www.sec.gov/files/dera/data/form-n-port-data-sets/<JJJJ>q<N>_nport.zip`, ~440 MB gepackt je Quartal, alle US-Fonds mit
+vollständigen Beständen, Stichtag bis ~3 Monate alt). Direkt aus dem Zip gelesen (25 s), Tabellen IDENTIFIERS (ISIN) →
+FUND_REPORTED_HOLDING (Stück, nur `UNIT=NS`, `ASSET_CAT=EC`) → FUND_REPORTED_INFO/REGISTRANT/SUBMISSION; je Fonds
+(`SERIES_ID`) nur der neueste Bericht; Prozent = Stück / Gesamtstimmrechte aus der letzten Stimmrechtsmitteilung.
+Ergebnis (2026q2, Stichtage meist 31.03.2026):
+- US-Fonds halten im Median **10,7 %** (DAX 14,1, MDAX 7,6; Spitze Brenntag 31 %, Lanxess 25 %).
+- **Netto nach Abzug der Überschneidung** (Fondsfamilie steckt schon im Großaktionär, z. B. iShares in BlackRock, MFS bei
+  Zalando): Median **+8,7 Prozentpunkte** mit Namen. Mit Namen zusammen dann Median 48 % statt 36 %.
+  Beispiele (groß → zusammen): SAP 26 → 36 %, Zalando 22 → 33 %, Siemens 10 → 22 %, Allianz 8 → 17 %, Hugo Boss 70 → 78 %.
+  32 von 81 Firmen bleiben unter 40 % mit Namen. Erwartung vorher (10–25 Pp.) war zu hoch, die Wirklichkeit liegt am unteren Rand.
+- ADR/andere ISIN bringen wenig (SAP +0,4 %). Fehlende Treffer: Fresenius, Qiagen (andere ISIN, vgl. `EP_KENNUNG`);
+  Firmen mit zwei Gattungen (VW, Henkel, Sartorius, BMW, Porsche) brauchen Gesamtzahl je Gattung, sonst falsche Prozente.
+- Fondsfamilien-Zuordnung im Test grob über Stichwörter → im echten Bau saubere Tabelle Fondsgesellschaft → Konzern.
+
+**Plan (Schritt für Schritt, je Schritt abbrechbar):**
+- [x] 1. **Ring gebaut (31.10.2026, gepusht 79c9b0b).** Tobias: „einfach einen Ring, in unseren Farben“ (kein Entwurf nötig).
+      `seiten.aktionaersring(aktionaere)` über der Großaktionärs-Tabelle: CSS-Ring (`conic-gradient`, kein Skript), nur Spalte
+      Aktien (Instrumente sind keine Aktien), Halter ≥ 1 % einzeln (höchstens 7), kleinere als „Weitere gemeldete Halter“,
+      Summe auf 100 % gedeckelt; Blau `--kauf` in abnehmender Stärke, Rest „Übrige Aktien“ (Streubesitz, Halter unter 3 %,
+      eigene Aktien) in `--ring-rest` (Grau, im dunklen Modus kräftiger als `--gitter`). Mitte: „x % mit Namen bekannt“.
+      Stile `.ring*` am Ende von `style.css`. 85 Firmenseiten mit Ring. Geprüft per Bildschirmfoto hell/dunkel, 950 und 520 px
+      (SAP 26 %, Hugo Boss 70 %, Allianz 8 %). Sicherung vorher: `.recherche/sicherung_ring/`.
+- [x] 2. **Eigene Aktien im Ring (31.10.2026, gepusht 3894525).** Quelle: Mitteilungen nach § 40 Abs. 1 Satz 2 WpHG (Firma meldet
+      ihren Bestand, wenn er 3, 5 oder 10 % berührt), die schon als `anderes` in `stimmrechte.csv` lagen. Rückkäufe taugen
+      nicht (Einziehungen unbekannt). `stimmrechte.eigene_aktien_lesen` (Formular DE/EN: Abschnitt 3 Datum, „Neu“/„Resulting
+      situation“ → Anteil und Gesamtzahl), `stimmrechte.eigene_aktien` (letzter Stand je Firma ab 2018, **nur ≥ 3 %**, weil
+      darunter keine Meldepflicht mehr besteht). `stimmrechte_laden.eigene_aktien_nachladen()` läuft am Ende jedes Aufrufs
+      (auch nachts) und liest nur fehlende → `daten/stimmrechte_eigene_aktien.csv` (wird von der Action über
+      `daten/stimmrechte*.csv` mit committet). Erstlauf lokal: 123 Mitteilungen in 5 Min., keine Lesefehler.
+      **11 Firmen mit ≥ 3 %:** SAP 5,0, Scout24 5,0, Salzgitter 4,9, United Internet 10,0 (2023), FMC, Mercedes, DHL, Ionos,
+      Hochtief (2020), Lanxess (2019), Munich Re (2019) je ~3 %. Alte Stände können zwischen den Schwellen (3–5, 5–10 %)
+      veraltet sein → Datum mit Link steht in der Legende. Segment „Eigene Aktien der Firma“ in `--sonstiges` (Mittelgrau),
+      zählt zu „mit Namen bekannt“ (SAP 26 → 31 %). Keine Firma steht zugleich als eigener Großaktionär drin (geprüft).
+      Geprüft per Bildschirmfoto hell/dunkel.
+      **Nebenbefund (nicht behoben):** Halternamen mit Ort, z. B. „Salzgitter Aktiengesellschaft, Salzgitter,, Deutschland“ bei Aurubis.
+- [x] 3. **US-Fonds im Ring (31.10.2026, gepusht 3894525).** `pipeline/fonds_us.py`: `laden()` liest das neueste Quartal von
+      der SEC-Seite, lädt nur, wenn es in `daten/fonds_us.csv` noch fehlt (Zip in temporären Ordner, danach gelöscht,
+      ~1,5 Min.), behält nur unsere ISINs, je ISIN und Fondsträger eine Zeile (isin, gesellschaft, stueck, fonds, stichtag,
+      quartal; 2026q3: 9.508 Zeilen, 94 Firmen, 650 KB; nur das neueste Quartal). `KONZERNE`: Fondsträger → Konzern
+      (iShares → BlackRock, EUPAC/New Perspective … → Capital Group, Hartford → auch Wellington usw.) mit Muster für
+      Großaktionärsnamen. `je_firma` rechnet in % der Gesamtstimmrechte (letzte Stimmrechtsmitteilung) und lässt Konzerne
+      weg, die schon als Großaktionär gemeldet sind (geprüft: SAP ohne iShares, Zalando ohne MFS, Brenntag ohne Artisan,
+      Harris, Hartford). Ring: bis 4 Konzerne einzeln „(US-Fonds)“, Rest „Weitere US-Fonds“, dunkleres Blau, Stand und
+      Hinweis unter dem ersten Eintrag. **Nicht bei Firmen mit zwei Gattungen** (VW, Henkel, Sartorius, BMW, Fuchs …)
+      und Porsche (`NUR_VORZUG`), weil die Stimmrechte nur Stammaktien zählen. Workflow „Stimmrechte laden“: nachts
+      Schritt „US-Fonds laden“ (`continue-on-error`), committet `daten/fonds_us.csv` mit.
+      **Ergebnis: Median „mit Namen bekannt“ 49 % (vorher 36 %), 73 Seiten mit US-Fonds.** SAP 26 → 41 % (mit eigenen
+      Aktien), Allianz 8 → 18 %, Siemens 10 → 22 %, Hugo Boss 70 → 77 %, Brenntag 70 %. Bildschirmfoto hell/dunkel geprüft.
+      Offen: Fresenius/Qiagen ohne Treffer (andere ISIN), Vorzugsaktien-Firmen ohne Fonds (bräuchten Gesamtzahl je
+      Gattung), „Weitere US-Fonds“ oft 4–6 % (Zuordnungstabelle bei Bedarf erweitern).
+- [x] 4. **Norwegischer Staatsfonds (31.10.2026, gepusht 4b4c358).** `pipeline/norwegen.py`: NBIM-JSON-Schnittstelle der Seite
+      nbim.no/en/investments/all-investments/ (`/api/investments/v2/init.json` → neueste Datei, z. B. `2026-06-30.json`;
+      Felder n = Name, cc = Land, at = 0 Aktien, o = Eigentumsanteil %). Halbjährlich, lädt nur bei neuem Stand →
+      `daten/norwegen.csv` (firma, name_nbim, anteil, stichtag). Zuordnung über bereinigten Namen + `NAMEN` (9 Abweichungen,
+      z. B. DHL = „Deutsche Post AG“). 88 von 90 Firmen; Airbus fehlt bei NBIM absichtlich (ethischer Ausschluss), Deutz
+      nicht gehalten. Segment „Norwegischer Staatsfonds“ in `--link`; entfällt, wenn Norwegen schon Großaktionär ist
+      (Vonovia: Ministry of Finance 10,1 %) und bei Firmen mit zwei Gattungen (NBIM nennt nur einen Anteil je Firma).
+      Workflow „Stimmrechte laden“: Schritt „Norwegischen Staatsfonds laden“ nachts, committet `daten/norwegen.csv`.
+- [x] 5. **Vorzugsaktien und Firmen ohne EQS-Stimmrechte (31.10.2026, gepusht 4b4c358).** `daten/aktiengattungen.csv`
+      (firma, isin, gattung stamm/vorzug/einzig, stueck, eigene, stand, quelle; alle Zahlen mit Quelle, Fuchs nach HV 05/2026
+      65,5 Mio. je Gattung). `export.ring_daten` (Hilfsfunktion in `exportiere`): Stammseite = Großaktionäre + US-Fonds der
+      Stamm-ISIN / Stammaktien; Vorzugsseite = nur US-Fonds der Vorzugs-ISIN / Vorzugsaktien (+ eigene Aktien), Satz über dem
+      Ring „Der Ring zeigt die Vorzugsaktien …“; `einzig` = eine Gattung, Gesamtzahl aus der Tabelle (Wacker, DWS haben keine
+      EQS-Stimmrechte). Fresenius/TUI (alte + neue ISIN) zählen jetzt alle ISINs der Firma. Kein Ring, wenn nichts bekannt ist.
+      `firmenseite(ring=…)` statt einzelner Argumente. **Geprüfte Großaktionäre ergänzt** (`grossaktionaere_geprueft.csv`):
+      VW (Porsche SE 53,3, Niedersachsen 20,0, Katar 17,0; VW-Seite Aktionärsstruktur 31.12.2025), Sartorius (Testaments-
+      vollstrecker 50,3, Bio-Rad 34,8, eigene Aktien 8,6 % der Stämme; H1-Factsheet, auf ausgegebene Aktien umgerechnet),
+      Wacker (Familie 66,9 = 100 − Streubesitz 33,09 laut IR), DWS (Deutsche Bank 79,5), Airbus (SOGEPA 10,83, GZBV 10,82,
+      SEPI 4,08; Zweitquelle uamr.de, Stand 31.12.2025), RTL (Bertelsmann 75,1; Quelle Wikipedia, Angaben schwanken 75,1–76,3).
+      **Namen bereinigt:** `stimmrechte.anzeigename` kürzt „Name, Ort, Land“ nur, wenn der letzte Teil ein Land ist
+      (Salzgitter-Fall); 11 Kandidaten geprüft, „Günter, Prof. Dr. Zimmer“ und „ACS, ACTIVIDADES …“ bleiben ganz.
+      **Ergebnis:** 94 Seiten mit Ring, Median „mit Namen bekannt“ ohne Vorzugsseiten **50,5 %** (Start: 36 %); VW-Stämme 91 %,
+      Sartorius 94 %, DWS 81 %, RTL 76 %, Wacker 73 %, Airbus 26 %. Vorzugsseiten 2–9 % (dort gibt es keine Meldepflicht).
+      Bildschirmfotos hell/dunkel geprüft.
+- [x] 6. **Darstellung überarbeitet (31.10.2026, Rückmeldung Tobias mit Bildschirmfoto Commerzbank):** Ring wirkte nach links
+      verschoben, Blautöne nicht unterscheidbar, zwei Listen (Legende + Tabelle) mit widersprüchlichen Zahlen (BlackRock
+      3,1 % Aktien im Ring, 4,38 % „Zusammen“ in der Tabelle). Lösung: `seiten.aktionaersstruktur` ersetzt `aktionaersring`
+      + Großaktionärs-Tabelle: **eine Tabelle = Legende** (Farbfeld, Halter, Anteil, Stand) rechts neben dem Ring über die
+      volle Breite (CSS-Grid 180 px | Rest, unter 640 px untereinander). **Nur Aktienanteil**, Spalten Instrumente/Zusammen
+      entfallen; Instrumente klein beim Halter („zusätzlich x % über Instrumente, zählen nicht mit“). Kleine Halter in
+      „Weitere gemeldete Halter“ mit Namen, Link und Instrumenten klein. US-Fonds als eine Zeile mit Aufteilung klein.
+      Farben: feste kategoriale Palette `--serie-1…8` (dataviz-Richtlinie, gleiche Familie wie `--kauf`/`--verkauf`,
+      hell/dunkel mit `validate_palette.js` geprüft: alle Pflichtprüfungen bestanden, Kontrastwarnung durch beschriftete
+      Tabelle abgedeckt), 2-px-Lücken zwischen Segmenten. Halter ab 1 % einzeln, solange Farben frei sind (max. 8).
+      Einheitlich eine Nachkommastelle. Überschrift „Aktionäre“, Erklärtext gekürzt. Vorzugsseiten: Hinweis „Anteile bezogen
+      auf die Vorzugsaktien“, Stimmrechte der Stammaktien als ein Satz darunter. Bildschirmfotos CBK hell, SAP dunkel,
+      VOW3 520 px geprüft. Dabei versehentlich gelöschte Logo-Stile in `style.css` sofort wiederhergestellt.
+- **Offen / Pflege (Thema sonst abgeschlossen):**
+      - BMW: aktuelle Zahl der Stamm-/Vorzugsaktien fehlt (letzte Stimmrechtsmitteilung 2020) → US-Fonds bei BMW aus.
+      - Qiagen, RTL, Airbus: keine Gesamtzahl der Aktien → keine US-Fonds. Qiagen meldet Stimmrechte über **pressetext**
+        statt EQS (auch für andere Auslandsfirmen prüfen: zweite Quelle für Stimmrechtsmitteilungen).
+      - Bio-Rad hält ~28 % der Sartorius-Vorzüge (Factsheet), Vorzugsseiten kennen bisher keine Großaktionäre.
+      - Jährlich prüfen: `aktiengattungen.csv` (Kapitalmaßnahmen, Einziehungen) und neue Einträge in `grossaktionaere_geprueft.csv`.
+      - Airbus und RTL mit besseren Primärquellen belegen (Airbus-IR-Seite gab 404, RTL-Seite nicht abrufbar).
+- USA-Aktien später: 13F + 13D/13G + Form 4 decken dort meist 70–90 % mit Namen ab.
+
+## Erledigt: Aktienrückkäufe (Art. 5 MAR) ab 2018 (30.10.2026, Reste offen)
 
 Auftrag Tobias 30.10.2026 (nach Abschluss Stimmrechte). Quelle: EQS-Kategorie `sonstige-kapitalmarktinformationen`
 (Titel nichtssagend, enthält auch Anleihen-/§-50-Meldungen → jede Meldung wird geöffnet). Probe-Skripte `.recherche/rueckkauf_*.py`.
@@ -667,13 +568,13 @@ Auftrag Tobias 30.10.2026 (nach Abschluss Stimmrechte). Quelle: EQS-Kategorie `s
       Test an 13 Firmen: alle Abweichungen liegen an den Meldungen (Telekom 22.04.2024 Text ≠ Tabelle, Mercedes 02.08.2024
       ohne Werte, Allianz 2018 Zahlendreher, Allianz 02.04.2024 Tabelle verrutscht, SAP 05.08.2025 Datum 07-01 statt 08-01).
       Nicht bei EQS: BMW (Verteiler seit 2020 gewechselt, wie bei Directors' Dealings), Munich Re nicht geprüft.
-- [x] **Block 2 – Lader + Action (30.10.2026, nicht gepusht):** `rueckkaeufe_laden.py` (wie `stimmrechte_laden.py`:
+- [x] **Block 2 – Lader + Action (30.10.2026, gepusht ec378e2):** `rueckkaeufe_laden.py` (wie `stimmrechte_laden.py`:
       `--max-minuten`, `--tage`, `--firmen`, speichert je Firma, meldet offene Firmen) → `daten/rueckkaeufe.csv`
       (firma, isin, veroeffentlicht, art, datum, stueck, kurs, stueck_text, url; je Rückkauftag eine Zeile),
       `daten/rueckkaeufe_fortschritt.csv`. Workflow `.github/workflows/rueckkaeufe.yml` „Rückkäufe laden“: Knopfdruck =
       Historie (320 Min.), nachts `17 3 * * *` nur 14 Tage. Lokal getestet (SAP, Zalando, Deutz): Abbruch nach 4 Min. und
       Fortsetzen ohne Doppelte, 184 Meldungen, Kontrollzahl 169/170. Zalando 2024 und 2025 je 100,0 Mio. € = Programmgröße.
-- [x] **Block 3 – Anzeige (30.10.2026, nicht gepusht):** `rueckkaeufe.jahre` (je Firma und Jahr: Handelstage, Stück,
+- [x] **Block 3 – Anzeige (30.10.2026, gepusht ec378e2):** `rueckkaeufe.jahre` (je Firma und Jahr: Handelstage, Stück,
       Volumen, Ø Kurs, letzter Tag; gleicher Tag aus zwei Meldungen nur einmal), Abschnitt „Aktienrückkäufe“ auf der
       Firmenseite nach den Großaktionären. Nur für Firmen in `rueckkaeufe_fortschritt.csv`, sonst fehlt der Abschnitt
       (sonst stünde „keine Rückkäufe“ bei noch nicht geladenen Firmen). Lokal geprüft (SAP, Allianz ohne Abschnitt), `docs/` zurückgesetzt.
@@ -691,7 +592,7 @@ Auftrag Tobias 30.10.2026 (nach Abschluss Stimmrechte). Quelle: EQS-Kategorie `s
 - [ ] Offen aus der Prüfung: Scout24-Abweichungen ansehen; `art=anderes` mit „Rückkauf“ im Text (braucht die Meldungstexte).
 - [ ] Später: laufende Programme (Ankündigung nach lit. a: Volumen, Zeitraum) anzeigen; Rückkäufe im Kursdiagramm markieren.
 
-## Geplantes Vorhaben: Fundamentaldaten (Planung #6), Stand 30.10.2026
+## Erledigt: Fundamentaldaten (Planung #6), 31.10.2026, nur lokal
 
 Auftrag Tobias 30.10.2026: viele Finanzkennzahlen, mindestens die Datenpunkte der AlleAktien-Karte (Beispiel Atoss).
 **Vorgaben Tobias:** kein Geld ausgeben, global denken (nicht nur Europa), erst nur lokal testen (nicht live) →
@@ -806,14 +707,58 @@ Plan (Tobias 31.10.2026: „so machen“), nur lokal, in abbrechbaren Blöcken:
 - [ ] Danach offen: Handyansicht auf echtem Gerät; SEC um IFRS erweitern (Freigabe Tobias); Universum über DAX/MDAX hinaus (Freigabe Tobias);
       vor dem Livegang Rechtslage TradingView/onvista/Nasdaq.
 
-## Laufendes Vorhaben: Guru-Depots (13F der SEC)
+## Erledigt bis auf Pflege: Firmenlogos, Stand 06.11.2026
+
+Auftrag Tobias 31.10.2026: Logo für jede Firma. Plan (Tobias: „ja bitte“): einmal laden, lokal in `docs/logos/` speichern
+(keine fremden Dienste beim Seitenaufruf), von Hand durchsehen, erst danach auf der Website einbauen.
+- [x] 1. **Skript (31.10.2026, gepusht a3563e6):** `python3 logos_laden.py` (`--neu` lädt alles neu) → `docs/logos/<ISIN>.svg|png|jpg`
+      (1,4 MB), Liste `daten/logos.csv` (isin, name, datei, quelle, url), Übersicht `logos_uebersicht.html` (im
+      Projektordner, nicht in `docs/`, in `.gitignore`). Quelle Wikidata (ISIN P946 → Logo P154, Datei von Commons);
+      `daten/logos_hand.csv` (isin,url) hat Vorrang. Per ISIN 88 von 97; die übrigen per Namenssuche bei Wikidata
+      gefunden und in die Handliste eingetragen (Fresenius 2. ISIN, Qiagen, Aroundtown, Fuchs ×2, Jenoptik, Renk, Schaeffler).
+      **Ergebnis 97 von 97.** Hochtief fehlte bei Wikidata und Commons → SVG von hochtief.com in die Handliste. Keine SVG enthält `<script>`.
+- [ ] 2. **Tobias:** Übersicht durchsehen. Verdacht auf veraltete Logos (Claude, nicht geprüft): Nordex (mit „acciona“),
+      TUI (mit „Aktiengesellschaft“), Jenoptik (blaues Kästchen), Hella (Forvia-Doppellogo), Porsche AG (Wappen statt Schriftzug),
+      Fuchs (kleines PNG mit Werbespruch).
+- [x] 2a. Tobias 31.10.2026: „Passt, alles einbauen“ (Verdachtsfälle bleiben vorerst).
+- [x] 3. **Eingebaut (31.10.2026, gepusht e689e8f):** `seiten.logo_datei`/`firmenlogo` (Logo neben dem Namen im Kopf der
+      Firmenseite, weiße Kachel auch im dunklen Modus, ohne Logo Anfangsbuchstabe), Feld `logo` in `firmen.json`
+      (`export.py`), kleines Logo in der Firmenliste der Startseite (`start.js`), Stile `.firmenlogo`/`.titelzeile` am Ende
+      von `style.css`. Lokal geprüft per Bildschirmfoto (SAP hell, Hochtief dunkel 420 px, Firmenliste): 94 von 94 Seiten mit Logo.
+      Die Firmenseiten baut der Bot beim nächsten Lauf neu.
+      **Nachtrag 31.10.2026 (Tobias):** Logo groß rechts im Kopf der Firmenseite (`.firmenkopf`, `.firmenlogo.gross` 220×96,
+      unter 600 px 112×52) statt klein vor dem Namen. Live fehlten die Logos nach dem Push, weil der Bot ohne neue BaFin-Meldung
+      nicht neu rechnet (und `--immer` nur werktags) → nach Änderungen an `seiten.py` Action „Daten aktualisieren“ mit „immer“ starten. Noch nicht in Ticker, Cluster und Ranking (nur Firmenname).
+      **Nachtrag 06.11.2026:** Die CSS-Regeln aus dem Nachtrag waren nie in `style.css` angekommen (Commit e059200 enthielt nur
+      die Aktionärsring-Stile), deshalb stand das Logo klein links. Jetzt ergänzt: `header.firmenkopf` (Flex, Logo rechts),
+      `.firmenlogo.gross` 240×104, unter 600 px 120×56. Lokal geprüft (Rheinmetall 1300 px, SAP 520 px). Gepusht 06.11.2026 (ead6284).
+- **Tooltip Kursdiagramm (06.11.2026, Tobias):** Bei 5 Jahren lag weniger als 1 px pro Handelstag, Insider-Punkte waren
+  kaum zu treffen. `liniendiagramm` in `gemeinsam.js`: Marker im Umkreis von 16 px rasten ein (sonst wie bisher nächster Tag).
+  Test RHM 5 Jahre, Maus 8 px neben jedem Punkt: vorher 2/64, nachher 64/64 Tooltips mit Geschäft. Gepusht 06.11.2026.
+- **Kapitelleiste Firmenseite (06.11.2026, Tobias: „bau es so im heutigen Stil“):** `seiten.mit_kapiteln` gibt jeder
+  `<section class="karte"><h2>` eine `id` und baut daraus `<nav class="kapitel">` (fehlende Kapitel fallen von selbst weg).
+  Ab 1240 px Leiste links (180 px, mitlaufend, `.kapitel-raster` als Raster um Kopf/Leiste/Inhalt/Fuß), darunter waagerechte
+  Zeile oben (mitlaufend, wischbar). `firma.js` markiert das aktuelle Kapitel. Geprüft an RHM (hell/dunkel 1400 px, 520 px,
+  Sprünge per Messwert). Aussehen nur vorläufig, kommt mit der Neugestaltung neu. Gepusht 06.11.2026; live erst nach Bot-Lauf „immer“.
+- **Kapitelleiste auch auf der Startseite (07.11.2026, Tobias):** `docs/index.html` von Hand ergänzt (`.kapitel-raster`,
+  `nav.kapitel`, `id` je Karte; „Sonntags-Report“ behält `#newsletter`). Markier-Skript von `firma.js` nach `gemeinsam.js`
+  verschoben (läuft nur, wenn eine Leiste da ist). Geprüft 1400/520 px, Sprünge zu Timing/Firmen/Report, RHM weiter ok.
+  Sicherung: `.recherche/sicherung_kapitel_start/`. Neue Karte auf der Startseite → Link in der Leiste von Hand ergänzen.
+  **Fehler und Reparatur 07.11.2026:** Die Sprungmarken `#cluster` und `#firmen` gab es schon als Ids der Listen,
+  `start.js` füllte deshalb die ganze Karte (Firmenliste und Cluster zerschossen, live). Umbenannt in `#cluster-kaeufe`
+  und `#firmenliste`; keine doppelten Ids mehr auf Start- und Firmenseiten. Lehre: vor neuen Ids nach vorhandenen suchen.
+- **Kursreaktion je Ereignis (06.11.2026, Tobias):** Tabelle jetzt neueste zuerst (`sort_values(..., ascending=False)`). Gepusht 06.11.2026.
+- **Erklärtexte volle Breite (06.11.2026, Tobias):** `max-width: 760px` bei `.karte .erklaerung` entfernt, gilt für alle Karten. Geprüft RHM „Aktionäre“ 1400 px. Gepusht 06.11.2026.
+- Rechtlich: Logos nur zur Kennzeichnung der Firma zeigen, kein Anschein einer Partnerschaft → zu „vor dem Livegang klären“.
+
+## Erledigt: Guru-Depots (13F der SEC), live seit 28.10.2026; Einbindung beim Ausbau offen
 
 Auftrag Tobias 28.10.2026: Depots bekannter Investoren (Buffett usw.) wie bei GuruFocus. OpenBB (github.com/openbq-org/OpenBB,
 früher OpenBB-finance, Apache 2.0) für diesen Zweck verworfen (später aus Startup-Sicht neu bewertet: `DATENQUELLEN.md` Abschnitt 5): keine deutschen Insider-/Fundamentaldaten, `openbb-sec` zieht
 95 Pakete nach (Webserver, MCP, ruff), 13F selbst lesen sind ~80 Zeilen mit vorhandenen Paketen. Tobias: bei komplizierten
 Datenquellen fertige Lösungen nutzen, hier selbst bauen.
 
-- [x] **Block 1 – Leser (28.10.2026, nicht gepusht):** `pipeline/gurus.py` (`python3 -m pipeline.gurus`) holt je Guru die
+- [x] **Block 1 – Leser (28.10.2026, gepusht b9c18da):** `pipeline/gurus.py` (`python3 -m pipeline.gurus`) holt je Guru die
       letzten 8 Meldungen 13F-HR von data.sec.gov und speichert jede Zeile nach `daten/gurus.csv` (lädt nur fehlende).
       7 Gurus in `GURUS` (CIK geprüft; Berkshire = 1067983). Werte vor 03.01.2023 in Tausend USD → ×1000.
       Test: 56 Meldungen, 1.942 Zeilen, 55 s, keine leeren Felder, 268 KB. Berkshire 266–299 Mrd. USD je Quartal, Apple vorn.
@@ -822,13 +767,13 @@ Datenquellen fertige Lösungen nutzen, hier selbst bauen.
       **Deutsche Firmen:** nur Deutsche Bank bei Tepper (2025–2026). 13F enthält nur US-gehandelte Papiere.
       **Formfehler bei der SEC:** Baupost meldet auch nach 2023 in Tausend → `positionen` erkennt das am Median-Preis
       je Aktie < 1 USD und rechnet ×1000. Nach Korrektur liegen alle Median-Preise zwischen 18 und 238 USD.
-- [x] **Block 2 – Anzeige (28.10.2026, nicht gepusht):** `gurus.depot`/`alle_depots` fassen je CUSIP + Put/Call zusammen
+- [x] **Block 2 – Anzeige (28.10.2026, gepusht b9c18da):** `gurus.depot`/`alle_depots` fassen je CUSIP + Put/Call zusammen
       und vergleichen mit dem Vorquartal nach Stückzahl (neu / aufgestockt / reduziert / verkauft / unverändert, ±0,5 %).
       Anteil nur über Aktien (Optionen = Wert des Basiswerts). Seiten `docs/gurus/` (Übersicht) und
       `docs/gurus/<name>/` aus `seiten.guruseite`/`gurus_uebersicht`, Aufruf in `export.py`, Einträge in `sitemap.xml`,
       Link in der Fußzeile der Startseite. Geprüft: Screenshot Buffett und Übersicht (Werte stimmen, Apple 22 %, Alphabet +45 %).
       Bildschirmfotos unter ~500 px schneiden rechts ab, auch bei bestehenden Firmenseiten → Werkzeug, nicht Seite.
-- [x] **Block 3 – Automatisch (28.10.2026, nicht gepusht):** `lauf.py --immer` (werktags 17:15 UTC) ruft `gurus.laden()` auf,
+- [x] **Block 3 – Automatisch (28.10.2026, gepusht b9c18da):** `lauf.py --immer` (werktags 17:15 UTC) ruft `gurus.laden()` auf,
       Fehler bei der SEC brechen den Lauf nicht ab. Ganzer Lauf lokal getestet (15 s). **Tobias:** committen und pushen
       (`pipeline/gurus.py`, `daten/gurus.csv`, `docs/gurus/`, `lauf.py`, `pipeline/export.py`, `pipeline/seiten.py`,
       `docs/index.html`, `CLAUDE.md`), danach https://insider.tobiaszwilling.me/gurus/ ansehen.
@@ -838,30 +783,6 @@ Datenquellen fertige Lösungen nutzen, hier selbst bauen.
       in der Fußzeile der Startseite (vorher im Kopf). Beim GuruFocus-Ausbau richtig einbinden (Navigation, eigener
       Bereich neben Insidern und Großaktionären, Verknüpfung mit Firmenseiten).
 - [ ] Später: Nachträge 13F-HR/A, Hinweis auf Firmenseiten bei US-Notierung (z. B. Deutsche Bank bei Tepper), mehr Investoren.
-
-## Geplantes Vorhaben: Sentiment und News (Freigabe Tobias steht aus)
-
-Tobias 28.10.2026: „Ich brauche unbedingt eine Sentiment- und News-Sektion“, ohne KI-Agent. **Vorgabe: Startup, kein
-Hobbyprojekt. Tech-Stack offen (eigene Datenbank kommt), Markt global, nicht auf GitHub Actions oder Deutschland beschränken.**
-Gründliche Prüfung von last30days-skill: `DATENQUELLEN.md` Abschnitt 4.
-
-Vorschlag (Reihenfolge offen, Entscheidung Tobias):
-- [ ] **Ranking-Engine aus last30days übernehmen** (MIT, nur Standardbibliothek): einheitliches Datenmodell, Relevanz,
-      Engagement-Gewichtung, Rank Fusion, Duplikate, Story-Cluster → Grundgerüst für News-Feed und Sentiment.
-- [ ] **Quellen anbinden:** Pflichtmeldungen (EQS, SEC 8-K), Polymarket, Stellenanzeigen (Greenhouse/Lever/Ashby),
-      Bluesky, Hacker News, Reddit (Arctic-Shift-Archiv, interne Seitenteile), X (Cookies/GraphQL oder API), YouTube (yt-dlp),
-      StockTwits und alle weiteren Anschlüsse aus `DATENQUELLEN.md` Abschnitt 4.
-- [ ] **Stimmungswert je Firma und Tag** in der Datenbank: jede Meldung/jeden Beitrag einmal bewerten (Finanz-Wörterbuch,
-      FinBERT oder Sprachmodell im Stapel), Firmenzuordnung über ISIN/Ticker; danach Event Study auf Stimmungsänderungen.
-- [ ] **Lizenzierte Nachrichten** für die News-Sektion prüfen: GDELT (frei), Benzinga/Polygon/Tiingo (bezahlt).
-- [ ] **Nächster Schritt: Krypto-Wale (Tobias 08.11.2026, Planungs-App #78).** Test eine Woche: große Überweisungen
-      auf Solana/Ethereum über Gratis-Schnittstellen (Etherscan, Solana-RPC, mempool.space), Börsenadressen erkennen
-      (Zufluss zur Börse = möglicher Verkauf), bei neuen Memecoins Entwickler-/Sniper-/gebündelte Käufe vor dem Start
-      (Vorbild Bubblemaps). Ziel: „Wal/Entwickler kauft vor dem Reddit/X-Hype“ als Teil des Alleinstellungsmerkmals.
-      Recherche `DATENQUELLEN.md` Abschnitt 10; Optionsfluss à la Bullflow verworfen (anonym, Lizenz, kein USP).
-**Tobias 28.10.2026: Alles Recherchierte wird übernommen**, auch Cookies und Umgehung von Bot-Sperren (noch nicht live,
-kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLEN.md`). Noch nichts gebaut, erst Recherche.
-
 
 # Anhang: Entscheidungen, Datenquellen und Offen in voller Länge (Stand 08.11.2026)
 
@@ -881,7 +802,10 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - **Ranking** (Tobias): 3 Monate (60 Handelstage), nur Käufe, mind. 3 Käufe. Maß: Überrendite gegenüber DAX/MDAX
   ab Schlusskurs des Geschäftstags (Marktmodell über 60 Tage zu unzuverlässig). Sortiert nach Median
   (Ausreißer wie Auto1/Bertermann: Ø +30 %, Median −0,8 %). Holdings über `bezug_person` zugeordnet.
-- **Statisch bleiben** (GitHub Pages), eigener Server erst bei Screener über viele Firmen, Nutzerkonten oder Echtzeit.
+- **Architektur (Tobias 31.10.2026, `ARCHITEKTUR.md`):** Datenbank PostgreSQL bei Supabase (kostenloses Paket), Sammler
+  bleiben in GitHub Actions, kein eigener Server und 0 € bis zum MVP; Website-Technik offen. Ersetzt die frühere
+  Entscheidung „Statisch bleiben“ (eigener Server erst bei Screener, Nutzerkonten oder Echtzeit). Bis zur Umsetzung
+  läuft die Seite weiter statisch auf GitHub Pages.
 
 ### Datenquellen und bekannte Lücken
 
@@ -904,12 +828,6 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 
 ### Offen
 
-- [x] **Taktung reicht nicht** (**gelöst, geprüft 06.11.2026:** cron-job.org-Läufe 02.–05.11. je 46–48/Tag, alle erfolgreich; 31.10.2026 erneut gezählt: 24.–30.10. je 5–7 geplante Läufe statt 48, Lücken bis 6,5 h,
-      0 Fehler). Lösung vorbereitet: Kommentar im Workflow, Anleitung cron-job.org an Tobias gegeben (Token fein
-      abgestuft, nur Repo insider, Actions: Read and write; POST auf `…/workflows/aktualisieren.yml/dispatches` mit
-      `{"ref":"main","inputs":{"immer":"false"}}`, sonst rechnet jeder Lauf neu und committet). **Eingerichtet 31.10.2026**, Testlauf 204, Lauf 17:34 UTC erfolgreich. Nach 1–2 Tagen Läufe zählen (Soll ~48/Tag), dann Punkt abhaken (Planungs-App #62). Workflow-Kommentar gepusht 31.10.2026. Alt: gepusht, aber geprüft am 24.10.2026: nur 12 geplante Läufe in ~1,5 Tagen (23.10.: 6 statt
-      ~48), alle erfolgreich. Neue Meldungen kommen also mit Stunden Verspätung. Abhilfe: externer Auslöser (cron-job.org
-      ruft `workflow_dispatch` über die GitHub-API auf; braucht ein Token mit Actions-Recht). Entscheidung Tobias.
 - [ ] Diagramm auf der Firmenseite einmal auf dem echten Handy ansehen.
 - [ ] Code-Review (`/code-review high`) in einem neuen Chat.
 - [ ] **Datenquelle für Fundamentaldaten klären**, bevor der GuruFocus-Ausbau beginnt: Yahoo (gratis, ~4 Jahre,
@@ -938,7 +856,7 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - [ ] **Große Datenbank, Ausbau auf USA und weitere Märkte** (Tobias 28.10.2026, perspektivisch): Quellen in
       `DATENQUELLEN.md`. Empfohlene Reihenfolge USA (alles SEC, offiziell, gratis): Form 4 (Insider), companyfacts
       (Fundamentaldaten), 13D/13G (Großaktionäre), Finra (Leerverkäufe). Inoffizielle Quellen (Nasdaq, TMX) nur nach
-      Prüfung der Nutzungsbedingungen. Datenbank-Frage hängt mit „Statisch bleiben“ und „Repository-Größe“ zusammen.
+      Prüfung der Nutzungsbedingungen. Datenbank-Frage hängt mit der Architektur (Supabase, `ARCHITEKTUR.md`) und „Repository-Größe“ zusammen.
 - [ ] **Repository-Größe beobachten:** Der Bot committet bei jedem Lauf mehrere MB; GitHub empfiehlt < 1 GB.
       Beim GuruFocus-Ausbau Daten in eigenen Branch oder Release-Dateien auslagern.
 - [ ] Geschwärzte Bachelorarbeit auf der Methode-Seite verlinken? PDF in Dropbox unter
@@ -951,3 +869,104 @@ kein Geld). Rechtslage erst vor dem Start klären (Status-Spalte in `DATENQUELLE
 - [ ] Beobachten: GitHub deaktiviert geplante Läufe nach 60 Tagen ohne Aktivität (Bot-Commits zählen vermutlich).
 - [ ] Fremdwährungs-Volumen (GBp/USD) in Euro umrechnen, falls Cluster/Volumen-Anzeigen das brauchen.
 
+
+# Archiv (überholte Stände)
+
+Diese Abschnitte geben ältere Stände wieder und werden nicht mehr gepflegt. Aktuell gilt `CLAUDE.md` und der
+jeweilige Abschnitt oben. Text unverändert, nur die „nicht gepusht“-Vermerke mit Commit-Kürzel berichtigt.
+
+## Nächste Schritte (Stand 31.10.2026, nach Rauszoomen mit Tobias)
+
+Ziel bleibt: Startup, Finanzdaten-Plattform „GuruFocus für Europa, günstiger“ + „Folge den Profis“ + Sentiment.
+Fundamentaldaten sind dafür Pflicht, aber nicht das Alleinstellungsmerkmal.
+**Korrektur Tobias 06.11.2026:** Insider, Großaktionäre, Rückkäufe, Guru-Depots und alles Bisherige sind KEIN
+Alleinstellungsmerkmal (haben etablierte Anbieter auch). Das Alleinstellungsmerkmal soll eine **Sentimentanalyse von
+Reddit und Twitter/X für Krypto und Pennystocks** werden, die es bei etablierten Anbietern bisher nicht gibt.
+Reihenfolge laut Empfehlung Claude:
+1. ✅ **Eulerpool eingebaut (31.10.2026, Details unter Fundamentaldaten, Block „Eulerpool“).** Ursprünglicher Auftrag: Leser in `pipeline/fundamental.py`
+   (GuV, Bilanz, Cashflow, Schätzungen; Ist-Jahre von Schätzjahren trennen; Werte in Mio. → ×1e6; verschlüsselte
+   Antworten überspringen, nie entschlüsseln), in `kennzahlen.PRIORITAET` vor onvista/TradingView für EBIT und
+   Schätzungen; dann alle Firmen automatisch gegen `/api/1/aaqs/by-isin` abgleichen (nur Prüfung, nicht anzeigen) und
+   Formeln nachschärfen (ROCE, Verschuldung). Danach Fundamentaldaten als fertig betrachten, **nicht weiter ausbauen**.
+2. **Kleine Fehler auf der Live-Seite zuerst beheben:** Rückkäufe „keine Daten“ ✅ (31.10., gepusht);
+   Taktung: cron-job.org einrichten (Tobias, Abschnitt Offen).
+3. **Positionierung: erledigt 31.10.2026** (siehe Marketing Schritt 1). Name: **Rhodus** (31.10.2026, TMview frei), Untertitel offen.
+4. **Newsletter „Sonntags-Report“ + 5–10 Gespräche mit Anlegern** (Marketing Schritt 2–3): erste echte Rückmeldung.
+5. **Architektur entschieden (31.10.2026, `ARCHITEKTUR.md` unten):** Supabase (Postgres, kostenlos), Sammler bleiben
+   in GitHub Actions, kein Hetzner bis MVP, 0 € bis MVP. Umsetzung (Block 1–2) nach der Positionierung (erledigt) und
+   bevor das Universum über DAX/MDAX hinaus wächst, **kann also jetzt starten**; braucht ein Supabase-Konto von Tobias.
+   Website-Technik ist noch festzulegen.
+6. **Vor dem Livegang:** Rechtslage der Quellen; legaler Weg mit Anzeigerecht wäre Eulerpool Builder (99 $/Monat).
+
+## Einstieg für einen neuen Chat (Stand 28.10.2026)
+
+**Was das ist:** Tobias baut aus dem Insider-Monitor
+ein **Startup**: eine Finanzdaten-Plattform nach Vorbild GuruFocus/AlleAktien, **global** (Deutschland, USA, weitere
+Märkte), mit eigener Datenbank. Der heutige Stand (statische Website auf GitHub Pages, Python-Pipeline in GitHub Actions)
+ist nur der Anfang; **Tech-Stack ist offen**, Umzug auf eine richtige Datenbank ist geplant.
+
+**Aktuelle Phase: Recherche.** Noch nichts davon gebaut. Ergebnisse in `DATENQUELLEN.md` (zuerst Lesehinweis und
+Abschnitt 7 lesen). Geprüft: OpenBB, last30days-skill, FinceptTerminal.
+
+**Lesereihenfolge:** diese Datei (Stand, Vorhaben, Offen) → `DATENQUELLEN.md` (Quellen für den Ausbau) →
+`GURUFOCUS.md` (Vorbild, Aufbau der Seiten) → `ALTERNATIVE_DATEN.md` (Rechtslage, Meldeschwellen, Ausbauideen) →
+`BESTANDSAUFNAHME.md` (alte eigene Projekte) → `README.md` (Dateien und Befehle).
+
+**So arbeitet Tobias (bitte einhalten):**
+- Deutsch, einfache Sprache, direkt; widersprechen, wenn er falschliegt; klare Empfehlung statt Optionsliste.
+- **Startup-Sicht:** Repositories und Quellen nach Nutzen fürs Produkt bewerten, nicht nach „passt in die GitHub Action“
+  oder „nur deutsche Aktien“. In der Recherche **alles aufnehmen**, auch graue Wege (Browser-Cookies, Umgehung von
+  Bot-Sperren); Rechtslage nur als Hinweis „vor dem Start klären“.
+- **Nicht ungefragt bauen:** Fragt er „Ist X nützlich?“, ist das eine Recherchefrage, kein Bauauftrag.
+- **Alles notieren**, laufend in dieser Datei (Stand, Offen, Verlauf) und in den Recherchedateien.
+- Er **pusht selbst**: am Ende jedes Schritts die Befehle zum Committen/Pushen als Codeblock geben (Dateien einzeln
+  `git add`, nie `git add .`; `.env` mit API-Schlüssel ist in `.gitignore`).
+- Bei schweren Datenquellen fertige Lösungen bevorzugen, bei einfachen schlank selbst bauen.
+
+**Offene Entscheidungen von Tobias:** Reihenfolge des Ausbaus (Sentiment/News, USA über SEC, Datenbank-Umzug);
+ob die Regel „kein Fincept-Code“ bleibt (Urheberrecht AGPL, nicht nur Nutzungsbedingungen); Taktung der Action (s. „Offen“).
+
+## Aktueller Stand (22.10.2026 abends)
+
+**Live:** BaFin-Meldungen ab 22.10.2025 (alle 30 Min.) plus EQS-Archiv 2018 bis 21.10.2025; Event Study über
+1.572 Ereignisse; Cluster-Käufe mit Telegram; Ranking „Timing der Insider“ (265 Personen); Impressum ausgefüllt.
+Ergebnis: Käufe AAR t0 +0,24 %*, t+1 +0,23 %*, vorher signifikant negativ; Verkäufe t+1 −0,41 %*.
+Jahreszahlen EQS passen zu den BA-Daten (2018: 211 vs. 239, 2019: 219 vs. 194, 2021: 497 vs. 452).
+
+**Seit 22.10.2026 abends ebenfalls live** (Umsetzung GURUFOCUS.md Punkt 1–4): Firmenseiten als fertiges HTML unter
+`/firma/<TICKER>/` (`pipeline/seiten.py`, Texte mit `html.escape`, Markierungen als eingebettetes JSON), Kurse in
+`docs/data/kurse/<TICKER>.json`, Weiterleitung `firma.html?t=…`, `sitemap.xml`, `robots.txt`, automatische
+Versionsnummern `?v=<Prüfsumme>`, Speculation Rules auf der Startseite. `ereignisse.json` und `data/firmen/` entfernt
+(7,5 → 4,8 MB). GBp-Fix (TUI/Unifirm, 16 Meldungen repariert). Live geprüft: 6 Firmenseiten antworten (200),
+Deutz/SAP per Screenshot korrekt, Diagramm auch bei 500 px Breite (63 Markierungen bei Rheinmetall).
+
+**Befund Taktung (22.10.2026):** Mit `*/30` hat GitHub in 17 Stunden nur 3 geplante Läufe gestartet (alle erfolgreich).
+Geändert auf `13,43 * * * *` (krumme Minuten, gepusht 07cd2bb). Nach 1–2 Tagen prüfen:
+`curl -s "https://api.github.com/repos/tobzwil89/insider/actions/workflows/aktualisieren.yml/runs?per_page=100"`.
+Reicht das nicht, externen Auslöser nehmen (z. B. cron-job.org ruft `workflow_dispatch` über die GitHub-API auf;
+braucht ein Token mit Actions-Recht).
+
+**Abgleich mit dem ursprünglichen Plan** (Auftrag vom 21.10.2026): Action prüft BaFin regelmäßig ✅ (Taktung s. o.),
+Kurse + AR nach BA-Methode + JSON ✅, GitHub Pages unter insider.tobiaszwilling.me ✅, Live-Ticker ✅, Cluster-Käufe ✅,
+Kurs mit Insider-Markierungen ✅, CAR-Kurve Käufe vs. Verkäufe laufend ✅, Ranking bestes Timing ✅, Telegram bei
+Clustern ✅, „keine Anlageberatung“ + Impressum ✅. Zusätzlich: Historie 2018–2025 aus EQS, Methode-Seite, Firmenseiten als HTML.
+
+**Was manuell bleibt** (alles andere läuft automatisch):
+1. Vierteljährlich nach Indexänderungen (März, Juni, Sept., Dez.): `python3 -m pipeline.firmen`, Ergebnis prüfen, pushen;
+   danach „Historie laden“ starten (lädt nur neue Firmen, weil die Fortschrittsliste sie nicht kennt).
+2. Bei E-Mail von GitHub über einen fehlgeschlagenen Lauf: nachsehen (meist BaFin/Yahoo/EQS kurz nicht erreichbar,
+   der nächste Lauf holt alles nach; dauerhaft nur bei Formatänderungen der Quellen).
+3. Gelegentlich prüfen, ob die geplanten Läufe noch aktiv sind (60-Tage-Regel; der tägliche Lauf committet immer,
+   das sollte als Aktivität reichen).
+
+**Review:** `/code-review ultra` ist kostenpflichtig (nicht kostenlos). Empfehlung: `/code-review high` lokal in einem
+neuen Chat (frischer Blick, kein Zusatzpreis über die normale Nutzung hinaus), vor dem GuruFocus-Ausbau.
+
+## Erledigt aus „Offen“ (Anhang): Taktung der Action (gelöst, cron-job.org seit 31.10.2026)
+
+- [x] **Taktung reicht nicht** (**gelöst, geprüft 06.11.2026:** cron-job.org-Läufe 02.–05.11. je 46–48/Tag, alle erfolgreich; 31.10.2026 erneut gezählt: 24.–30.10. je 5–7 geplante Läufe statt 48, Lücken bis 6,5 h,
+      0 Fehler). Lösung vorbereitet: Kommentar im Workflow, Anleitung cron-job.org an Tobias gegeben (Token fein
+      abgestuft, nur Repo insider, Actions: Read and write; POST auf `…/workflows/aktualisieren.yml/dispatches` mit
+      `{"ref":"main","inputs":{"immer":"false"}}`, sonst rechnet jeder Lauf neu und committet). **Eingerichtet 31.10.2026**, Testlauf 204, Lauf 17:34 UTC erfolgreich. Nach 1–2 Tagen Läufe zählen (Soll ~48/Tag), dann Punkt abhaken (Planungs-App #62). Workflow-Kommentar gepusht 31.10.2026. Alt: gepusht, aber geprüft am 24.10.2026: nur 12 geplante Läufe in ~1,5 Tagen (23.10.: 6 statt
+      ~48), alle erfolgreich. Neue Meldungen kommen also mit Stunden Verspätung. Abhilfe: externer Auslöser (cron-job.org
+      ruft `workflow_dispatch` über die GitHub-API auf; braucht ein Token mit Actions-Recht). Entscheidung Tobias.
