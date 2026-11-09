@@ -24,7 +24,7 @@ import shutil
 import numpy as np
 import pandas as pd
 
-from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, personen as ps, politiker as pol, ranking as rk, rueckkaeufe, seiten, spenden, stimmrechte, us_firmen
+from pipeline import AUSGABE, DATEN, event_study as es, cluster as cl, fonds_us, gurus, personen as ps, politiker as pol, trump, lobbying, ranking as rk, rueckkaeufe, seiten, spenden, stimmrechte, us_firmen
 
 NEUESTE = 300        # so viele Meldungen im Live-Ticker
 KURS_JAHRE = 10      # so weit reicht der Kursverlauf auf den Firmenseiten (ab Beginn der Historie)
@@ -235,6 +235,7 @@ def us_exportieren(v: dict, spenden_alle: pd.DataFrame, abgeordnete: list) -> li
         kongress = pd.concat([p["geschaefte"].assign(adresse=p["adresse"]) for p in abgeordnete])
         kongress = kongress[kongress["anlageart"].eq("ST")]
         kongress = kongress.assign(firma=kongress["symbol"].replace(us_firmen.ZWEITE_GATTUNG))
+    lob = lobbying.lesen()
     gj = seiten._us_geschaeftsjahr()
     zeilen = []
     for f in firmen.to_dict("records"):
@@ -242,7 +243,8 @@ def us_exportieren(v: dict, spenden_alle: pd.DataFrame, abgeordnete: list) -> li
         sp = spenden_alle[spenden_alle["kuerzel"] == f["kuerzel"]]
         k = kongress[kongress["firma"] == f["kuerzel"]] if kongress is not None else None
         seiten.schreiben(ziel / f["kuerzel"] / "index.html", seiten.us_firmenseite(
-            f, auftraege, empfaenger.get(f["kuerzel"], ""), sp, k, politiker, v))
+            f, auftraege, empfaenger.get(f["kuerzel"], ""), sp, k, politiker, v,
+            dict(zip(*(lob.loc[lob["kuerzel"] == f["kuerzel"], s] for s in ["jahr", "betrag"])))))
         zeilen.append({**f, "auftraege": auftraege.get(gj - 1), "spenden": sp.loc[sp["zyklus"] == 2024, "betrag"].sum(),
                        "kongress": len(k) if k is not None else 0})
     zeilen.sort(key=lambda z: -(z["auftraege"] or 0))
@@ -279,6 +281,8 @@ def kongress_exportieren(v: dict, spenden_alle: pd.DataFrame) -> list:
         ds = ds[ds["bioguide"] != ""]
         ds_meldungen = set(ds["doc_id"])
         z = pd.concat([z, pol.datensatz_zuordnen(ds, abg)], ignore_index=True)
+    # Donald J. Trump (OGE 278-T, daten/trump.csv, nur lokal): eigene Seite wie die Abgeordneten
+    z = pd.concat([z, trump.geschaefte()], ignore_index=True)
     symbole = sorted({s for s in z.loc[z["anlageart"].eq("ST"), "kuerzel"].map(pol.yahoo) if s})
     kurse = pol.kurse([pol.INDEX] + symbole, z["datum"].min() - pd.Timedelta(days=10))
     leute = pol.politiker(z, kurse)

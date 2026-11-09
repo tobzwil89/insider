@@ -796,7 +796,7 @@ ERKLAERUNG_KONGRESS = (
     "melden, auch die von Ehepartnern und Kindern (STOCK Act). Gemeldet wird nur eine Betragsspanne, z. B. 1.001–15.000 $; "
     "Summen rechnen mit der Mitte der Spanne und sind deshalb Schätzungen. Bei Papiermeldungen (Scans) kann der Tag "
     "eines Geschäfts um wenige Tage falsch gelesen sein.")
-KAMMER = {"rep": "Repräsentantenhaus", "sen": "Senat"}
+KAMMER = {"rep": "Repräsentantenhaus", "sen": "Senat", "reg": "Regierung"}
 MAX_GESCHAEFTE = 1000  # Tabelle „Alle Geschäfte“: sonst 20 MB bei Ro Khanna (43.000 Geschäfte aus Depot-Scans)
 
 
@@ -917,9 +917,10 @@ def politiker_uebersicht(liste: list, neueste: pd.DataFrame, v: dict) -> str:
           (_wertpapier(r), ""), (_kongress_art(r.art), ""), (_spanne(r.betrag_von, r.betrag_bis), "zahl")]
          for r in neueste.itertuples()])
     kopf = ('<div class="marke"><a href="../">← Insider-Monitor</a></div><h1>Aktiengeschäfte im US-Kongress</h1>'
-            f'<p class="unterzeile">{zahl(sum(p.get("kammer") != "sen" for p in liste))} Abgeordnete des '
+            f'<p class="unterzeile">{zahl(sum(p.get("kammer") == "rep" for p in liste))} Abgeordnete des '
             f'Repräsentantenhauses und {zahl(sum(p.get("kammer") == "sen" for p in liste))} Senatoren mit gemeldeten '
-            'Geschäften.</p>')
+            'Geschäften' + (', dazu Präsident Donald J. Trump' if any(p.get("kammer") == "reg" for p in liste) else '')
+            + '.</p>')
     inhalt = (f'<section class="karte"><h2>Neueste Geschäfte</h2><p class="erklaerung">{e(ERKLAERUNG_KONGRESS)}</p>'
               f'{letzte}</section><section class="karte"><h2>Alle Abgeordneten</h2><p class="erklaerung">Sortiert nach '
               'dem letzten Geschäft. Suche mit Strg+F bzw. ⌘+F.</p>'
@@ -933,7 +934,8 @@ def politiker_uebersicht(liste: list, neueste: pd.DataFrame, v: dict) -> str:
 # --- US-Firmen (S&P 500): Staatsaufträge, PAC-Spenden, Kongress-Geschäfte ----------------------------------
 
 PARTEI_FEC = {"DEM": "Demokraten", "REP": "Republikaner"}
-QUELLE_US = "USAspending.gov (Staatsaufträge), Wahlbehörde FEC (PAC-Spenden), SEC, Wikipedia (Index-Liste)"
+QUELLE_US = ("USAspending.gov (Staatsaufträge), Wahlbehörde FEC (PAC-Spenden), Clerk des Repräsentantenhauses "
+             "(Lobbying-Berichte), SEC, Wikipedia (Index-Liste)")
 ERKLAERUNG_PAC = (
     "Ein PAC (Political Action Committee) ist die Spendenkasse eines Konzerns, gespeist von Mitarbeitern; Firmen selbst "
     "dürfen Kandidaten nicht direkt unterstützen. Gezählt sind direkte Spenden an Wahlkampfkomitees von Kandidaten für "
@@ -953,7 +955,7 @@ def _kandidat(r, politiker: dict, wurzel: str) -> str:
 
 
 def us_firmenseite(f: dict, auftraege: dict, empfaenger: str, spenden: pd.DataFrame, kongress: pd.DataFrame | None,
-                   politiker: dict, v: dict) -> str:
+                   politiker: dict, v: dict, lobbying: dict | None = None) -> str:
     """f: kuerzel, name, sektor, branche. auftraege: {Geschäftsjahr: Betrag}. spenden: spenden.lesen() dieser Firma.
     kongress: Geschäfte von Abgeordneten in dieser Aktie (mit adresse, politiker) oder None (Daten nur lokal).
     politiker: bioguide → Adresse der Politikerseite (leer, wenn es die Seiten nicht gibt)."""
@@ -1007,6 +1009,9 @@ def us_firmenseite(f: dict, auftraege: dict, empfaenger: str, spenden: pd.DataFr
               (_kongress_art(r.art), ""), (e(r.inhaber), ""), (_spanne(r.betrag_von, r.betrag_bis), "zahl")]
              for r in k.itertuples()]) if len(k) else '<p class="leer">Keine gemeldeten Geschäfte seit Mitte 2022.</p>') + """
     </section>"""
+    lobby_html = (_balken("Lobbying-Ausgaben", {j: lobbying[j] for j in sorted(lobbying)}, "$",
+                          f"je Kalenderjahr, {pd.Timestamp.today().year} unvollständig")
+                  if lobbying else '<p class="leer">Keine Lobbying-Berichte gefunden (oder der Name passt nicht eindeutig).</p>')
     kopf = (f'<div class="marke"><a href="../">← US-Firmen</a></div><h1>{e(f["name"])}</h1>'
             f'<p class="unterzeile">{e(f["kuerzel"])} · S&amp;P 500 · {e(f["sektor"])} · {e(f["branche"])}</p>')
     inhalt = f"""<div class="kacheln">{"".join(kacheln)}</div>
@@ -1023,7 +1028,10 @@ def us_firmenseite(f: dict, auftraege: dict, empfaenger: str, spenden: pd.DataFr
     </section>{kongress_html}
     <section class="karte">
       <h2>Lobbying</h2>
-      <p class="leer">Folgt: Das Lobbying-Register des US-Senats (LDA) gibt Daten nur mit Schlüssel heraus.</p>
+      <p class="erklaerung">Ausgaben für Lobbyarbeit beim US-Kongress und der Bundesregierung laut den Quartalsberichten
+        nach dem Lobbying Disclosure Act: eigene Lobbyisten der Firma plus Honorare beauftragter Lobbyfirmen.
+        Beträge unter 5.000 $ je Bericht zählen als 0. Bundesstaaten fehlen.</p>
+      {lobby_html}
     </section>"""
     return _guru_rahmen(f"{f['name']} ({f['kuerzel']}): Staatsaufträge und politische Spenden",
                         f"{f['name']}: Aufträge der US-Bundesregierung je Jahr, Spenden des Firmen-PACs an Politiker"
