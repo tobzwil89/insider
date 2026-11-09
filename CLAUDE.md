@@ -67,16 +67,16 @@ Firmenseiten `/firma/<TICKER>/` mit Kursdiagramm, Kapitelleiste, Logos, Aktionä
 - **Guru-Depots (13F):** live unter `/gurus/`. Offen: Bereich beim Ausbau richtig einbinden, Nachträge 13F-HR/A.
 - **Firmenlogos:** live. Offen: Tobias sieht Verdachtsfälle durch (Nordex, TUI, Jenoptik, Hella, Porsche AG, Fuchs);
   Logos fehlen noch in Ticker/Cluster/Ranking.
-- **Personenseiten** (803 Vorstände/Aufsichtsräte, `/person/`): **live.** Offen, **eilt:** Datenschutzabsatz `#personen`
-  in `docs/impressum.html` einbauen (Entwurf fertig in `RECHTSFRAGEN.md` Abschnitt 2, wartet auf OK von Tobias, #75).
-  Nebenbefund: 13 Geschäfte doppelt (gleiche Meldung an zwei Tagen bei EQS).
+- **Personenseiten** (803 Vorstände/Aufsichtsräte, `/person/`): **live.** Datenschutzabsatz `#personen` in
+  `docs/impressum.html` eingebaut 09.11.2026 (#75, Text aus `RECHTSFRAGEN.md` Abschnitt 2). Offen: Anwalt liest gegen;
+  Lücken der übrigen Erklärung (siehe `VORHABEN.md`, Datenschutz). Nebenbefund: 13 Geschäfte doppelt (gleiche Meldung an zwei Tagen bei EQS).
 - **US-Politiker** (House + Senat 2012–2026, Trump 278-T): **nur lokal**, bis die Rechtsfrage #74 geklärt ist
   (`RECHTSFRAGEN.md` Abschnitt 1). Trump-Seite gebaut 08.11.2026 (91 % mit Kürzel). Offen: Erklärtexte der Trump-Seite
   sprechen noch von Kongress/Inhaber; Fotos, Branchen-Kuchen. Datensatz-Abhängigkeit: Hugging Face
   `austin-starks/congressional-stock-trades` (ein Betreiber).
 - **US-Firmen S&P 500** (`/us/<KÜRZEL>/`): Staatsaufträge (USAspending), PAC-Spenden (FEC), **Lobbying** (LD-2 vom
-  House-Clerk, 414 von 500 Firmen, gebaut 08.11.2026). Stand 09.11.2026: Lobbying/Trump-Code noch nicht gepusht,
-  `/us/` geht erst nach Push + Action „immer“ live.
+  House-Clerk, 414 von 500 Firmen, gebaut 08.11.2026). **Live seit 09.11.2026** (Commit 099af96; Test ohne
+  nur lokale Dateien: 500 Seiten, kein Kongress/Trump).
 - **Marketing / Rhodus:** Name Rhodus, Logo-Paket `logo/kit/`, Farben Grün #1E3B2F / Creme #F3EEE2, Schrift Geist.
   Design System https://claude.ai/artifact/X1njLe2gDXmPDRtszcsTRN. Startseiten-Richtungen
   https://claude.ai/artifact/416CVL22JqidLmcVQwTuWf und https://claude.ai/artifact/QuKEGndLbFhxJ68DNuHuDe
@@ -114,8 +114,7 @@ Firmenseiten `/firma/<TICKER>/` mit Kursdiagramm, Kapitelleiste, Logos, Aktionä
 
 ## Offen (allgemein)
 
-- [ ] Push der Lobbying/Trump-Arbeit vom 08.11.2026, danach Action „Daten aktualisieren“ mit „immer“ (#70: `/us/` sonst 404).
-- [ ] Datenschutzabsatz Personenseiten einbauen (#75, eilt) und Anwaltsfragen #74 klären.
+- [ ] Anwaltsfragen #74 (Kongressdaten) klären; Datenschutzerklärung gegenlesen lassen (#75).
 - [ ] Code-Review (`/code-review high`) in einem neuen Chat. Handyansicht und Tooltips im echten Browser prüfen.
 - [ ] Repository-Größe beobachten (Bot committet mehrere MB je Lauf; GitHub empfiehlt < 1 GB).
 - [ ] GitHub-Token „Insiderhandel Test 1 Github Actions“ läuft nie ab → löschen, bei Bedarf neu mit 90 Tagen.

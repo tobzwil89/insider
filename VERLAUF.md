@@ -125,3 +125,5 @@ Neue Einträge unten anhängen: `- **TT.MM.JJJJ (Thema):** …`
   `seiten.py` vor den Änderungen: `.recherche/sicherung_trump/`. Nicht gepusht.
 - **09.11.2026 (Aufräumen):** CLAUDE.md von 125 KB / 1.076 Zeilen auf eine Kurzfassung gekürzt. Details unverändert nach
   `VORHABEN.md`, Verlauf nach `VERLAUF.md`; Sicherung `.recherche/sicherung_claude_md/CLAUDE_2026-11-09.md`.
+- **09.11.2026 (Livegang):** Lobbying/Trump-Code gepusht (099af96), `/us/` mit Lobbying live; Test ohne nur lokale
+  Dateien bestanden. Datenschutzabsatz `#personen` ins Impressum eingebaut (#75), Lücken der Erklärung in `VORHABEN.md`.

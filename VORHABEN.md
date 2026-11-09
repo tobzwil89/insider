@@ -164,6 +164,16 @@ Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
       Datenschutzerklärung (`impressum.html`) um die Personenseiten ergänzen.
       **08.11.2026 vorbereitet (#75):** `RECHTSFRAGEN.md` Abschnitt 2: Abwägung, Empfehlung (keine Angehörigen), fertiger
       Absatz `#personen` für `impressum.html` (noch nicht eingebaut). **Eilt:** Personenseiten sind live (/person/ = 200).
+      **09.11.2026 eingebaut (OK Tobias):** ersetzt den Absatz „Die Namen der meldepflichtigen Personen …“; Id `personen`
+      gab es vorher nicht; Kontakt tobzwilling(at)gmx.de wie im Impressum. Sicherung `.recherche/sicherung_impressum/`.
+      Geprüft per Bildschirmfoto (1300 und 520 px). Abgleich mit den Seiten: keine Angehörigen auf eigenen Seiten,
+      „Seitdem ggü. Index“ auf allen, „Timing der Käufe“ auf 254 von 803. **Gemeldete Lücken (nicht selbst formuliert):**
+      (1) Der Text nennt nur Vorstand/Aufsichtsrat, die Seiten zeigen auch Geschäfte eigener Gesellschaften („über Hasso
+      Plattner Fund GmbH & Co. KG“, auch „über Sabine Plattner …“ mit dem Namen einer Angehörigen). (2) Verantwortlicher
+      im Sinne der DSGVO nicht ausdrücklich so benannt (nur „Angaben gemäß § 5 DDG“). (3) Beschwerderecht ohne Art. 77 und
+      ohne zuständige Behörde (BayLDA). (4) „Keine Anlageberatung“ nennt die Seite „privates, nichtkommerzielles Projekt“
+      (passt nicht zur Pro-Stufe). (5) „Datenquellen“ nennt die US-Quellen (USAspending, FEC, LD-2, SEC) nicht.
+      Art. 15–21 sind genannt.
 - [ ] **Nebenbefund, nicht behoben:** 13 Geschäfte stehen doppelt (gleiche Meldung an zwei Tagen bei EQS veröffentlicht,
       z. B. Kaeser/Daimler Truck 18.01.2022), betrifft auch Firmenseiten und Event Study.
 - [x] **2a. Repräsentantenhaus: Leser + Lader (06.11.2026, Freigabe Tobias „leg los“, nur lokal):** `pipeline/kongress.py`
@@ -294,6 +304,9 @@ Aufsichtsrat; danach US-Politiker „so wie Quiver, im Prinzip alles“.
       Technologies). Geprüft 2025: Meta 29,7, GM 24,0, Amazon 20,9, Lockheed 17,5, Google 16,8, AT&T 14,2,
       Microsoft 12,8 Mio. $ (Größenordnung wie OpenSecrets, eher etwas höher). Bildschirmfoto META geprüft.
       Manuell (vierteljährlich, wie Spenden): `python3 -m pipeline.lobbying`, `daten/lobbying.csv` committen.
+      **Live seit 09.11.2026** (Commit 099af96, Bot baute danach neu; /us/META/ zeigt Lobbying). Test im sauberen
+      Arbeitsbaum ohne nur lokale Dateien: 500 Seiten, alle mit Abschnitt Lobbying (86 ohne Berichte mit Erklärtext),
+      keine Politikerseiten, keine Kongress-/Trump-Zeilen. Push-Schutz deckt `trump`/`lobbying` automatisch ab.
 - [ ] **2. US-Politiker (Plan, Freigabe Tobias 06.11.2026):** eigene Daten aus den Primärquellen statt Quiver-API.
       Quiver-API: Hobbyist ~30 $/Monat und Trader ~75 $/Monat nur **privat** (keine kommerzielle Nutzung), kommerziell erst
       „Startup“ ~250 $/Monat bzw. Enterprise auf Anfrage (laut api.quiverquant.com 06.11.2026; Weitergabe/Anzeige
