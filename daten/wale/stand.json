@@ -1,0 +1,27 @@
+{
+ "dezimal": {
+  "AAVE": 18,
+  "AMP": 18,
+  "ARB": 18,
+  "CYBER": 18,
+  "ENS": 18,
+  "FET": 18,
+  "FLOKI": 9,
+  "GRT": 18,
+  "LINK": 18,
+  "MAGIC": 18,
+  "ONDO": 18,
+  "PEPE": 18,
+  "POL": 18,
+  "QNT": 18,
+  "RED": 18,
+  "SHIB": 18,
+  "TURBO": 18,
+  "UNI": 18,
+  "WLD": 18,
+  "WLFI": 18
+ },
+ "eth": 26387729,
+ "btc": 975356,
+ "xrp": 108248534
+}
