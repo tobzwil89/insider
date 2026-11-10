@@ -1,4 +1,9 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+SCI AG,40007484,DE0006051014,"Nachtigall, Wilhelm",Aufsichtsrat,Aktie,Verkauf,"19,50 EUR","19.500,00 EUR",2026-11-10,2026-11-06,Börse Hamburg,2026-11-10 13:04:31,19.5,EUR,19500.0,2026-11-10 13:13:33
+SCI AG,40007484,DE0006051014,"Wiederhold, Oliver",Vorstand,Aktie,Sonstiges,"20,50 EUR","6.539,50 EUR",2026-11-10,2026-11-05,,2026-11-10 13:04:31,20.5,EUR,6539.5,2026-11-10 13:13:33
+SCI AG,40007484,DE0006051014,"Nachtigall, Wilhelm",Aufsichtsrat,Aktie,Verkauf,"19,18 EUR","23.010,00 EUR",2026-11-10,2026-11-09,Börse Hamburg,2026-11-10 12:53:59,19.18,EUR,23010.0,2026-11-10 13:13:33
+SCI AG,40007484,DE0006051014,"Nachtigall, Wilhelm",Aufsichtsrat,Aktie,Sonstiges,"20,50 EUR","34.624,50 EUR",2026-11-10,2026-11-05,,2026-11-10 12:48:51,20.5,EUR,34624.5,2026-11-10 13:13:33
+ZEAL Network SE,40003601,DE000ZEAL241,"Schumann, Jens",Aufsichtsrat,Aktie,Sonstiges,,,2026-11-10,2026-11-09,,2026-11-10 12:43:48,,,,2026-11-10 13:13:33
 "ADTRAN Holdings, Inc.",50087419,US00486H1059,"Stanton, Thomas R.",Sonstige Führungsperson,Aktie,Sonstiges,,,2026-11-09,2026-11-03,,2026-11-10 06:32:38,,,,2026-11-10 06:43:37
 SUSS MicroTec SE,40001807,DE000A1K0235,"Frick, Burkhardt",Vorstand,Aktie,Kauf,"44,90 EUR","78.580,72 EUR",2026-11-09,2026-11-06,XETRA,2026-11-10 06:27:28,44.9,EUR,78580.72,2026-11-10 06:43:37
 "ADTRAN Holdings, Inc.",50087419,US00486H1059,"Wilson Jr, James Denson",Sonstige Führungsperson,Aktie,Sonstiges,,,2026-11-09,2026-11-03,,2026-11-10 06:27:28,,,,2026-11-10 06:43:37
