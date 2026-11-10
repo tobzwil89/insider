@@ -21,6 +21,8 @@ python3 -m pipeline.us_firmen         # S&P-500-Liste neu aufbauen (vierteljähr
 python3 -m pipeline.staatsauftraege   # US-Staatsaufträge (USAspending), vierteljährlich
 python3 -m pipeline.spenden           # PAC-Spenden (FEC), vierteljährlich
 python3 -m pipeline.lobbying          # Lobbying-Berichte (LD-2, House-Clerk), vierteljährlich
+python3 wale_laden.py                 # große Krypto-Überweisungen + neue Memecoins → docs/data/wale.json
+python3 wale_laden.py --adressen      # Adressnamen (Börsen, Protokolle) neu bauen, selten
 ```
 
 Lokal ansehen: `cd docs && python3 -m http.server`, dann http://localhost:8000
@@ -96,6 +98,9 @@ Lokal ansehen: `cd docs && python3 -m http.server`, dann http://localhost:8000
   Historie seit 2018 (höchstens 320 Minuten).
 - `historie.yml` („Historie laden“, nur per Knopfdruck): lädt das EQS-Archiv der Directors' Dealings, höchstens
   320 Minuten, speichert nach jeder Firma. Häkchen „reparieren“ liest fehlerhafte Meldungen neu.
+- `wale.yml` („Wale“): startet nach jedem Lauf von „Daten aktualisieren“ (`workflow_run`), lädt große Überweisungen
+  (BTC/ETH/XRP ab 5 Mio. $, 20 Reddit-Coins auf Ethereum ab 250.000 $) und prüft neue Solana-Memecoins. Committet
+  `daten/wale/` (Stand, Tagessummen, Memecoins 30 Tage) und `docs/data/wale.json` (48 Stunden).
 - Guru-Depots (13F) lädt `lauf.py --immer` mit. US-Firmen, Lobbying und die Firmenliste werden vierteljährlich von Hand
   aktualisiert (Befehle oben).
 

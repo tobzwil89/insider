@@ -1,0 +1,46 @@
+# Wal-Bewegungen (BTC, ETH, XRP, Reddit-Coins auf Ethereum) und Start-Prüfung neuer Solana-Memecoins.
+# Startet automatisch nach jedem Lauf von „Daten aktualisieren“ (also ~alle 30 Min., ausgelöst über cron-job.org),
+# eigene Action, damit der Insider-Lauf nicht länger dauert. Macht dort weiter, wo der letzte Lauf aufhörte
+# (daten/wale/stand.json); nach langer Pause wird übersprungen (Grenzen HOECHSTENS in wale_laden.py).
+name: Wale
+
+on:
+  workflow_run:
+    workflows: ["Daten aktualisieren"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wale
+  cancel-in-progress: false
+
+jobs:
+  wale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - run: python wale_laden.py
+
+      - name: Änderungen speichern
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add daten/wale docs/data/wale.json
+          if git diff --cached --quiet; then
+            echo "Keine Änderungen"
+          else
+            git commit -m "Wale $(TZ=Europe/Berlin date '+%d.%m.%Y %H:%M')"
+            for i in 1 2 3; do git pull --rebase && git push && break; sleep 10; done
+          fi
