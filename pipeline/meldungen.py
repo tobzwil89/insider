@@ -34,4 +34,26 @@ def lade_alle() -> pd.DataFrame:
             e[spalte] = pd.to_numeric(e[spalte], errors="coerce")
         for spalte in ["mitteilungsdatum", "geschaeftsdatum"]:
             e[spalte] = pd.to_datetime(e[spalte], errors="coerce")
-    return pd.concat([b, e], ignore_index=True).fillna({"bezug_person": "", "bezug_position": ""})
+    alle = pd.concat([b, e], ignore_index=True).fillna({"bezug_person": "", "bezug_position": ""})
+    return _doppelte_entfernen(alle)
+
+
+GESCHAEFT = ["isin", "person", "geschaeftsdatum", "art", "instrument", "preis", "volumen"]
+
+
+def _doppelte_entfernen(m: pd.DataFrame) -> pd.DataFrame:
+    """Dasselbe Geschäft in mehreren Mitteilungen (meist EQS-Berichtigung, die eqs.py nicht als Korrektur erkennt):
+    Zeilen der letzten Mitteilung behalten (richtige Angaben), Mitteilungsdatum der ersten setzen (ab da öffentlich,
+    wichtig für t = 0). Gleiche Zeilen innerhalb einer Mitteilung bleiben (Teilausführungen).
+    Prüfung und Gründe: .recherche/strukturbruch.md Abschnitt 4."""
+    m = m.sort_values("aktiviert", kind="stable").reset_index(drop=True)
+    mitteilung = m["url"].where(m["quelle"] == "eqs",
+                                m["bafin_id"].astype(str) + "|" + m["mitteilungsdatum"].astype(str))
+    gruppe = m.assign(_m=mitteilung).groupby(GESCHAEFT, dropna=False)
+    letzte = gruppe["_m"].transform("last")
+    erste = gruppe["mitteilungsdatum"].transform("min")
+    # Nur mit bezifferten Werten: Ohne Volumen sehen verschiedene Geschäfte gleich aus (Zalando 14.03.2023: 18 Optionsgeschäfte
+    # „nicht bezifferbar“); dann lieber einen Doppelten stehen lassen als ein echtes Geschäft löschen.
+    beziffert = pd.to_numeric(m["volumen"], errors="coerce").fillna(0) > 0
+    return m.assign(mitteilungsdatum=erste.where(beziffert, m["mitteilungsdatum"]))[
+        (mitteilung == letzte) | ~beziffert].reset_index(drop=True)

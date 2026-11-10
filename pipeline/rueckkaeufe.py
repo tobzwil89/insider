@@ -26,10 +26,11 @@ MONATE = {**eqs.MONATE, "Jänner": 1, **{m: i for i, m in enumerate(
      "November", "December"], 1)}, **{m: i for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}}
 DATUM = re.compile(r"(\d{4})-(\d{2})-(\d{2})|(\d{1,2})[./](\d{1,2})[./](\d{4})|(\d{1,2})\.? ?([A-Za-zäÄ]+)\.? (\d{4})")
-STUECK = re.compile(r"\d{1,3}(?:[.,' ]\d{3})+|\d+")
+STUECK = re.compile(r"\d{1,3}(?:[.,' \xa0]\d{3})+|\d+")  # \xa0 = geschütztes Leerzeichen (Scout24 2024)
 KURS = re.compile(r"(?:€|EUR)? ?(\d{1,3}(?:[.,]\d{3})*[.,]\d{1,6}|\d+)(?: ?(?:€|EUR))?")
 # Heidelberg Materials nennt die Verordnung nicht, nur „Aktienrückkaufprogramm“
 RUECKKAUF = re.compile(r"596/2014|2016/1052|rückkauf|buy-?back|repurchase", re.I)
+MIC = re.compile(r"[A-Z]{4}")  # Handelsplatz-Code, z. B. XETR, CHIX
 INSGESAMT = re.compile(r"(?:insgesamt|a total of|eine Anzahl von)(?: Stück)? ([\d.,]+) (?:Stück |eigene )?(?:Aktien|shares)", re.I)
 
 
@@ -78,15 +79,43 @@ def tage(text: str) -> list:
     """Alle Folgen Datum → Stückzahl → Kurs, je Tag zusammengefasst: [(datum, stueck, kurs), …]."""
     zellen = _teile(text)
     gefunden = {}
-    for i in range(len(zellen) - 2):
-        datum = _datum(zellen[i])
-        if datum is None:
-            continue
-        stueck, kurs = _stueck(zellen[i + 1]), _kurs(zellen[i + 2])
-        if stueck is None or kurs is None or stueck == 0:
-            continue
+
+    def dazu(datum, stueck, kurs):
         s, v = gefunden.get(datum, (0, 0.0))
         gefunden[datum] = (s + stueck, v + stueck * kurs)
+
+    i = 0
+    while i < len(zellen) - 2:
+        datum = _datum(zellen[i])
+        if datum is None:
+            i += 1
+            continue
+        # Spaltenweise Tabelle (Scout24 2022–2024): n Daten, dann n Stückzahlen, dann n Kurse
+        n = 1
+        while i + n < len(zellen) and _datum(zellen[i + n]) is not None:
+            n += 1
+        if n >= 2:
+            block = zellen[i + n: i + 3 * n]
+            stuecke, kurse = [_stueck(z) for z in block[:n]], [_kurs(z) for z in block[n:]]
+            if len(kurse) == n and None not in stuecke and None not in kurse:
+                for d, s, k in zip(zellen[i: i + n], stuecke, kurse):
+                    if s:
+                        dazu(_datum(d), s, k)
+                i += 3 * n
+                continue
+        stueck, kurs = _stueck(zellen[i + 1]), _kurs(zellen[i + 2])
+        if stueck is None or kurs is None or stueck == 0:
+            i += 1
+            continue
+        dazu(datum, stueck, kurs)
+        # Weitere Handelsplätze desselben Tags ohne erneutes Datum (Scout24 2019–2020): Handelsplatz-Code (MIC),
+        # dann Stück, Kurs, MIC … Nur mit MIC dahinter, damit eine Summenzeile nicht mitgezählt wird.
+        j = i + 3
+        while (j + 2 < len(zellen) and MIC.fullmatch(zellen[j]) and _stueck(zellen[j + 1])
+               and _kurs(zellen[j + 2]) is not None and j + 3 < len(zellen) and MIC.fullmatch(zellen[j + 3])):
+            dazu(datum, _stueck(zellen[j + 1]), _kurs(zellen[j + 2]))
+            j += 3
+        i = j if j > i + 3 else i + 1
     return [(d, s, round(v / s, 4)) for d, (s, v) in sorted(gefunden.items())]
 
 
