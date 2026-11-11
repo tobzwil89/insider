@@ -1,4 +1,6 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+AUMOVIO SE,40036346,DE000AUM0V10,"Tarabbia, Jean-Francois",Vorstand,Aktie,Kauf,"31,63 EUR","199.281,45 EUR",2026-11-10,2026-11-09,XETRA,2026-11-11 06:36:56,31.63,EUR,199281.45,2026-11-11 06:43:35
+AUMOVIO SE,40036346,DE000AUM0V10,"von Hirschheydt, Philipp",Vorstand,Aktie,Kauf,"31,72 EUR","74.854,50 EUR",2026-11-10,2026-11-09,Xetra,2026-11-11 06:36:56,31.72,EUR,74854.5,2026-11-11 06:43:35
 SCI AG,40007484,DE0006051014,"Nachtigall, Wilhelm",Aufsichtsrat,Aktie,Verkauf,"19,50 EUR","19.500,00 EUR",2026-11-10,2026-11-06,Börse Hamburg,2026-11-10 13:04:31,19.5,EUR,19500.0,2026-11-10 13:13:33
 SCI AG,40007484,DE0006051014,"Wiederhold, Oliver",Vorstand,Aktie,Sonstiges,"20,50 EUR","6.539,50 EUR",2026-11-10,2026-11-05,,2026-11-10 13:04:31,20.5,EUR,6539.5,2026-11-10 13:13:33
 SCI AG,40007484,DE0006051014,"Nachtigall, Wilhelm",Aufsichtsrat,Aktie,Verkauf,"19,18 EUR","23.010,00 EUR",2026-11-10,2026-11-09,Börse Hamburg,2026-11-10 12:53:59,19.18,EUR,23010.0,2026-11-10 13:13:33
