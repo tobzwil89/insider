@@ -1,4 +1,5 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+Baader Bank Aktiengesellschaft,20000004,DE0005088108,"Riedel, Oliver",Vorstand,Aktie,Kauf,"6,90 EUR","34.500,00 EUR",2026-11-11,2026-11-10,XETRA,2026-11-11 09:35:46,6.9,EUR,34500.0,2026-11-11 09:43:42
 Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"62,79 EUR","28.254,00 EUR",2026-11-10,2026-11-09,Tradegate,2026-11-11 06:52:48,62.79,EUR,28254.0,2026-11-11 07:13:36
 Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"63,66 EUR","15.915,00 EUR",2026-11-10,2026-11-09,Tradegate,2026-11-11 06:52:48,63.66,EUR,15915.0,2026-11-11 07:13:36
 The Naga Group AG,40026068,DE000A41YCM0,Netcore Investments Limited,in enger Beziehung,Aktie,Kauf,"2,35 EUR","11.739,58 EUR",2026-11-10,2026-11-06,Xetra,2026-11-11 06:52:48,2.35,EUR,11739.58,2026-11-11 07:13:36
