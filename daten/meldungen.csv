@@ -1,4 +1,5 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+FRoSTA AG,40000841,DE0006069008,"Kuhn, Volker",Aufsichtsrat,Aktie,Kauf,"103,50 EUR","62.100,00 EUR",2026-11-11,2026-11-10,Börse Frankfurt,2026-11-11 11:54:19,103.5,EUR,62100.0,2026-11-11 12:13:35
 Baader Bank Aktiengesellschaft,20000004,DE0005088108,"Riedel, Oliver",Vorstand,Aktie,Kauf,"6,90 EUR","34.500,00 EUR",2026-11-11,2026-11-10,XETRA,2026-11-11 09:35:46,6.9,EUR,34500.0,2026-11-11 09:43:42
 Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"62,79 EUR","28.254,00 EUR",2026-11-10,2026-11-09,Tradegate,2026-11-11 06:52:48,62.79,EUR,28254.0,2026-11-11 07:13:36
 Uzin Utz SE,40000768,DE0007551509,"Utz, Dr. Werner",Aufsichtsrat,Aktie,Kauf,"63,66 EUR","15.915,00 EUR",2026-11-10,2026-11-09,Tradegate,2026-11-11 06:52:48,63.66,EUR,15915.0,2026-11-11 07:13:36
