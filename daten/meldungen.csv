@@ -1,4 +1,9 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+SCI AG,40007484,DE0006051014,"Wiederhold, Oliver",Vorstand,Aktie,Kauf,"19,20 EUR","16.396,80 EUR",2026-11-12,2026-11-11,Börse Hamburg,2026-11-12 12:28:46,19.2,EUR,16396.8,2026-11-12 12:43:35
+"ADTRAN Holdings, Inc.",50087419,US00486H1059,"Stanton, Thomas R.",Sonstige Führungsperson,Aktie,Sonstiges,"4,29 USD","171.605,49 USD",2026-11-12,2026-11-09,Nasdaq,2026-11-12 12:18:09,4.29,USD,171605.49,2026-11-12 12:43:35
+"ADTRAN Holdings, Inc.",50087419,US00486H1059,"Santo, Timothy",Sonstige Führungsperson,Aktie,Sonstiges,"4,16 USD","74.189,01 USD",2026-11-12,2026-11-06,NASDAQ,2026-11-12 12:18:09,4.16,USD,74189.01,2026-11-12 12:43:35
+"ADTRAN Holdings, Inc.",50087419,US00486H1059,"Stanton, Thomas R.",Sonstige Führungsperson,Aktie,Sonstiges,"4,00 USD","599.458,47 USD",2026-11-12,2026-11-06,Nasdaq,2026-11-12 12:18:09,4.0,USD,599458.47,2026-11-12 12:43:35
+tk accelis Group AG & Co. KGaA,40036903,DE000TKCC1S8,"Dienstuhl, Dr. Volkmar",Aufsichtsrat,Aktie,Sonstiges,"27,80 EUR","88.265,00 EUR",2026-11-12,2026-10-27,,2026-11-12 12:12:54,27.8,EUR,88265.0,2026-11-12 12:43:35
 RENK Group AG,50085580,DE000RENK730,"Nowotne, N/A Doreen",Aufsichtsrat,Aktie,Kauf,"34,00 EUR","24.650,00 EUR",2026-11-11,2026-11-09,Tradegate,2026-11-12 12:08:12,34.0,EUR,24650.0,2026-11-12 12:13:38
 RENK Group AG,50085580,DE000RENK730,"Nowotne, N/A Doreen",Aufsichtsrat,Aktie,Kauf,"34,48 EUR","24.997,13 EUR",2026-11-11,2026-11-05,Tradegate,2026-11-12 12:08:12,34.48,EUR,24997.13,2026-11-12 12:13:38
 FRoSTA AG,40000841,DE0006069008,"Kuhn, Volker",Aufsichtsrat,Aktie,Kauf,"103,50 EUR","62.100,00 EUR",2026-11-11,2026-11-10,Börse Frankfurt,2026-11-11 11:54:19,103.5,EUR,62100.0,2026-11-11 12:13:35
