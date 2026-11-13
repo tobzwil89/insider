@@ -1,0 +1,96 @@
+{
+ "geladen": "2026-11-13T17:17+00:00",
+ "quelle": "FraudCoins.com (2026). On-chain holder-concentration dataset. https://fraudcoins.com/data/ (CC BY 4.0)",
+ "coins": {
+  "AAVE": {
+   "top10_pct": 21.2,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "AMP": {
+   "top10_pct": 43.2,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "ARB": {
+   "top10_pct": 16.6,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "CYBER": {
+   "top10_pct": 63.5,
+   "auffaellig": false,
+   "schwelle_pct": 70,
+   "gemessen": "2026-11-13"
+  },
+  "ENS": {
+   "top10_pct": 23.3,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "FET": {
+   "top10_pct": 43.1,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "FLOKI": {
+   "top10_pct": 9.5,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "GRT": {
+   "top10_pct": 27.9,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "MAGIC": {
+   "top10_pct": 6.4,
+   "auffaellig": false,
+   "schwelle_pct": 70,
+   "gemessen": "2026-11-10"
+  },
+  "PEPE": {
+   "top10_pct": 19.7,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "POL": {
+   "top10_pct": 13.2,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "SHIB": {
+   "top10_pct": 12.1,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "TURBO": {
+   "top10_pct": 24.2,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-07"
+  },
+  "WLD": {
+   "top10_pct": 22.1,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  },
+  "WLFI": {
+   "top10_pct": 82.9,
+   "auffaellig": false,
+   "schwelle_pct": 50,
+   "gemessen": "2026-11-13"
+  }
+ }
+}
