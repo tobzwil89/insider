@@ -24,7 +24,10 @@ RPC = "https://solana-rpc.publicnode.com"
 SNIPER_SLOTS = 5
 MAX_SEITEN = 100  # je 1.000 Signaturen; ältere/belebtere Token werden als „zu_alt“ markiert
 SPALTEN = ["mint", "name", "gesehen", "erstellt", "dev", "dev_pct", "buendel_pct", "buendel_n", "sniper_pct",
-           "sniper_n", "mc_start", "liq_start", "mc_24h", "mc_7t", "status"]
+           "sniper_n", "mc_start", "liq_start", "mc_24h", "mc_7t", "status",
+           "hd_note", "hd_mint_aus", "hd_freeze_aus", "hd_top10_pct", "hd_fallen"]
+HOSTDEFI = "https://hostdefi.com/api/v1/token-risk/solana/"
+HOSTDEFI_JE_LAUF = 2  # gratis 100 Abrufe/Tag je IP; ~48 Läufe/Tag
 
 
 def rpc(methode, params):
@@ -92,6 +95,18 @@ def startkaeufe(mint):
                 sniper_n=k[~im_start & ~ist_dev].signer.nunique())
 
 
+def hostdefi(mint):
+    """Zweite Meinung von HostDeFi (gratis, ohne Schlüssel): Note A+–F (bei frischen Token meist keine), ob Prägen und
+    Einfrieren abgeschaltet sind, Top-10-Anteil, Fallen in Token-2022 (z. B. Gebühr beim Überweisen, Fremdzugriff)."""
+    r = requests.get(HOSTDEFI + mint, timeout=40).json()
+    if not r.get("ok"):
+        return {}
+    s, a = r.get("signals") or {}, (r.get("signals") or {}).get("authorities") or {}
+    return dict(hd_note=(r.get("risk") or {}).get("grade") or "keine", hd_mint_aus=a.get("mintDisabled"),
+                hd_freeze_aus=a.get("freezeDisabled"), hd_top10_pct=(s.get("holders") or {}).get("top10Pct"),
+                hd_fallen=",".join(k for k, v in (s.get("token2022Extensions") or {}).items() if v is True))
+
+
 def sammeln():
     df = pd.read_csv(DATEI) if DATEI.exists() else pd.DataFrame(columns=SPALTEN)
     jetzt = datetime.now(timezone.utc)
@@ -114,6 +129,17 @@ def sammeln():
         zeilen.append(z)
     if zeilen:
         df = pd.concat([df, pd.DataFrame(zeilen)], ignore_index=True)
+    # HostDeFi für noch ungeprüfte Token (neueste zuerst), wenige je Lauf wegen Gratisgrenze; Fehler → nächster Lauf
+    df = df.reindex(columns=SPALTEN)
+    hd = [s for s in SPALTEN if s.startswith("hd_")]
+    df[hd] = df[hd].astype(object)  # Text/Wahrheitswerte in sonst leere Spalten
+    offen = df.index[df.hd_note.isna()][::-1][:HOSTDEFI_JE_LAUF]
+    for i in offen:
+        try:
+            for k, v in hostdefi(df.at[i, "mint"]).items():
+                df.at[i, k] = v
+        except (requests.RequestException, ValueError):
+            break
     # Marktwert nach 24 h / 7 Tagen nachtragen (0 = kein Handelspaar mehr = tot)
     alter = (jetzt - pd.to_datetime(df.gesehen, utc=True)).dt.total_seconds() / 3600
     for spalte, stunden in (("mc_24h", 24), ("mc_7t", 168)):
@@ -123,5 +149,5 @@ def sammeln():
             df.loc[teil, spalte] = [(werte.get(m) or {}).get("mc") or 0 for m in df.loc[teil, "mint"]]
     df = df[pd.to_datetime(df.gesehen, utc=True) >= jetzt - pd.Timedelta(days=TAGE_BEHALTEN)]
     DATEI.parent.mkdir(parents=True, exist_ok=True)
-    df[SPALTEN].to_csv(DATEI, index=False)
+    df.to_csv(DATEI, index=False)
     print(f"{datetime.now():%Y-%m-%d %H:%M} memecoins: {len(zeilen)} neu, {len(df)} gesamt")

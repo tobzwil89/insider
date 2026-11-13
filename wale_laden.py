@@ -27,7 +27,7 @@ from datetime import datetime, timedelta, timezone
 import pandas as pd
 import requests
 
-from pipeline import AUSGABE, DATEN, HEADER, memecoins
+from pipeline import AUSGABE, DATEN, HEADER, konzentration, memecoins
 
 ORDNER = DATEN / "wale"
 STAND, FLUSS, ADRESSEN = ORDNER / "stand.json", ORDNER / "tagesfluss.csv", ORDNER / "adressen.csv"
@@ -290,6 +290,8 @@ def speichern(neu, jetzt):
         "ueberweisungen": df.to_dict("records"),
         "fluss_7_tage": fluss.to_dict("records"),
         "memecoins": json.loads(mc.to_json(orient="records")) if not mc.empty else [],
+        "konzentration": konzentration.aktuell(TOKEN),  # Top-10-Anteil + Vertragsrechte je Reddit-Coin
+        "konzentration_quelle": konzentration.QUELLE,
     }, ensure_ascii=False, separators=(",", ":")))
 
 
