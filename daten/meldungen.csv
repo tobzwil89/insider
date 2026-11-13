@@ -1,4 +1,6 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+RENK Group AG,50085580,DE000RENK730,"Richter, Dr. Klaus Eberhard und Eva-Maria",Aufsichtsrat,Aktie,Kauf,"33,60 EUR","11.761,75 EUR",2026-11-13,2026-11-12,,2026-11-13 12:19:34,33.6,EUR,11761.75,2026-11-13 12:36:29
+RENK Group AG,50085580,DE000RENK730,"Richter, Dr. Klaus Eberhard und Eva-Maria",Aufsichtsrat,Aktie,Kauf,"33,63 EUR","38.674,50 EUR",2026-11-13,2026-11-12,,2026-11-13 12:19:34,33.63,EUR,38674.5,2026-11-13 12:36:29
 Baader Bank Aktiengesellschaft,20000004,DE0005088108,"Hagen, Dr. Louis",Aufsichtsrat,Aktie,Kauf,"6,90 EUR","20.700,00 EUR",2026-11-13,2026-11-09,München MAX ONE,2026-11-13 11:05:14,6.9,EUR,20700.0,2026-11-13 11:13:35
 UmweltBank Aktiengesellschaft,10108663,DE0005570808,"von Blücher, Dietmar",Vorstand,Aktie,Kauf,"3,55 EUR","20.945,00 EUR",2026-11-13,2026-11-12,XETRA,2026-11-13 10:59:42,3.55,EUR,20945.0,2026-11-13 11:13:35
 adidas AG,40001509,,NNS Investments (Cyprus) Limited,in enger Beziehung,Derivat,Sonstiges,"6,81 EUR","592.374,30 EUR",2026-11-12,2026-11-09,,2026-11-13 08:03:05,6.81,EUR,592374.3,2026-11-13 08:13:35
