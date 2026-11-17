@@ -1,12 +1,12 @@
 {
- "geladen": "2026-11-16T17:52+00:00",
+ "geladen": "2026-11-17T06:17+00:00",
  "quelle": "FraudCoins.com (2026). On-chain holder-concentration dataset. https://fraudcoins.com/data/ (CC BY 4.0)",
  "coins": {
   "AAVE": {
-   "top10_pct": 21.2,
+   "top10_pct": 21,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   },
   "AMP": {
    "top10_pct": 36,
@@ -15,10 +15,10 @@
    "gemessen": "2026-11-14"
   },
   "ARB": {
-   "top10_pct": 16.9,
+   "top10_pct": 16.7,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   },
   "CYBER": {
    "top10_pct": 63.5,
@@ -27,28 +27,28 @@
    "gemessen": "2026-11-13"
   },
   "ENS": {
-   "top10_pct": 23.3,
+   "top10_pct": 23.2,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   },
   "FET": {
-   "top10_pct": 43.5,
+   "top10_pct": 43.4,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   },
   "FLOKI": {
-   "top10_pct": 9.5,
+   "top10_pct": 9.4,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   },
   "GRT": {
    "top10_pct": 27.9,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   },
   "MAGIC": {
    "top10_pct": 6.4,
@@ -57,22 +57,22 @@
    "gemessen": "2026-11-10"
   },
   "PEPE": {
-   "top10_pct": 19.7,
+   "top10_pct": 19.4,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   },
   "POL": {
-   "top10_pct": 13.2,
+   "top10_pct": 12.7,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   },
   "SHIB": {
    "top10_pct": 12.1,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   },
   "TURBO": {
    "top10_pct": 24.2,
@@ -84,13 +84,13 @@
    "top10_pct": 22.3,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   },
   "WLFI": {
    "top10_pct": 82.9,
    "auffaellig": false,
    "schwelle_pct": 50,
-   "gemessen": "2026-11-16"
+   "gemessen": "2026-11-17"
   }
  }
 }
