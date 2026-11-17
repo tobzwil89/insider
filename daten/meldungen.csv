@@ -1,4 +1,7 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,22 EUR","1.467,00 EUR",2026-11-17,2026-11-12,Xetra,2026-11-17 09:38:51,0.22,EUR,1467.0,2026-11-17 09:43:35
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,26 EUR","3.900,00 EUR",2026-11-17,2026-11-12,Xetra,2026-11-17 09:38:51,0.26,EUR,3900.0,2026-11-17 09:43:35
+Vidac Pharma Holding PLC,50089006,GB00BM9XQ619,"Herzberg, Dr. Max",Vorstand,Aktie,Verkauf,"0,22 EUR","3.300,00 EUR",2026-11-17,2026-11-12,Tradegate,2026-11-17 09:38:51,0.22,EUR,3300.0,2026-11-17 09:43:35
 ABO Energy GmbH & Co. KGaA,40001641,DE0005760029,"Block-Bockholt, Petra",in enger Beziehung,Aktie,Verkauf,"0,33 EUR","9.911,77 EUR",2026-11-16,2026-11-16,Tradegate,2026-11-16 15:43:26,0.33,EUR,9911.77,2026-11-16 16:13:49
 Einhell Germany AG,40001012,DE000A40ESU3,"Brunner, Michael",Vorstand,Aktie,Kauf,"66,90 EUR","6.690,00 EUR",2026-11-16,2026-11-12,QUOTRIX,2026-11-16 15:38:46,66.9,EUR,6690.0,2026-11-16 16:13:49
 Siemens Energy AG,40029647,DE000ENER6Y0,"Ferraro, Maria",Vorstand,Aktie,Sonstiges,,,2026-11-16,2026-11-12,,2026-11-16 15:33:56,,,,2026-11-16 15:43:37
