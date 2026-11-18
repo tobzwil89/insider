@@ -1,4 +1,9 @@
 emittent,bafin_id,isin,person,position,instrument,art,preis_text,volumen_text,mitteilungsdatum,geschaeftsdatum,ort,aktiviert,preis,waehrung,volumen,erstmals_gesehen
+Leo International Precision Health Aktiengesellschaft,40001640,DE0005490601,"Wang, Hsiao-Hsuan ""Leo""",Aufsichtsrat,Aktie,Verkauf,"0,01 EUR","85.318,17 EUR",2026-11-17,2026-11-16,,2026-11-18 09:32:59,0.01,EUR,85318.17,2026-11-18 09:43:36
+Leo International Precision Health Aktiengesellschaft,40001640,DE0005490601,"Lo, Shi-Hwa ""Joshua""",Vorstand,Aktie,Kauf,"0,01 EUR","85.318,17 EUR",2026-11-17,2026-11-16,,2026-11-18 09:32:59,0.01,EUR,85318.17,2026-11-18 09:43:36
+Ottobock SE & Co. KGaA,40029813,DE000BCK2223,"Jakobi, Oliver",Sonstige Führungsperson,Aktie,Kauf,"40,47 EUR","101.178,00 EUR",2026-11-17,2026-11-13,Tradegate,2026-11-18 09:20:44,40.47,EUR,101178.0,2026-11-18 09:43:36
+Ottobock SE & Co. KGaA,40029813,DE000BCK2223,"Bohr, Dr. Bernd",Aufsichtsrat,Aktie,Kauf,"40,88 EUR","51.919,00 EUR",2026-11-17,2026-11-13,,2026-11-18 09:20:44,40.88,EUR,51919.0,2026-11-18 09:43:36
+Ottobock SE & Co. KGaA,40029813,DE000BCK2223,"Bohr, Dr. Bernd",Aufsichtsrat,Aktie,Kauf,"41,00 EUR","28.700,00 EUR",2026-11-17,2026-11-13,Börse Stuttgart,2026-11-18 09:20:44,41.0,EUR,28700.0,2026-11-18 09:43:36
 SUSS MicroTec SE,40001807,DE000A1K0235,"Rohe, Dr. Thomas",Vorstand,Aktie,Kauf,"52,23 EUR","26.115,00 EUR",2026-11-17,2026-11-12,Gettex,2026-11-17 16:07:08,52.23,EUR,26115.0,2026-11-17 16:13:38
 UmweltBank Aktiengesellschaft,40000210,DE0005570808,"von Blücher, Dietmar",Vorstand,Aktie,Kauf,"3,61 EUR","14.356,97 EUR",2026-11-17,2026-11-16,Xetra,2026-11-17 16:02:50,3.61,EUR,14356.97,2026-11-17 16:13:38
 Münchener Rückversicherungs-Gesellschaft Aktiengesellschaft in München,40001467,DE0008430026,"Buchanan, Andrew",Vorstand,Aktie,Kauf,"592,20 EUR","118.440,00 EUR",2026-11-17,2026-11-13,Tradegate Berlin Stock Exchange,2026-11-17 16:02:50,592.2,EUR,118440.0,2026-11-17 16:13:38
